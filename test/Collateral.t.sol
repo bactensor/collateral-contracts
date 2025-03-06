@@ -34,6 +34,7 @@ contract CollateralTest is Test {
     error CollateralTooLow();
     error InsufficientAmount();
     error InvalidReclaimAmount();
+    error InvalidSlashAmount();
     error ReclaimNotFound();
     error NotAvailableYet();
     error TransferFailed();
@@ -158,12 +159,15 @@ contract CollateralTest is Test {
     function test_reclaim_CanReclaimLessThanMinIncreaseIfItsTheWholeCollateral() public {
         vm.startPrank(DEPOSITOR1);
         uint256 reclaimRequestId = 1;
-        collateral.deposit{value: 1.5 ether}();
+        collateral.deposit{value: 2.5 ether}();
         collateral.reclaimCollateral(1 ether, URL, URL_CONTENT_MD5_CHECKSUM);
+        collateral.reclaimCollateral(1 ether, URL, URL_CONTENT_MD5_CHECKSUM);
+
+        // 1 request is finalized
         skip(DECISION_TIMEOUT + 1);
         collateral.finalizeReclaim(reclaimRequestId);
 
-        uint256 nextReclaimId = 2;
+        uint256 nextReclaimId = 3;
         vm.expectEmit(true, true, false, true);
         emit ReclaimProcessStarted(
             nextReclaimId,
@@ -174,6 +178,7 @@ contract CollateralTest is Test {
             URL_CONTENT_MD5_CHECKSUM
         );
 
+        // 1 request is pending, we start another to withdraw all the remaining collateral
         collateral.reclaimCollateral(0.5 ether, URL, URL_CONTENT_MD5_CHECKSUM);
         verifyReclaim(nextReclaimId, DEPOSITOR1, 0.5 ether, block.timestamp + DECISION_TIMEOUT);
     }
@@ -435,6 +440,12 @@ contract CollateralTest is Test {
 
         vm.expectRevert(NotTrustee.selector);
         collateral.slashCollateral(DEPOSITOR1, 1 ether);
+    }
+
+    function test_revert_slashCollateral_CanNotSlashZero() public {
+        vm.prank(TRUSTEE);
+        vm.expectRevert(InvalidSlashAmount.selector);
+        collateral.slashCollateral(DEPOSITOR1, 0);
     }
 
     function verifyReclaim(
