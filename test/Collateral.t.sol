@@ -1,11 +1,17 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.28;
 
+import {Collateral} from "../src/Collateral.sol";
 import {CollateralTestBase} from "./CollateralTestBase.sol";
 
 contract CollateralTest is CollateralTestBase {
     address constant DEPOSITOR1 = address(0x1001);
     address constant DEPOSITOR2 = address(0x1002);
+
+    // used to test a case in which transfer in finalizeReclaim fails
+    receive() external payable {
+        revert();
+    }
 
     function setUp() public override {
         // fund depositors
@@ -18,6 +24,21 @@ contract CollateralTest is CollateralTestBase {
         assertEq(collateral.TRUSTEE(), TRUSTEE);
         assertEq(collateral.MIN_COLLATERAL_INCREASE(), MIN_COLLATERAL_INCREASE);
         assertEq(collateral.DECISION_TIMEOUT(), DECISION_TIMEOUT);
+    }
+
+    function test_revert_constructor_RevertIfAmountIsZero() public {
+        vm.expectRevert();
+        new Collateral(address(0), MIN_COLLATERAL_INCREASE, DECISION_TIMEOUT);
+    }
+
+    function test_revert_constructor_RevertIfMinCollateralIncreaseIsZero() public {
+        vm.expectRevert();
+        new Collateral(TRUSTEE, 0, DECISION_TIMEOUT);
+    }
+
+    function test_revert_constructor_RevertIfDecisionTimeoutIsZero() public {
+        vm.expectRevert();
+        new Collateral(TRUSTEE, MIN_COLLATERAL_INCREASE, 0);
     }
 
     function test_deposit() public {
@@ -175,7 +196,7 @@ contract CollateralTest is CollateralTestBase {
         vm.startPrank(DEPOSITOR1);
         collateral.deposit{value: 1 ether}();
 
-        vm.expectRevert(InvalidReclaimAmount.selector);
+        vm.expectRevert(AmountZero.selector);
         collateral.reclaimCollateral(0, URL, URL_CONTENT_MD5_CHECKSUM);
     }
 
@@ -183,7 +204,7 @@ contract CollateralTest is CollateralTestBase {
         vm.startPrank(DEPOSITOR1);
         collateral.deposit{value: 1 ether}();
 
-        vm.expectRevert(InvalidReclaimAmount.selector);
+        vm.expectRevert(ReclaimAmountTooSmall.selector);
         collateral.reclaimCollateral(0.5 ether, URL, URL_CONTENT_MD5_CHECKSUM);
     }
 
@@ -191,7 +212,7 @@ contract CollateralTest is CollateralTestBase {
         vm.startPrank(DEPOSITOR1);
         collateral.deposit{value: 1 ether}();
 
-        vm.expectRevert(CollateralTooLow.selector);
+        vm.expectRevert(ReclaimAmountTooLarge.selector);
         collateral.reclaimCollateral(2 ether, URL, URL_CONTENT_MD5_CHECKSUM);
     }
 
@@ -203,7 +224,7 @@ contract CollateralTest is CollateralTestBase {
         collateral.reclaimCollateral(1 ether, URL, URL_CONTENT_MD5_CHECKSUM);
 
         // This reclaim pushes collateral under reclaim over total collateral
-        vm.expectRevert(CollateralTooLow.selector);
+        vm.expectRevert(ReclaimAmountTooLarge.selector);
         collateral.reclaimCollateral(2 ether, URL, URL_CONTENT_MD5_CHECKSUM);
     }
 
@@ -298,7 +319,7 @@ contract CollateralTest is CollateralTestBase {
 
         collateral.reclaimCollateral(1 ether, URL, URL_CONTENT_MD5_CHECKSUM);
 
-        vm.expectRevert(NotAvailableYet.selector);
+        vm.expectRevert(BeforeDenyTimeout.selector);
         collateral.finalizeReclaim(1);
     }
 
@@ -311,6 +332,16 @@ contract CollateralTest is CollateralTestBase {
 
         collateral.finalizeReclaim(1);
         vm.expectRevert(ReclaimNotFound.selector);
+        collateral.finalizeReclaim(1);
+    }
+
+    function test_revert_finalizeReclaim_CanNotFinalizeReclaimIfTransferFails() public {
+        collateral.deposit{value: 1 ether}();
+
+        collateral.reclaimCollateral(1 ether, URL, URL_CONTENT_MD5_CHECKSUM);
+        skip(DECISION_TIMEOUT + 1);
+
+        vm.expectRevert(TransferFailed.selector);
         collateral.finalizeReclaim(1);
     }
 
@@ -407,7 +438,7 @@ contract CollateralTest is CollateralTestBase {
 
     function test_revert_slashCollateral_CanNotSlashZero() public {
         vm.prank(TRUSTEE);
-        vm.expectRevert(InvalidSlashAmount.selector);
+        vm.expectRevert(AmountZero.selector);
         collateral.slashCollateral(DEPOSITOR1, 0);
     }
 }

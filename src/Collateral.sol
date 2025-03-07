@@ -31,16 +31,16 @@ contract Collateral {
     event Denied(uint256 indexed reclaimRequestId);
     event Slashed(address indexed account, uint256 amount);
 
-    error InvalidDepositMethod();
-    error CollateralTooLow();
+    error AmountZero();
+    error BeforeDenyTimeout();
     error InsufficientAmount();
-    error InvalidReclaimAmount();
-    error InvalidSlashAmount();
-    error ReclaimNotFound();
-    error NotAvailableYet();
-    error TransferFailed();
-    error PastDenyTimeout();
+    error InvalidDepositMethod();
     error NotTrustee();
+    error PastDenyTimeout();
+    error ReclaimAmountTooLarge();
+    error ReclaimAmountTooSmall();
+    error ReclaimNotFound();
+    error TransferFailed();
 
     /// @notice Initializes a new Collateral contract with specified parameters
     /// @param trustee H160 address of the trustee who has permissions to slash collateral or deny reclaim requests
@@ -97,21 +97,21 @@ contract Collateral {
     /// @param url URL containing information about the reclaim request
     /// @param urlContentMd5Checksum MD5 checksum of the content at the provided URL
     /// @dev Emits ReclaimProcessStarted event with reclaim details and timeout
-    /// @dev Reverts with InvalidReclaimAmount if amount is 0 or doesn't meet minimum requirements
-    /// @dev Reverts with CollateralTooLow if there's insufficient collateral available
+    /// @dev Reverts with ReclaimAmountTooSmall if amount is 0 or doesn't meet minimum requirements
+    /// @dev Reverts with ReclaimAmountTooLarge if there's insufficient collateral available
     function reclaimCollateral(uint256 amount, string calldata url, bytes16 urlContentMd5Checksum) external {
         if (amount == 0) {
-            revert InvalidReclaimAmount();
+            revert AmountZero();
         }
 
         uint256 collateral = collaterals[msg.sender];
         uint256 pendingCollateral = collateralUnderPendingReclaims[msg.sender];
         uint256 collateralAvailableForReclaim = collateral - pendingCollateral;
         if (pendingCollateral + amount > collateral) {
-            revert CollateralTooLow();
+            revert ReclaimAmountTooLarge();
         }
         if (amount < MIN_COLLATERAL_INCREASE && collateralAvailableForReclaim != amount) {
-            revert InvalidReclaimAmount();
+            revert ReclaimAmountTooSmall();
         }
 
         uint64 expirationTime = uint64(block.timestamp) + DECISION_TIMEOUT;
@@ -128,7 +128,7 @@ contract Collateral {
     /// @param reclaimRequestId The ID of the reclaim request to finalize
     /// @dev Emits Reclaimed event with reclaim details if successful
     /// @dev Reverts with ReclaimNotFound if the reclaim request doesn't exist or was denied
-    /// @dev Reverts with NotAvailableYet if the deny timeout hasn't expired
+    /// @dev Reverts with BeforeDenyTimeout if the deny timeout hasn't expired
     /// @dev Reverts with TransferFailed if the ETH transfer fails
     function finalizeReclaim(uint256 reclaimRequestId) external {
         Reclaim memory reclaim = reclaims[reclaimRequestId];
@@ -136,7 +136,7 @@ contract Collateral {
             revert ReclaimNotFound();
         }
         if (reclaim.denyTimeout >= block.timestamp) {
-            revert NotAvailableYet();
+            revert BeforeDenyTimeout();
         }
 
         delete reclaims[reclaimRequestId];
@@ -150,6 +150,8 @@ contract Collateral {
         collaterals[reclaim.miner] -= reclaim.amount;
 
         emit Reclaimed(reclaimRequestId, reclaim.miner, reclaim.amount);
+
+        // check-effect-interact pattern used to prevent reentrancy attacks
         (bool success,) = payable(reclaim.miner).call{value: reclaim.amount}("");
         if (!success) {
             revert TransferFailed();
@@ -186,12 +188,12 @@ contract Collateral {
     /// @param miner The address of the miner to slash
     /// @param amount The amount of collateral to slash, must be greater than 0
     /// @dev Emits Slashed event with the miner's address and the amount slashed
-    /// @dev Reverts with InvalidSlashAmount if amount is 0
+    /// @dev Reverts with AmountZero if amount is 0
     /// @dev Reverts with InsufficientAmount if the miner has less collateral than the amount to slash
     /// @dev Reverts with TransferFailed if the ETH transfer fails
     function slashCollateral(address miner, uint256 amount) external onlyTrustee {
         if (amount == 0) {
-            revert InvalidSlashAmount();
+            revert AmountZero();
         }
         if (collaterals[miner] < amount) {
             revert InsufficientAmount();
