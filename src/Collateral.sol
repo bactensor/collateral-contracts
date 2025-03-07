@@ -4,7 +4,7 @@ pragma solidity ^0.8.28;
 contract Collateral {
     address public immutable TRUSTEE;
     uint64 public immutable DECISION_TIMEOUT;
-    uint64 public immutable MIN_COLLATERAL_INCREASE;
+    uint256 public immutable MIN_COLLATERAL_INCREASE;
 
     mapping(uint256 => Reclaim) public reclaims;
     mapping(address => uint256) public collaterals;
@@ -47,7 +47,7 @@ contract Collateral {
     /// @param minCollateralIncrease The minimum amount that can be deposited or reclaimed
     /// @param decisionTimeout The time window (in seconds) for the trustee to deny a reclaim request
     /// @dev Reverts if any of the arguments is zero
-    constructor(address trustee, uint64 minCollateralIncrease, uint256 decisionTimeout) {
+    constructor(address trustee, uint256 minCollateralIncrease, uint64 decisionTimeout) {
         // custom errors are not used here because it's a 1-time setup
         require(trustee != address(0), "Trustee address must be non-zero");
         require(minCollateralIncrease > 0, "Min collateral increase must be greater than 0");
@@ -55,7 +55,7 @@ contract Collateral {
 
         TRUSTEE = trustee;
         MIN_COLLATERAL_INCREASE = minCollateralIncrease;
-        DECISION_TIMEOUT = uint64(decisionTimeout);
+        DECISION_TIMEOUT = decisionTimeout;
     }
 
     modifier onlyTrustee() {

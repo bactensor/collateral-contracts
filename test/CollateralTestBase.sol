@@ -7,7 +7,7 @@ import {Collateral} from "../src/Collateral.sol";
 abstract contract CollateralTestBase is Test {
     address constant TRUSTEE = address(0x1000);
     uint64 constant DECISION_TIMEOUT = 1 days;
-    uint64 constant MIN_COLLATERAL_INCREASE = 1 ether;
+    uint256 constant MIN_COLLATERAL_INCREASE = 1 ether;
     string constant URL = "https://reclaimreason.io";
     bytes16 constant URL_CONTENT_MD5_CHECKSUM = 0x12345678901234567890123456789012;
 
