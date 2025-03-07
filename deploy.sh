@@ -2,7 +2,7 @@
 
 # Example usage:
 # First set the required environment variables:
-#   export RPC_URL="https://test.chain.opentensor.ai
+#   export RPC_URL="https://test.chain.opentensor.ai"
 #   export DEPLOYER_PRIVATE_KEY="your-private-key"
 #
 # Then run the script:

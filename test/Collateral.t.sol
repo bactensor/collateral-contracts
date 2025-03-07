@@ -20,13 +20,13 @@ contract CollateralTest is CollateralTestBase {
         super.setUp();
     }
 
-    function test_constructor_ConfigIsSetProperly() public view {
+    function test_constructor_ConfigSetProperly() public view {
         assertEq(collateral.TRUSTEE(), TRUSTEE);
         assertEq(collateral.MIN_COLLATERAL_INCREASE(), MIN_COLLATERAL_INCREASE);
         assertEq(collateral.DECISION_TIMEOUT(), DECISION_TIMEOUT);
     }
 
-    function test_revert_constructor_RevertIfAmountIsZero() public {
+    function test_revert_constructor_RevertIfTrusteeIsZeroAddress() public {
         vm.expectRevert();
         new Collateral(address(0), MIN_COLLATERAL_INCREASE, DECISION_TIMEOUT);
     }
