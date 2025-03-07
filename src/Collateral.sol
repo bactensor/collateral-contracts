@@ -46,7 +46,13 @@ contract Collateral {
     /// @param trustee H160 address of the trustee who has permissions to slash collateral or deny reclaim requests
     /// @param minCollateralIncrease The minimum amount that can be deposited or reclaimed
     /// @param decisionTimeout The time window (in seconds) for the trustee to deny a reclaim request
+    /// @dev Reverts if any of the arguments is zero
     constructor(address trustee, uint64 minCollateralIncrease, uint256 decisionTimeout) {
+        // custom errors are not used here because it's a 1-time setup
+        require(trustee != address(0), "Trustee address must be non-zero");
+        require(minCollateralIncrease > 0, "Min collateral increase must be greater than 0");
+        require(decisionTimeout > 0, "Decision timeout must be greater than 0");
+
         TRUSTEE = trustee;
         MIN_COLLATERAL_INCREASE = minCollateralIncrease;
         DECISION_TIMEOUT = uint64(decisionTimeout);
