@@ -1,9 +1,8 @@
 # Collateral Smart Contract for Bittensor
 
 > **Purpose**: Manage miner collaterals in the Bittensor ecosystem, allowing validators to slash misbehaving miners.
-> **Design**: One collateral contract per validator and subnet.
 
----
+> **Design**: One collateral contract per validator and subnet.
 
 ## Overview
 
