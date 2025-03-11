@@ -190,7 +190,7 @@ contract Collateral {
     /// @dev Emits Slashed event with the miner's address and the amount slashed
     /// @dev Reverts with AmountZero if amount is 0
     /// @dev Reverts with InsufficientAmount if the miner has less collateral than the amount to slash
-    /// @dev Reverts with TransferFailed if the ETH transfer fails
+    /// @dev Reverts with TransferFailed if the TAO transfer fails
     function slashCollateral(address miner, uint256 amount) external onlyTrustee {
         if (amount == 0) {
             revert AmountZero();
