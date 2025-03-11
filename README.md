@@ -24,6 +24,13 @@ This contract creates a **trust-minimized interaction** between miners and valid
 - **Trustless & Auditable**
   All operations (deposits, reclaims, slashes) are publicly logged on-chain, enabling transparent oversight for both validators and miners.
 
+> **Important Notice on Addressing**
+> This contract uses **H160 (Ethereum) addresses** for both miner and validator identities.
+> - Before interacting with the contract (depositing, slashing, reclaiming, etc.), **all parties must have an Ethereum wallet** (including a plain text private key) to sign the required transactions.
+> - An association between these H160 wallet addresses and the respective **SS58 hotkeys** (used in Bittensor) is **strongly recommended** so validators can reliably identify miners.
+> - Best practices for managing and verifying these address associations are still under development within the broader Bittensor ecosystem.
+
+
 ## Collateral Smart Contract Lifecycle
 
 Below is a typical sequence for integrating and using this collateral contract within a Bittensor subnet:
