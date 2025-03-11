@@ -13,7 +13,7 @@
 #    Example: 0x742d35Cc6634C0532925a3b844Bc454e4438f44e
 #
 # 2. min_collateral_increase_u256: Minimum amount for deposits/reclaims in wei
-#    Example: 1000000000000000000 (= 1 ETH in wei)
+#    Example: 1000000000000000000 (= 1 TAO in wei)
 #
 # 3. deny_timeout_u64: Time window in seconds for trustee to deny reclaim requests
 #    Example: 3600 (= 1 hour in seconds)
