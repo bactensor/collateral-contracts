@@ -12,7 +12,7 @@ This contract creates a **trust-minimized interaction** between miners and valid
   
   Miners demonstrate their commitment by staking collateral into the validator's contract.
 
-- **Miner Prioritization**
+- **Collateral-Based Prioritization**
 
   Validators may choose to favor miners with higher collateral when assigning tasks, incentivizing greater stakes for reliable performance.
 
