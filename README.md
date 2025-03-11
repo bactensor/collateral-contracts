@@ -69,7 +69,6 @@ Below is a typical sequence for integrating and using this collateral contract w
 ## Usage Guides
 
 Below are step-by-step instructions tailored to **miners**, **validators**, and **subnet owners**.
-These guides cover contract deployment, collateral management, slashing procedures, and more.
 Refer to the repository's `scripts/` folder for sample implementations and helper scripts.
 
 ## As a Miner, you can:
@@ -121,11 +120,13 @@ Refer to the repository's `scripts/` folder for sample implementations and helpe
 ### As a Subnet Owner, you can
 
 - **Provide Deployment Tools for Validators**
+  
   Offer a script <!--(e.g. built on top of [`scripts/deploy.sh`](todo-link))--> to help validators:
   - Deploy the contract.
   - Publish the resulting contract address (e.g., as a knowledge commitment) so miners can easily verify and deposit collateral.
 
 - **Provide Tools for Miners**
+  
   Offer a script that retrieves a list of active validator contract addresses from your on-chain registry or other trusted source.
   This helps miners discover the correct contract for depositing collateral.
 
@@ -135,11 +136,13 @@ Refer to the repository's `scripts/` folder for sample implementations and helpe
     <!-- - Check out the [ComputeHorde Grafana chart](https://grafana.bactensor.io/d/subnet/metagraph-subnet?var-subnet=12) for a real-world example.-->
 
 - **Facilitate Result-Based Slashing**
+  
   Provide validators with automated checks that periodically verify a small subset (e.g., 1–2%) of the miner's submissions.
   If a miner's responses fall below the desired quality threshold, the code calls `slashCollateral()` to penalize substandard performance.
   <!--For example, in the [ComputeHorde SDK](todo-link), slashing is triggered via the `report_cheated_job()` method.-->
 
 - **Facilitate Collateral Verification**
+  
   Provide validator code that checks each miner's staked amount before assigning tasks. This code can:
   - Prioritize miners who have staked more collateral.
   - Reject miners who do not meet a minimum collateral requirement.
