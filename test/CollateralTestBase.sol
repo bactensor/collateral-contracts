@@ -9,6 +9,7 @@ abstract contract CollateralTestBase is Test {
     uint64 constant DECISION_TIMEOUT = 1 days;
     uint256 constant MIN_COLLATERAL_INCREASE = 1 ether;
     string constant URL = "https://reclaimreason.io";
+    string constant SLASH_REASON_URL = "https://slashreason.io";
     bytes16 constant URL_CONTENT_MD5_CHECKSUM = 0x12345678901234567890123456789012;
 
     Collateral public collateral;
@@ -26,7 +27,7 @@ abstract contract CollateralTestBase is Test {
     );
     event Reclaimed(uint256 indexed reclaimRequestId, address indexed account, uint256 amount);
     event Denied(uint256 indexed reclaimRequestId);
-    event Slashed(address indexed account, uint256 amount);
+    event Slashed(address indexed account, uint256 amount, string url, bytes16 urlContentMd5Checksum);
 
     error AmountZero();
     error BeforeDenyTimeout();

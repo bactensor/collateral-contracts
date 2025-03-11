@@ -2,7 +2,7 @@
 
 # Example usage:
 # First set the required environment variables:
-#   export RPC_URL="https://test.chain.opentensor.ai"
+#   export RPC_URL="https://lite.chain.opentensor.ai"
 #   export DEPLOYER_PRIVATE_KEY="your-private-key"
 #
 # Then run the script:
@@ -49,7 +49,9 @@ if ! [[ $TRUSTEE_ADDRESS =~ ^0x[a-fA-F0-9]{40}$ ]]; then
 fi
 
 # Execute the forge create command
-forge create --rpc-url "$RPC_URL" \
+forge create src/Collateral.sol:Collateral \
+    --broadcast \
+    --rpc-url "$RPC_URL" \
     --private-key "$DEPLOYER_PRIVATE_KEY" \
-    --constructor-args "$TRUSTEE_ADDRESS" "$MIN_COLLATERAL_INCREASE" "$DENY_TIMEOUT" \
-    src/Collateral.sol:Collateral
+    --constructor-args "$TRUSTEE_ADDRESS" "$MIN_COLLATERAL_INCREASE" "$DENY_TIMEOUT"
+    

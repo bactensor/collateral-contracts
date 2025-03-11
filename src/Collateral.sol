@@ -29,7 +29,7 @@ contract Collateral {
     );
     event Reclaimed(uint256 indexed reclaimRequestId, address indexed account, uint256 amount);
     event Denied(uint256 indexed reclaimRequestId);
-    event Slashed(address indexed account, uint256 amount);
+    event Slashed(address indexed account, uint256 amount, string url, bytes16 urlContentMd5Checksum);
 
     error AmountZero();
     error BeforeDenyTimeout();
@@ -191,7 +191,10 @@ contract Collateral {
     /// @dev Reverts with AmountZero if amount is 0
     /// @dev Reverts with InsufficientAmount if the miner has less collateral than the amount to slash
     /// @dev Reverts with TransferFailed if the TAO transfer fails
-    function slashCollateral(address miner, uint256 amount) external onlyTrustee {
+    function slashCollateral(address miner, uint256 amount, string calldata url, bytes16 urlContentMd5Checksum)
+        external
+        onlyTrustee
+    {
         if (amount == 0) {
             revert AmountZero();
         }
@@ -205,6 +208,6 @@ contract Collateral {
             revert TransferFailed();
         }
 
-        emit Slashed(miner, amount);
+        emit Slashed(miner, amount, url, urlContentMd5Checksum);
     }
 }

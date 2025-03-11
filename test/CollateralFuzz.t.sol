@@ -93,10 +93,10 @@ contract CollateralTest is CollateralTestBase {
         collateral.deposit{value: 2 * amount}();
 
         vm.expectEmit(true, false, false, true);
-        emit Slashed(address(this), amount);
+        emit Slashed(address(this), amount, SLASH_REASON_URL, URL_CONTENT_MD5_CHECKSUM);
 
         vm.prank(TRUSTEE);
-        collateral.slashCollateral(address(this), amount);
+        collateral.slashCollateral(address(this), amount, SLASH_REASON_URL, URL_CONTENT_MD5_CHECKSUM);
 
         // slashes only amount and leaves the rest
         assertEq(collateral.collaterals(address(this)), amount);
@@ -109,10 +109,10 @@ contract CollateralTest is CollateralTestBase {
         collateral.deposit{value: 2 * amount}();
 
         vm.expectEmit(true, false, false, true);
-        emit Slashed(address(this), amount);
+        emit Slashed(address(this), amount, SLASH_REASON_URL, URL_CONTENT_MD5_CHECKSUM);
 
         vm.prank(TRUSTEE);
-        collateral.slashCollateral(address(this), amount);
+        collateral.slashCollateral(address(this), amount, SLASH_REASON_URL, URL_CONTENT_MD5_CHECKSUM);
 
         // slashes only amount and leaves the rest
         assertEq(collateral.collaterals(address(this)), amount);
