@@ -113,8 +113,8 @@ Refer to the repository's `scripts/` folder for sample implementations and helpe
 
 - **Provide Deployment Tools for Validators**
   Offer a script <!--(e.g. built on top of [`scripts/deploy.sh`](todo-link))--> to help validators:
-  1. **Deploy** the contract.
-  2. **Publish** the resulting contract address (e.g., as a knowledge commitment) so miners can easily verify and deposit collateral.
+  1. Deploy the contract.
+  2. Publish the resulting contract address (e.g., as a knowledge commitment) so miners can easily verify and deposit collateral.
 
 - **Provide Tools for Miners**
   Offer a script that retrieves a list of active validator contract addresses from your on-chain registry or other trusted source.
@@ -132,8 +132,8 @@ Refer to the repository's `scripts/` folder for sample implementations and helpe
 
 - **Facilitate Collateral Verification**
   Provide validator code that checks each miner's staked amount before assigning tasks. This code can:
-  1. **Prioritize** miners who have staked more collateral.
-  2. **Reject** miners who do not meet a minimum collateral requirement.
+  1. Prioritize miners who have staked more collateral.
+  2. Reject miners who do not meet a minimum collateral requirement.
 
   By coupling task assignment with the collateral balance, the subnetwork ensures more consistent performance and discourages low-quality or malicious contributions.
 
