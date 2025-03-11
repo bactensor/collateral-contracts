@@ -12,13 +12,17 @@ This contract creates a **trust-minimized interaction** between miners and valid
   
   Miners demonstrate their commitment by staking collateral into the validator's contract.
 
-- **Automatic Release**
-  
-  If a validator does not respond to a miner's reclaim request within a configured deadline, the miner can reclaim their stake, preventing indefinite lock-ups.
+- **Miner Prioritization**
+
+  Validators may choose to favor miners with higher collateral when assigning tasks, incentivizing greater stakes for reliable performance.
 
 - **Arbitrary Slashing**
   
   Validators can penalize a misbehaving miner by slashing any portion of the miner's collateral.
+
+- **Automatic Release**
+
+  If a validator does not respond to a miner's reclaim request within a configured deadline, the miner can reclaim their stake, preventing indefinite lock-ups.
 
 - **Configurable Minimum Bond & Decision Deadline**
   
