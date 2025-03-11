@@ -101,12 +101,12 @@ Refer to the repository's `scripts/` folder for sample implementations and helpe
 
 - **Manually Deny a Reclaim**
   1. Identify the relevant `reclaimRequestId` (from `ReclaimProcessStarted` event, for example).
-  2. Call `denyReclaim(reclaimRequestId)` before the deadline.
+  2. Use `scripts/deny_reclaim.sh` (calling the contract's `denyReclaim(reclaimRequestId)`) before the deadline.
   3. Verify on-chain that the reclaim request is removed and the miner's `hasPendingReclaim` is reset to `false`.
 
 - **Manually Slash Collateral**
   1. Confirm miner misconduct based on subnetwork rules (e.g., invalid blocks, spam, protocol violations).
-  2. Call `slashCollateral(miner, slashAmount)` to penalize the miner by reducing their staked amount.
+  2. Use `scripts/slash_collateral.sh` (calling the contract's `slashCollateral(miner, slashAmount)`) to penalize the miner by reducing their staked amount.
   3. Verify the transaction on-chain and confirm the miner's `collaterals[miner]` value has changed.
 
 ### As a Subnet Owner, you can
