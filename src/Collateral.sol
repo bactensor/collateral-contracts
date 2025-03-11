@@ -129,7 +129,7 @@ contract Collateral {
     /// @dev Emits Reclaimed event with reclaim details if successful
     /// @dev Reverts with ReclaimNotFound if the reclaim request doesn't exist or was denied
     /// @dev Reverts with BeforeDenyTimeout if the deny timeout hasn't expired
-    /// @dev Reverts with TransferFailed if the ETH transfer fails
+    /// @dev Reverts with TransferFailed if the TAO transfer fails
     function finalizeReclaim(uint256 reclaimRequestId) external {
         Reclaim memory reclaim = reclaims[reclaimRequestId];
         if (reclaim.amount == 0) {
