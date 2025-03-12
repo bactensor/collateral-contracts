@@ -38,12 +38,14 @@ This contract creates a **trust-minimized interaction** between miners and valid
   All operations (deposits, reclaims, slashes) are publicly logged on-chain, enabling transparent oversight for both validators and miners.
 
 > **Important Notice on Addressing**
+>
 > This contract uses **H160 (Ethereum) addresses** for both miner and validator identities.
 > - Before interacting with the contract (depositing, slashing, reclaiming, etc.), **all parties must have an Ethereum wallet** (including a plain text private key) to sign the required transactions.
 > - An association between these H160 wallet addresses and the respective **SS58 hotkeys** (used in Bittensor) is **strongly recommended** so validators can reliably identify miners.
 > - Best practices for managing and verifying these address associations are still under development within the broader Bittensor ecosystem.
 
 > **Transaction Fees**
+>
 > All on-chain actions (deposits, slashes, reclaims, etc.) consume gas, so **both miners and validators must hold enough TAO in their Ethereum (H160) wallets** to cover transaction fees.
 > - Make sure to keep a sufficient balance to handle any deposits, reclaims, or slashes you need to perform.
 > - You can transfer TAO back to your SS58 wallet when no more contract interactions are required.
