@@ -25,18 +25,18 @@ This contract creates a **trust-minimized interaction** between miners and valid
 
   If a validator does not respond to a miner's reclaim request within a configured deadline, the miner can reclaim their stake, preventing indefinite lock-ups.
 
-- **Configurable Minimum Bond & Decision Deadline**
+- **Trustless & Auditable**
   
-  Defines a minimum stake requirement and a strict timeline for validator responses.
+  All operations (deposits, reclaims, slashes) are publicly logged on-chain, enabling transparent oversight for both validators and miners.
 
 - **Off-Chain Justifications**
 
   Functions `slashCollateral`, `reclaimCollateral`, and `denyReclaim` include URL fields (and content MD5 checksums) to reference off-chain
   explanations or evidence for each action, ensuring decisions are transparent and auditable.
 
-- **Trustless & Auditable**
+- **Configurable Minimum Bond & Decision Deadline**
   
-  All operations (deposits, reclaims, slashes) are publicly logged on-chain, enabling transparent oversight for both validators and miners.
+  Defines a minimum stake requirement and a strict timeline for validator responses.
 
 > **Important Notice on Addressing**
 >
