@@ -44,6 +44,13 @@ This contract creates a **trust-minimized interaction** between miners and valid
 > - An association between these H160 wallet addresses and the respective **SS58 hotkeys** (used in Bittensor) is **strongly recommended** so validators can reliably identify miners.
 > - Best practices for managing and verifying these address associations are still under development within the broader Bittensor ecosystem.
 
+> **Transaction Fees**
+> All on-chain actions (deposits, slashes, reclaims, etc.) consume gas, so **both miners and validators must hold enough TAO in their Ethereum (H160) wallets** to cover transaction fees.
+> - Make sure to keep a sufficient balance to handle any deposits, reclaims, or slashes you need to perform.
+> - You can transfer TAO back to your SS58 wallet when no more contract interactions are required.
+> - Refer to [`scripts/transfer_ss58_h160.sh`](./scripts/transfer_tao_to_eth.sh) (and similarly [`scripts/transfer_tao_from_eth.sh`](./scripts/transfer_tao_from_eth.sh`))
+>   for examples of how to move TAO between your Bittensor SS58 wallet and your H160 wallet.
+
 
 ## Collateral Smart Contract Lifecycle
 
@@ -54,11 +61,13 @@ Below is a typical sequence for integrating and using this collateral contract w
    - Validators adopt this updated code and prepare to enforce collateral requirements.
 
 - **Validator Deployment**
-   - A validator **deploys the contract**, requiring participating miners to stake collateral.
+   - The validator **creates an Ethereum (H160) wallet**, links it to their hotkey, and funds it with enough TAO to cover transaction fees.
+   - The validator **deploys the contract**, requiring participating miners to stake collateral.
    - The validator **publishes the contract address** on-chain, allowing miners to discover and verify it.
    - Once ready, the validator **enables collateral-required mode** and prioritizes miners based on their locked amounts.
 
 - **Miner Deposit**
+   - Each miner **creates an Ethereum (H160) wallet**, links it to their hotkey, and funds it with enough TAO for transaction fees.
    - Miners **retrieve** the validator's contract address from the chain or another trusted source.
    - They **verify** the contract is indeed associated with the intended validator.
    - Upon confirmation, miners **deposit** collateral by calling the contract's `deposit()` function.
@@ -69,8 +78,6 @@ Below is a typical sequence for integrating and using this collateral contract w
 - **Reclaiming Collateral**
    - When miners wish to withdraw their stake, they **initiate a reclaim** by calling `reclaimCollateral()`.
    - If the validator does not deny the request before the deadline, miners (or anyone) can **finalize** it using `finalizeReclaim()`, thus unlocking and returning the collateral.
-
-
 
 ## Usage Guides
 
