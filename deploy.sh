@@ -2,7 +2,7 @@
 
 # Example usage:
 # First set the required environment variables:
-#   export RPC_URL="https://test.chain.opentensor.ai"
+#   export RPC_URL="https://lite.chain.opentensor.ai"
 #   export DEPLOYER_PRIVATE_KEY="your-private-key"
 #
 # Then run the script:
@@ -13,7 +13,7 @@
 #    Example: 0x742d35Cc6634C0532925a3b844Bc454e4438f44e
 #
 # 2. min_collateral_increase_u256: Minimum amount for deposits/reclaims in wei
-#    Example: 1000000000000000000 (= 1 ETH in wei)
+#    Example: 1000000000000000000 (= 1 TAO in wei)
 #
 # 3. deny_timeout_u64: Time window in seconds for trustee to deny reclaim requests
 #    Example: 3600 (= 1 hour in seconds)
@@ -49,7 +49,9 @@ if ! [[ $TRUSTEE_ADDRESS =~ ^0x[a-fA-F0-9]{40}$ ]]; then
 fi
 
 # Execute the forge create command
-forge create --rpc-url "$RPC_URL" \
+forge create src/Collateral.sol:Collateral \
+    --broadcast \
+    --rpc-url "$RPC_URL" \
     --private-key "$DEPLOYER_PRIVATE_KEY" \
-    --constructor-args "$TRUSTEE_ADDRESS" "$MIN_COLLATERAL_INCREASE" "$DENY_TIMEOUT" \
-    src/Collateral.sol:Collateral
+    --constructor-args "$TRUSTEE_ADDRESS" "$MIN_COLLATERAL_INCREASE" "$DENY_TIMEOUT"
+    

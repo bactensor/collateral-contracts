@@ -299,7 +299,7 @@ contract CollateralTest is CollateralTestBase {
 
         skip(DECISION_TIMEOUT + 1);
         vm.prank(TRUSTEE);
-        collateral.slashCollateral(DEPOSITOR1, 1.5 ether);
+        collateral.slashCollateral(DEPOSITOR1, 1.5 ether, SLASH_REASON_URL, URL_CONTENT_MD5_CHECKSUM);
 
         vm.prank(DEPOSITOR1);
 
@@ -418,8 +418,8 @@ contract CollateralTest is CollateralTestBase {
 
         vm.prank(TRUSTEE);
         vm.expectEmit(true, false, false, true);
-        emit Slashed(DEPOSITOR1, 1 ether);
-        collateral.slashCollateral(DEPOSITOR1, 1 ether);
+        emit Slashed(DEPOSITOR1, 1 ether, SLASH_REASON_URL, URL_CONTENT_MD5_CHECKSUM);
+        collateral.slashCollateral(DEPOSITOR1, 1 ether, SLASH_REASON_URL, URL_CONTENT_MD5_CHECKSUM);
 
         uint256 bondPosterCollateralAfterSlash = collateral.collaterals(DEPOSITOR1);
         assertEq(bondPosterCollateralAfterSlash, bondPosterCollateralBeforeSlash - 1 ether);
@@ -433,12 +433,12 @@ contract CollateralTest is CollateralTestBase {
         collateral.deposit{value: 2 ether}();
 
         vm.expectRevert(NotTrustee.selector);
-        collateral.slashCollateral(DEPOSITOR1, 1 ether);
+        collateral.slashCollateral(DEPOSITOR1, 1 ether, SLASH_REASON_URL, URL_CONTENT_MD5_CHECKSUM);
     }
 
     function test_revert_slashCollateral_CanNotSlashZero() public {
         vm.prank(TRUSTEE);
         vm.expectRevert(AmountZero.selector);
-        collateral.slashCollateral(DEPOSITOR1, 0);
+        collateral.slashCollateral(DEPOSITOR1, 0, SLASH_REASON_URL, URL_CONTENT_MD5_CHECKSUM);
     }
 }
