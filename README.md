@@ -28,6 +28,12 @@ This contract creates a **trust-minimized interaction** between miners and valid
   
   Defines a minimum stake requirement and a strict timeline for validator responses.
 
+- **Off-Chain Justifications**
+
+  Functions `slashCollateral`, `reclaimCollateral`, and `denyReclaim` include URL fields (and content MD5 checksums) to reference off-chain
+  explanations or evidence for each action, ensuring decisions are transparent and auditable.
+
+
 - **Trustless & Auditable**
   
   All operations (deposits, reclaims, slashes) are publicly logged on-chain, enabling transparent oversight for both validators and miners.
