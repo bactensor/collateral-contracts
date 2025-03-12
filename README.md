@@ -77,7 +77,7 @@ Refer to the repository's `scripts/` folder for sample implementations and helpe
   If you plan to stake for multiple validators, simply repeat these steps for each one:
   - Obtain the validator's contract address (usually via tools provided by the subnet owner).
   - Run [`scripts/deposit.sh`](./scripts/deposit.sh) (or a similar tool) to initiate the deposit transaction.
-    This script checks the contract address, verifies its contents, and calls the `deposit()` function with your specified amount of $TAO.
+    This script verifies that code deployed at the address is indeed the collateral smart contract, and calls the `deposit()` function with your specified amount of $TAO.
   - Confirm on-chain that your collateral has been successfully locked for that validator.
 
 - **Reclaim Collateral**
@@ -103,7 +103,7 @@ Refer to the repository's `scripts/` folder for sample implementations and helpe
     - misbehaviour checks causing slashing are automated.
 
 - **Monitor Activity**
-  - Use the contract's public functions or a blockchain explorer to view events (`Deposit`, `ReclaimProcessStarted`, `Slashed`, `Reclaimed`).
+  - Use Ethereum JSON-RPC API or a blockchain explorer to view events (`Deposit`, `ReclaimProcessStarted`, `Slashed`, `Reclaimed`).
   - Query contract mappings (`collaterals`, `reclaims`) to check staked amounts and pending reclaim requests.
   - Maintain a local script or UI to stay updated on changes in miner collateral.
 
