@@ -160,7 +160,7 @@ Refer to the repository's [`scripts/`](todo-link) folder for sample implementati
   By coupling task assignment with the collateral balance, the subnetwork ensures more consistent performance and discourages low-quality or malicious contributions.
 
 
-## Usage
+## Technical details
 
 ### Build
 
