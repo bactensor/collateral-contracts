@@ -33,7 +33,6 @@ This contract creates a **trust-minimized interaction** between miners and valid
   Functions `slashCollateral`, `reclaimCollateral`, and `denyReclaim` include URL fields (and content MD5 checksums) to reference off-chain
   explanations or evidence for each action, ensuring decisions are transparent and auditable.
 
-
 - **Trustless & Auditable**
   
   All operations (deposits, reclaims, slashes) are publicly logged on-chain, enabling transparent oversight for both validators and miners.
@@ -48,7 +47,7 @@ This contract creates a **trust-minimized interaction** between miners and valid
 > All on-chain actions (deposits, slashes, reclaims, etc.) consume gas, so **both miners and validators must hold enough TAO in their Ethereum (H160) wallets** to cover transaction fees.
 > - Make sure to keep a sufficient balance to handle any deposits, reclaims, or slashes you need to perform.
 > - You can transfer TAO back to your SS58 wallet when no more contract interactions are required.
-> - Refer to [`scripts/transfer_ss58_h160.sh`](./scripts/transfer_tao_to_eth.sh) (and similarly [`scripts/transfer_tao_from_eth.sh`](./scripts/transfer_tao_from_eth.sh`))
+> - Refer to [`scripts/transfer_ss58_h160.py`](todo-link) (and similarly [`scripts/transfer_tao_from_eth.py`](todo-link))
 >   for examples of how to move TAO between your Bittensor SS58 wallet and your H160 wallet.
 
 
@@ -82,32 +81,30 @@ Below is a typical sequence for integrating and using this collateral contract w
 ## Usage Guides
 
 Below are step-by-step instructions tailored to **miners**, **validators**, and **subnet owners**.
-Refer to the repository's `scripts/` folder for sample implementations and helper scripts.
+Refer to the repository's [`scripts/`](todo-link) folder for sample implementations and helper scripts.
 
 ## As a Miner, you can:
 
 - **Deposit Collateral**
   If you plan to stake for multiple validators, simply repeat these steps for each one:
   - Obtain the validator's contract address (usually via tools provided by the subnet owner).
-  - Run [`scripts/deposit.sh`](./scripts/deposit.sh) (or a similar tool) to initiate the deposit transaction.
+  - Run [`scripts/deposit.py`](todo-link) (or a similar tool) to initiate the deposit transaction.
     This script verifies that code deployed at the address is indeed the collateral smart contract, and calls the `deposit()` function with your specified amount of $TAO.
   - Confirm on-chain that your collateral has been successfully locked for that validator.
 
 - **Reclaim Collateral**
-  - Initiate the reclaim process by running [`scripts/start_reclaim_process.sh`](./scripts/start_reclaim_process.sh) with your desired withdrawal amount.
+  - Initiate the reclaim process by running [`scripts/start_reclaim_process.py`](todo-link) with your desired withdrawal amount.
   - Wait for the validator's response or for the configured inactivity timeout to pass.
-  - If the validator does not deny your request by the deadline, run [`scripts/finalize_reclaim.sh`](./scripts/finalize_reclaim.sh) to unlock and retrieve your collateral.
+  - If the validator does not deny your request by the deadline, run [`scripts/finalize_reclaim.py`](todo-link) to unlock and retrieve your collateral.
   - Verify on-chain that your balance has been updated accordingly.
 
 
 ### As a Validator, you can:
 
 - **Deploy the Contract**
-  - Clone this repository and install dependencies (using [Foundry](https://book.getfoundry.sh/)):
-     ```bash
-     forge build
-     ```
-  - Compile and deploy the contract, use `scripts/deploy.sh` with your details as arguments.
+  - Install [Foundry](https://book.getfoundry.sh/).
+  - Clone this repository.
+  - Compile and deploy the contract, use [`scripts/deploy.sh`](todo-link) with your details as arguments.
   - Record the deployed contract address and publish it via a subnet-owner-provided tool so that miners can discover and verify it.
 
 - **Enable Regular Operation**
@@ -122,12 +119,12 @@ Refer to the repository's `scripts/` folder for sample implementations and helpe
 
 - **Manually Deny a Reclaim**
   - Identify the relevant `reclaimRequestId` (from `ReclaimProcessStarted` event, for example).
-  - Use `scripts/deny_reclaim.sh` (calling the contract's `denyReclaim(reclaimRequestId)`) before the deadline.
+  - Use [`scripts/deny_reclaim.py`](todo-link) (calling the contract's `denyReclaim(reclaimRequestId)`) before the deadline.
   - Verify on-chain that the reclaim request is removed and the miner's `hasPendingReclaim` is reset to `false`.
 
 - **Manually Slash Collateral**
   - Confirm miner misconduct based on subnetwork rules (e.g., invalid blocks, spam, protocol violations).
-  - Use `scripts/slash_collateral.sh` (calling the contract's `slashCollateral(miner, slashAmount)`) to penalize the miner by reducing their staked amount.
+  - Use [`scripts/slash_collateral.py`](todo-link) (calling the contract's `slashCollateral(miner, slashAmount)`) to penalize the miner by reducing their staked amount.
   - Verify the transaction on-chain and confirm the miner's `collaterals[miner]` value has changed.
 
 ### As a Subnet Owner, you can
@@ -144,7 +141,7 @@ Refer to the repository's `scripts/` folder for sample implementations and helpe
   This helps miners discover the correct contract for depositing collateral.
 
 - **Track Miner Collateral Usage**
-  - Query each validator's contract <!---(using, for example, an off-chain script based on [`scripts/query.sh`](todo-link))--> to see how much collateral is staked by each miner.
+  - Query each validator's contract <!---(using, for example, an off-chain script based on [`scripts/query.py`](todo-link))--> to see how much collateral is staked by each miner.
   - Aggregate this data into a subnet-wide dashboard for real-time oversight of miner participation.
     <!-- - Check out the [ComputeHorde Grafana chart](https://grafana.bactensor.io/d/subnet/metagraph-subnet?var-subnet=12) for a real-world example.-->
 
