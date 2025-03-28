@@ -3,6 +3,7 @@ import sys
 import json
 import hashlib
 import requests
+from dataclasses import dataclass
 from web3 import Web3
 from eth_account import Account
 
@@ -150,4 +151,82 @@ def calculate_md5_checksum(url):
         return hashlib.md5(response.content).hexdigest()
     except requests.RequestException as e:
         print(f"Error fetching URL content: {str(e)}", file=sys.stderr)
+        sys.exit(1)
+
+
+@dataclass
+class DepositEvent:
+    """Represents a Deposit event emitted by the Collateral contract."""
+    account: str
+    amount: int
+    block_number: int
+    transaction_hash: str
+
+
+def get_deposit_events(w3, contract_address, block_num_low, block_num_high):
+    """Fetch all Deposit events emitted by the Collateral contract within a block range.
+    
+    Args:
+        w3 (Web3): Web3 instance to use for blockchain interaction
+        contract_address (str): The address of the deployed Collateral contract
+        block_num_low (int): The starting block number (inclusive)
+        block_num_high (int): The ending block number (inclusive)
+        
+    Returns:
+        list[DepositEvent]: List of Deposit events
+    """
+    ABI = [
+        {
+            "anonymous": False,
+            "inputs": [
+                {"indexed": True, "internalType": "address", "name": "account", "type": "address"},
+                {"indexed": False, "internalType": "uint256", "name": "amount", "type": "uint256"}
+            ],
+            "name": "Deposit",
+            "type": "event"
+        }
+    ]
+
+    contract = w3.eth.contract(address=contract_address, abi=ABI)
+    
+    event_filter = contract.events.Deposit.create_filter(
+        fromBlock=block_num_low,
+        toBlock=block_num_high
+    )
+    
+    events = event_filter.get_all_entries()
+    
+    formatted_events = []
+    for event in events:
+        formatted_events.append(DepositEvent(
+            account=event['args']['account'],
+            amount=event['args']['amount'],
+            block_number=event['blockNumber'],
+            transaction_hash=event['transactionHash'].hex(),
+        ))
+    
+    return formatted_events
+
+
+def get_miner_collateral(w3, contract_address, miner_address):
+    """Query the collateral amount for a given miner address.
+
+    Args:
+        w3: Web3 instance
+        contract_address: Address of the Collateral contract
+        miner_address: Address of the miner to query
+
+    Returns:
+        number: Collateral amount in Wei
+
+    Raises:
+        SystemExit: If there's an error querying the collateral
+    """
+    contract_abi = load_contract_abi()
+    contract = w3.eth.contract(address=contract_address, abi=contract_abi)
+    
+    try:
+        return contract.functions.collaterals(miner_address).call()
+    except Exception as e:
+        print(f"Error querying collateral: {str(e)}", file=sys.stderr)
         sys.exit(1)
