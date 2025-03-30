@@ -8,7 +8,7 @@ from common import (
     get_account,
     validate_address_format,
     build_and_send_transaction,
-    wait_for_receipt
+    wait_for_receipt,
 )
 
 
@@ -19,7 +19,7 @@ def check_minimum_collateral(contract, amount_wei):
         print(
             f"Error: Amount {Web3.from_wei(amount_wei, 'ether')} TAO is less than "
             f"minimum required {Web3.from_wei(min_collateral, 'ether')} TAO",
-            file=sys.stderr
+            file=sys.stderr,
         )
         sys.exit(1)
     return min_collateral
@@ -32,7 +32,7 @@ def verify_trustee(contract, expected_trustee):
         print(
             f"Error: Trustee address mismatch. Expected: {expected_trustee}, "
             f"Got: {trustee}",
-            file=sys.stderr
+            file=sys.stderr,
         )
         sys.exit(1)
 
@@ -58,17 +58,13 @@ def deposit_collateral(w3, account, amount_tao, contract_address, trustee_addres
 
     verify_trustee(contract, trustee_address)
 
-    amount_wei = w3.to_wei(amount_tao, 'ether')
+    amount_wei = w3.to_wei(amount_tao, "ether")
 
     try:
         check_minimum_collateral(contract, amount_wei)
 
         tx_hash = build_and_send_transaction(
-            w3,
-            contract,
-            contract.functions.deposit(),
-            account,
-            value=amount_wei
+            w3, contract, contract.functions.deposit(), account, value=amount_wei
         )
 
         receipt = wait_for_receipt(w3, tx_hash)
@@ -90,11 +86,11 @@ def main():
         print(
             "Usage: ./deposit_collateral.py <contract_address> "
             "<amount_in_tao> <trustee_address>",
-            file=sys.stderr
+            file=sys.stderr,
         )
         print(
             "Example: python deposit_collateral.py 0x123... 1.5 0x456...",
-            file=sys.stderr
+            file=sys.stderr,
         )
         sys.exit(1)
 
@@ -110,7 +106,7 @@ def main():
         account=account,
         amount_tao=amount_tao,
         contract_address=contract_address,
-        trustee_address=trustee_address
+        trustee_address=trustee_address,
     )
 
     print(f"Successfully deposited {amount_tao} TAO")

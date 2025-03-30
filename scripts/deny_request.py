@@ -33,8 +33,8 @@ def deny_reclaim_request(w3, account, reclaim_request_id, url, contract_address)
 
     try:
         # Calculate MD5 checksum of the URL content
-        md5_checksum = '0' * 32
-        if url.startswith(('http://', 'https://')):
+        md5_checksum = "0" * 32
+        if url.startswith(("http://", "https://")):
             print("Calculating MD5 checksum of URL content...", file=sys.stderr)
             md5_checksum = calculate_md5_checksum(url)
             print(f"MD5 checksum: {md5_checksum}", file=sys.stderr)
@@ -43,11 +43,9 @@ def deny_reclaim_request(w3, account, reclaim_request_id, url, contract_address)
             w3,
             contract,
             contract.functions.denyReclaimRequest(
-                reclaim_request_id,
-                url,
-                bytes.fromhex(md5_checksum)
+                reclaim_request_id, url, bytes.fromhex(md5_checksum)
             ),
-            account
+            account,
         )
 
         receipt = wait_for_receipt(w3, tx_hash)
@@ -63,10 +61,16 @@ def deny_reclaim_request(w3, account, reclaim_request_id, url, contract_address)
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Deny a reclaim request on the Collateral contract')
-    parser.add_argument('contract_address', help='Address of the deployed Collateral contract')
-    parser.add_argument('reclaim_request_id', type=int, help='ID of the reclaim request to deny')
-    parser.add_argument('url', help='URL containing the reason for denial')
+    parser = argparse.ArgumentParser(
+        description="Deny a reclaim request on the Collateral contract"
+    )
+    parser.add_argument(
+        "contract_address", help="Address of the deployed Collateral contract"
+    )
+    parser.add_argument(
+        "reclaim_request_id", type=int, help="ID of the reclaim request to deny"
+    )
+    parser.add_argument("url", help="URL containing the reason for denial")
     args = parser.parse_args()
 
     w3 = get_web3_connection()
@@ -77,7 +81,7 @@ def main():
         account=account,
         reclaim_request_id=args.reclaim_request_id,
         url=args.url,
-        contract_address=args.contract_address
+        contract_address=args.contract_address,
     )
 
     print(f"Successfully denied reclaim request {args.reclaim_request_id}")
@@ -89,5 +93,5 @@ def main():
     print(f"  Block number: {receipt['blockNumber']}")
 
 
-if __name__ == '__main__':
-    main() 
+if __name__ == "__main__":
+    main()

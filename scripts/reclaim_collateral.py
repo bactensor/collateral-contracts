@@ -21,28 +21,28 @@ def reclaim_collateral(
     url,
 ):
     """Reclaim collateral from the contract.
-    
+
     Args:
         w3 (Web3): Web3 instance
         account: The account to use for the transaction
         amount_tao (float): Amount of TAO to reclaim
         contract_address (str): Address of the collateral contract
         url (str): URL for reclaim information
-        
+
     Returns:
         dict: Transaction receipt with reclaim event details
-        
+
     Raises:
         Exception: If the transaction fails
     """
     contract_abi = load_contract_abi()
     contract = w3.eth.contract(address=contract_address, abi=contract_abi)
 
-    amount_wei = w3.to_wei(amount_tao, 'ether')
+    amount_wei = w3.to_wei(amount_tao, "ether")
 
     # Calculate MD5 checksum if URL is valid
-    md5_checksum = '0' * 32
-    if url.startswith(('http://', 'https://')):
+    md5_checksum = "0" * 32
+    if url.startswith(("http://", "https://")):
         print("Calculating MD5 checksum of URL content...", file=sys.stderr)
         md5_checksum = calculate_md5_checksum(url)
         print(f"MD5 checksum: {md5_checksum}", file=sys.stderr)
@@ -67,9 +67,9 @@ def reclaim_collateral(
     )[0]
 
     return {
-        'receipt': receipt,
-        'event': reclaim_event,
-        'amount_tao': amount_tao,
+        "receipt": receipt,
+        "event": reclaim_event,
+        "amount_tao": amount_tao,
     }
 
 
@@ -99,7 +99,7 @@ def main():
 
     try:
         result = reclaim_collateral(w3, account, amount_tao, contract_address, url)
-        
+
         print(f"Successfully initiated reclaim of {result['amount_tao']} TAO")
         print("Event details:")
         print(f"  Reclaim ID: {result['event']['args']['reclaimRequestId']}")
@@ -124,4 +124,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
