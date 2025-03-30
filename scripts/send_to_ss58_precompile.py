@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import os
 import sys
 from web3 import Web3
 from eth_account import Account
@@ -36,6 +35,7 @@ def send_tao_to_ss58(
     contract = w3.eth.contract(address=contract_address, abi=abi)
     # Convert SS58 address to public key bytes32
     pubkey = ss58_to_pubkey(recipient_ss58)
+    print(f"Pubkey: {pubkey.hex()}")
 
     # Prepare transaction
     nonce = w3.eth.get_transaction_count(sender_account.address)

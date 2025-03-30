@@ -2,6 +2,34 @@
 from substrateinterface import Keypair
 
 
+def privkey_to_ss58(private_key: str) -> str:
+    """
+    Convert private key to SS58 address.
+
+    Args:
+        private_key (str): The private key in hex format (with or without 0x prefix)
+
+    Returns:
+        str: The SS58 address
+
+    Raises:
+        ValueError: If the private key is invalid
+    """
+    try:
+        # Remove 0x prefix if present
+        if private_key.startswith("0x"):
+            private_key = private_key[2:]
+            
+        # Create a Keypair from the private key
+        keypair = Keypair(private_key=bytes.fromhex(private_key), ss58_format=42)
+        
+        # Get the SS58 address
+        return keypair.ss58_address
+
+    except Exception as e:
+        raise ValueError(f"Error converting private key to SS58 address: {str(e)}")
+
+
 def ss58_to_pubkey(ss58_address: str) -> bytes:
     """
     Convert SS58 address to public key bytes.

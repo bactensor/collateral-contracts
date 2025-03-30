@@ -5,6 +5,7 @@ import sys
 import json
 from web3 import Web3
 from eth_keys import keys
+import bittensor_wallet
 
 
 def generate_keypair() -> dict:
@@ -24,7 +25,7 @@ def generate_keypair() -> dict:
         "public_key": public_key,
         "private_key": account.key.hex()
     }
-    
+    bittensor_wallet.keyfile
     return keypair_data
 
 

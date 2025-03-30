@@ -5,3 +5,8 @@ web3==6.15.1
 requests==2.31.0
 
 substrate-interface==1.7.11
+
+# Bittensor wallet for key management
+bittensor-wallet==3.0.4
+
+bittensor-cli==9.1.0
