@@ -1,15 +1,23 @@
 #!/usr/bin/env python3
 
+<<<<<<< HEAD
 import argparse
+=======
+>>>>>>> 99ec69217d556a9981a40a68e1b618aa92aa09c9
 import sys
 
 from common import (
     get_web3_connection,
+<<<<<<< HEAD
     load_contract_abi,
+=======
+    get_miner_collateral,
+>>>>>>> 99ec69217d556a9981a40a68e1b618aa92aa09c9
     validate_address_format,
 )
 
 
+<<<<<<< HEAD
 def get_miner_collateral(w3, contract_address, miner_address):
     """Query the collateral amount for a given miner address.
 
@@ -34,6 +42,8 @@ def get_miner_collateral(w3, contract_address, miner_address):
         sys.exit(1)
 
 
+=======
+>>>>>>> 99ec69217d556a9981a40a68e1b618aa92aa09c9
 def main():
     """Main function to handle command line arguments and display collateral."""
     if len(sys.argv) != 3:
