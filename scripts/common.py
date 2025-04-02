@@ -135,9 +135,9 @@ def build_and_send_transaction(
     return tx_hash
 
 
-def wait_for_receipt(w3, tx_hash):
+def wait_for_receipt(w3, tx_hash, timeout=24, poll_latency=6):
     """Wait for transaction receipt and return it."""
-    return w3.eth.wait_for_transaction_receipt(tx_hash)
+    return w3.eth.wait_for_transaction_receipt(tx_hash, timeout=timeout, poll_latency=poll_latency)
 
 
 def calculate_md5_checksum(url):
