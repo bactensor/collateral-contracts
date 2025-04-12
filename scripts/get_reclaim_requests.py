@@ -35,20 +35,15 @@ def get_reclaim_process_started_events(
     Returns:
         list[ReclaimProcessStartedEvent]: List of ReclaimProcessStarted events
     """
-    # Load contract ABI
     contract_abi = load_contract_abi()
     
-    # Create contract instance
     contract = w3.eth.contract(address=contract_address, abi=contract_abi)
     
-    # Convert contract address to checksum format
     checksum_address = w3.to_checksum_address(contract_address)
 
-    # Create the event signature hash for the ReclaimProcessStarted event
     event_signature = "ReclaimProcessStarted(uint256,address,uint256,uint64,string,bytes16)"
     event_topic = w3.keccak(text=event_signature).hex()
 
-    # Create filter parameters for eth_getLogs
     filter_params = {
         "fromBlock": hex(block_num_low),
         "toBlock": hex(block_num_high),

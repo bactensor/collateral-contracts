@@ -70,7 +70,6 @@ def slash_collateral(
 
 
 def main():
-    # Check command line arguments
     if len(sys.argv) != 5:
         print(
             "Usage: python slash_collateral.py "
