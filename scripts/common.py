@@ -130,7 +130,8 @@ def build_and_send_transaction(
     )
 
     signed_txn = w3.eth.account.sign_transaction(transaction, account.key)
-    tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+    print(f"Signed transaction: {signed_txn}", file=sys.stderr)
+    tx_hash = w3.eth.send_raw_transaction(signed_txn.raw_transaction)
     print(f"Transaction sent: {tx_hash.hex()}", file=sys.stderr)
     return tx_hash
 
@@ -183,44 +184,45 @@ def get_deposit_events(w3, contract_address, block_num_low, block_num_high):
     Returns:
         list[DepositEvent]: List of Deposit events
     """
-    ABI = [
-        {
-            "anonymous": False,
-            "inputs": [
-                {
-                    "indexed": True,
-                    "internalType": "address",
-                    "name": "account",
-                    "type": "address",
-                },
-                {
-                    "indexed": False,
-                    "internalType": "uint256",
-                    "name": "amount",
-                    "type": "uint256",
-                },
-            ],
-            "name": "Deposit",
-            "type": "event",
-        }
-    ]
+    # Load contract ABI
+    contract_abi = load_contract_abi()
+    
+    # Create contract instance
+    contract = w3.eth.contract(address=contract_address, abi=contract_abi)
 
-    contract = w3.eth.contract(address=contract_address, abi=ABI)
+    # Convert contract address to checksum format
+    checksum_address = w3.to_checksum_address(contract_address)
 
-    event_filter = contract.events.Deposit.create_filter(
-        fromBlock=block_num_low, toBlock=block_num_high
-    )
+    # Create the event signature hash for the Deposit event
+    event_signature = "Deposit(address,uint256)"
+    event_topic = w3.keccak(text=event_signature).hex()
 
-    events = event_filter.get_all_entries()
+    # Prepare the filter parameters for eth_getLogs
+    filter_params = {
+        "fromBlock": hex(block_num_low),
+        "toBlock": hex(block_num_high),
+        "address": checksum_address,
+        "topics": [event_topic]
+    }
+
+    # Get the logs using eth_getLogs
+    logs = w3.eth.get_logs(filter_params)
 
     formatted_events = []
-    for event in events:
+    for log in logs:
+        # Convert the account address to checksum format
+        account_address = "0x" + log["topics"][1].hex()[-40:]
+        account = w3.to_checksum_address(account_address)
+        
+        # Use the contract's event decoder to properly decode the event data
+        decoded_event = contract.events.Deposit().process_log(log)
+        
         formatted_events.append(
             DepositEvent(
-                account=event["args"]["account"],
-                amount=event["args"]["amount"],
-                block_number=event["blockNumber"],
-                transaction_hash=event["transactionHash"].hex(),
+                account=account,
+                amount=decoded_event['args']['amount'],
+                block_number=log["blockNumber"],
+                transaction_hash=log["transactionHash"].hex(),
             )
         )
 

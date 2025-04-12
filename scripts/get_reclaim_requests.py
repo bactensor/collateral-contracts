@@ -4,7 +4,7 @@ import sys
 import csv
 import argparse
 from dataclasses import dataclass
-from common import get_web3_connection
+from common import get_web3_connection, load_contract_abi
 
 
 @dataclass
@@ -35,72 +35,56 @@ def get_reclaim_process_started_events(
     Returns:
         list[ReclaimProcessStartedEvent]: List of ReclaimProcessStarted events
     """
-    ABI = [
-        {
-            "anonymous": False,
-            "inputs": [
-                {
-                    "indexed": True,
-                    "internalType": "uint256",
-                    "name": "reclaimRequestId",
-                    "type": "uint256",
-                },
-                {
-                    "indexed": True,
-                    "internalType": "address",
-                    "name": "account",
-                    "type": "address",
-                },
-                {
-                    "indexed": False,
-                    "internalType": "uint256",
-                    "name": "amount",
-                    "type": "uint256",
-                },
-                {
-                    "indexed": False,
-                    "internalType": "uint64",
-                    "name": "expirationTime",
-                    "type": "uint64",
-                },
-                {
-                    "indexed": False,
-                    "internalType": "string",
-                    "name": "url",
-                    "type": "string",
-                },
-                {
-                    "indexed": False,
-                    "internalType": "bytes16",
-                    "name": "urlContentMd5Checksum",
-                    "type": "bytes16",
-                },
-            ],
-            "name": "ReclaimProcessStarted",
-            "type": "event",
-        }
-    ]
+    # Load contract ABI
+    contract_abi = load_contract_abi()
+    
+    # Create contract instance
+    contract = w3.eth.contract(address=contract_address, abi=contract_abi)
+    
+    # Convert contract address to checksum format
+    checksum_address = w3.to_checksum_address(contract_address)
 
-    contract = w3.eth.contract(address=contract_address, abi=ABI)
+    # Create the event signature hash for the ReclaimProcessStarted event
+    event_signature = "ReclaimProcessStarted(uint256,address,uint256,uint64,string,bytes16)"
+    event_topic = w3.keccak(text=event_signature).hex()
 
-    event_filter = contract.events.ReclaimProcessStarted.create_filter(
-        fromBlock=block_num_low, toBlock=block_num_high
-    )
+    # Create filter parameters for eth_getLogs
+    filter_params = {
+        "fromBlock": hex(block_num_low),
+        "toBlock": hex(block_num_high),
+        "address": checksum_address,
+        "topics": [
+            event_topic,  # Event signature topic
+            None,  # reclaimRequestId (indexed)
+            None,  # account (indexed)
+        ]
+    }
 
-    events = event_filter.get_all_entries()
+    # Get logs using eth_getLogs
+    logs = w3.eth.get_logs(filter_params)
 
     formatted_events = []
-    for event in events:
+    for log in logs:
+        # Get the indexed parameters from topics
+        reclaim_request_id = int(log["topics"][1].hex(), 16)
+        
+        # Convert the account address to checksum format
+        account_address = "0x" + log["topics"][2].hex()[-40:]
+        account = w3.to_checksum_address(account_address)
+        
+        # Use the contract's event decoder to properly decode the event data
+        decoded_event = contract.events.ReclaimProcessStarted().process_log(log)
+        
         formatted_events.append(
             ReclaimProcessStartedEvent(
-                reclaim_request_id=event["args"]["reclaimRequestId"],
-                account=event["args"]["account"],
-                amount=event["args"]["amount"],
-                expiration_time=event["args"]["expirationTime"],
-                url=event["args"]["url"],
-                url_content_md5_checksum=event["args"]["urlContentMd5Checksum"].hex(),
-                block_number=event["blockNumber"],
-                transaction_hash=event["transactionHash"].hex(),
+                reclaim_request_id=reclaim_request_id,
+                account=account,
+                amount=decoded_event['args']['amount'],
+                expiration_time=decoded_event['args']['expirationTime'],
+                url=decoded_event['args']['url'],
+                url_content_md5_checksum=decoded_event['args']['urlContentMd5Checksum'].hex(),
+                block_number=log["blockNumber"],
+                transaction_hash=log["transactionHash"].hex(),
             )
         )
 

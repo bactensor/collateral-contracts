@@ -1,5 +1,5 @@
 # Web3 for Ethereum interaction
-web3==6.15.1
+web3==7.10.0
 
 # HTTP requests for URL content fetching
 requests==2.31.0
