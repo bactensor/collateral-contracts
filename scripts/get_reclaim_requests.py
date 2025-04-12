@@ -59,20 +59,15 @@ def get_reclaim_process_started_events(
             None,  # account (indexed)
         ]
     }
-
-    # Get logs using eth_getLogs
     logs = w3.eth.get_logs(filter_params)
 
     formatted_events = []
     for log in logs:
-        # Get the indexed parameters from topics
-        reclaim_request_id = int(log["topics"][1].hex(), 16)
-        
-        # Convert the account address to checksum format
+        reclaim_request_id = int(log["topics"][1].hex(), 16)   
+
         account_address = "0x" + log["topics"][2].hex()[-40:]
         account = w3.to_checksum_address(account_address)
-        
-        # Use the contract's event decoder to properly decode the event data
+
         decoded_event = contract.events.ReclaimProcessStarted().process_log(log)
         
         formatted_events.append(

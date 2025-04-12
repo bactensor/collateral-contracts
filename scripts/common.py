@@ -56,7 +56,7 @@ def get_contract_config(w3, contract_address):
     Returns:
         tuple: (trustee, decision_timeout, min_collateral_increase, netuid)
     """
-    # Contract ABI (minimal ABI for the functions we need)
+    # minimal ABI for the functions we need
     ABI = [
         {
             "inputs": [],
@@ -184,20 +184,15 @@ def get_deposit_events(w3, contract_address, block_num_low, block_num_high):
     Returns:
         list[DepositEvent]: List of Deposit events
     """
-    # Load contract ABI
     contract_abi = load_contract_abi()
     
-    # Create contract instance
     contract = w3.eth.contract(address=contract_address, abi=contract_abi)
 
-    # Convert contract address to checksum format
     checksum_address = w3.to_checksum_address(contract_address)
 
-    # Create the event signature hash for the Deposit event
     event_signature = "Deposit(address,uint256)"
     event_topic = w3.keccak(text=event_signature).hex()
 
-    # Prepare the filter parameters for eth_getLogs
     filter_params = {
         "fromBlock": hex(block_num_low),
         "toBlock": hex(block_num_high),
@@ -205,16 +200,13 @@ def get_deposit_events(w3, contract_address, block_num_low, block_num_high):
         "topics": [event_topic]
     }
 
-    # Get the logs using eth_getLogs
     logs = w3.eth.get_logs(filter_params)
 
     formatted_events = []
     for log in logs:
-        # Convert the account address to checksum format
         account_address = "0x" + log["topics"][1].hex()[-40:]
         account = w3.to_checksum_address(account_address)
         
-        # Use the contract's event decoder to properly decode the event data
         decoded_event = contract.events.Deposit().process_log(log)
         
         formatted_events.append(

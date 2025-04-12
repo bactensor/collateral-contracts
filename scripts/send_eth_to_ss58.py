@@ -20,21 +20,16 @@ def main():
         print("Error: Amount must be a valid number", file=sys.stderr)
         sys.exit(1)
 
-    # Convert SS58 address to H160
     h160_address = ss58_to_h160(ss58_address)
     print(
         f"Converting SS58 address {ss58_address} to H160: {h160_address}",
         file=sys.stderr,
     )
 
-    # Get Web3 connection and account
     w3 = get_web3_connection()
     account = get_account()
 
-    # Convert ETH amount to Wei
     amount_wei = w3.to_wei(amount_eth, "ether")
-
-    # Build the transaction
     transaction = {
         "from": account.address,
         "to": Web3.to_checksum_address(h160_address),
@@ -45,12 +40,10 @@ def main():
         "chainId": w3.eth.chain_id,
     }
 
-    # Sign and send the transaction
     signed_txn = w3.eth.account.sign_transaction(transaction, account.key)
     tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
     print(f"Transaction sent: {tx_hash.hex()}", file=sys.stderr)
 
-    # Wait for transaction receipt
     receipt = wait_for_receipt(w3, tx_hash)
     print(f"Transaction successful! Hash: {tx_hash.hex()}", file=sys.stderr)
     print(f"Gas used: {receipt['gasUsed']}", file=sys.stderr)

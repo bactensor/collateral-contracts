@@ -49,8 +49,6 @@ def deny_reclaim_request(w3, account, reclaim_request_id, url, contract_address)
         )
 
         receipt = wait_for_receipt(w3, tx_hash)
-
-        # Get the Denied event from the receipt
         deny_event = contract.events.Denied().process_receipt(receipt)[0]
 
         return deny_event, receipt

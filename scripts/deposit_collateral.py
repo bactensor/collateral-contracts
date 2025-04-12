@@ -68,8 +68,6 @@ def deposit_collateral(w3, account, amount_tao, contract_address, trustee_addres
         )
 
         receipt = wait_for_receipt(w3, tx_hash)
-
-        # Get the Deposit event from the receipt
         deposit_event = contract.events.Deposit().process_receipt(receipt)[0]
 
         return deposit_event, receipt
@@ -81,7 +79,6 @@ def deposit_collateral(w3, account, amount_tao, contract_address, trustee_addres
 
 def main():
     """Handle command line arguments and execute deposit."""
-    # Check command line arguments
     if len(sys.argv) != 4:
         print(
             "Usage: ./deposit_collateral.py <contract_address> "

@@ -61,11 +61,7 @@ def slash_collateral(
     )
 
     receipt = wait_for_receipt(w3, tx_hash)
-    print(receipt)
-
-    # Get the Slashed event from the receipt
     slash_event = contract.events.Slashed().process_receipt(receipt)[0]
-    print(slash_event)
 
     return {
         "receipt": receipt,

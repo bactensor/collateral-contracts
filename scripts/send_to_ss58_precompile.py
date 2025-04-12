@@ -34,14 +34,10 @@ def send_tao_to_ss58(
         }
     ]
     contract = w3.eth.contract(address=contract_address, abi=abi)
-    # Convert SS58 address to public key bytes32
     pubkey = ss58_to_pubkey(recipient_ss58)
 
-    # Prepare transaction
     nonce = w3.eth.get_transaction_count(sender_account.address)
     gas_price = w3.eth.gas_price
-
-    # Build transaction
     transaction = contract.functions.transfer(pubkey).build_transaction(
         {
             "from": sender_account.address,
@@ -52,12 +48,10 @@ def send_tao_to_ss58(
         }
     )
 
-    # Sign and send transaction
     signed_txn = w3.eth.account.sign_transaction(transaction, sender_account.key)
     tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
     print(f"Transaction sent! Hash: {tx_hash.hex()}")
 
-    # Wait for transaction receipt
     receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
     return receipt
 
@@ -70,12 +64,10 @@ def main():
     amount_wei = int(sys.argv[2])
 
     try:
-        # Initialize Web3 and account using common functions
         w3 = get_web3_connection()
         account = get_account()
         print(f"Using account: {account.address}")
 
-        # Send transaction
         receipt = send_tao_to_ss58(
             w3=w3,
             sender_account=account,

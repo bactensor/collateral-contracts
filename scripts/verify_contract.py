@@ -6,7 +6,6 @@ import time
 from web3 import Web3
 from common import get_web3_connection, get_contract_config
 
-# Constants
 ANVIL_PORT = 8555
 ANVIL_RPC_URL = f"http://127.0.0.1:{ANVIL_PORT}"
 # the first preset private key available in anvil
@@ -20,12 +19,10 @@ def get_deployed_bytecode(w3, contract_address):
 
 def deploy_on_devnet_and_get_bytecode(w3, contract_address):
     """Deploy the contract on anvil and return its bytecode."""
-    # Get constructor arguments from the deployed contract
     netuid, trustee, decision_timeout, min_collateral_increase = get_contract_config(
         w3, contract_address
     )
 
-    # Start anvil in the background
     anvil_process = subprocess.Popen(
         ["anvil", "--port", str(ANVIL_PORT)],
         stdout=subprocess.PIPE,
@@ -36,7 +33,6 @@ def deploy_on_devnet_and_get_bytecode(w3, contract_address):
         # Wait for anvil to start
         time.sleep(2)
 
-        # Deploy the contract using forge create
         deploy_cmd = [
             "forge",
             "create",
@@ -56,17 +52,13 @@ def deploy_on_devnet_and_get_bytecode(w3, contract_address):
         deploy_output = subprocess.run(
             deploy_cmd, check=True, capture_output=True, text=True
         )
-
-        # Extract the deployed address
         deployed_address = (
             deploy_output.stdout.split("Deployed to: ")[1].strip().split()[0]
         )
-        # Get the bytecode of the deployed contract
         devnet_w3 = Web3(Web3.HTTPProvider(ANVIL_RPC_URL))
         return get_deployed_bytecode(devnet_w3, deployed_address)
 
     finally:
-        # Clean up anvil process
         anvil_process.terminate()
         anvil_process.wait()
 
@@ -74,7 +66,6 @@ def deploy_on_devnet_and_get_bytecode(w3, contract_address):
 def verify_contract(contract_address):
     """Verify if the deployed contract matches the source code."""
     try:
-        # Connect to the blockchain
         w3 = get_web3_connection()
 
         deployed_bytecode = get_deployed_bytecode(w3, contract_address)

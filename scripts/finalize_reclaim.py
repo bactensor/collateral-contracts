@@ -38,8 +38,6 @@ def finalize_reclaim(w3, account, reclaim_request_id, contract_address):
         )
 
         receipt = wait_for_receipt(w3, tx_hash)
-
-        # Get the Reclaimed event from the receipt
         reclaim_event = contract.events.Reclaimed().process_receipt(receipt)[0]
 
         return reclaim_event, receipt

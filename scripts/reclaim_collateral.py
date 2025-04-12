@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import sys
-from web3 import Web3
 from common import (
     load_contract_abi,
     get_web3_connection,
@@ -60,8 +59,6 @@ def reclaim_collateral(
     )
 
     receipt = wait_for_receipt(w3, tx_hash)
-
-    # Get the ReclaimProcessStarted event from the receipt
     reclaim_event = contract.events.ReclaimProcessStarted().process_receipt(
         receipt,
     )[0]
@@ -74,7 +71,6 @@ def reclaim_collateral(
 
 
 def main():
-    # Check command line arguments
     if len(sys.argv) != 4:
         print(
             "Usage: python reclaim_collateral.py "

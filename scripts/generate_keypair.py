@@ -3,7 +3,6 @@
 import os
 import sys
 import json
-from web3 import Web3
 from eth_account import Account
 
 
@@ -20,16 +19,10 @@ def generate_and_save_keypair(output_path: str) -> dict:
     Raises:
         Exception: If there's an error saving the file
     """
-    # Generate a new account
     account = Account.create()
-
-    # Prepare the key pair data
     keypair_data = {"address": account.address, "private_key": account.key.hex()}
-
-    # Create directory if it doesn't exist
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
-    # Save to file
     try:
         with open(output_path, "w") as f:
             json.dump(keypair_data, f, indent=2)
