@@ -4,6 +4,7 @@ import os
 import sys
 import json
 from eth_account import Account
+from eth_keys import keys
 
 
 def generate_and_save_keypair(output_path: str) -> dict:
@@ -11,16 +12,23 @@ def generate_and_save_keypair(output_path: str) -> dict:
     Generate a new Ethereum key pair and save it to a file.
 
     Args:
-        output_path (str): Path where the key pair should be saved
+        output_path (str): Absolute path where the key pair should be saved
 
     Returns:
-        dict: Dictionary containing the account address and private key
+        dict: Dictionary containing the account address, private key, and public key
 
     Raises:
         Exception: If there's an error saving the file
     """
     account = Account.create()
-    keypair_data = {"address": account.address, "private_key": account.key.hex()}
+    private_key = keys.PrivateKey(account.key)
+    public_key = private_key.public_key
+    
+    keypair_data = {
+        "address": account.address, 
+        "private_key": account.key.hex(),
+        "public_key": public_key.to_hex()
+    }
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
     try:
@@ -28,6 +36,7 @@ def generate_and_save_keypair(output_path: str) -> dict:
             json.dump(keypair_data, f, indent=2)
         print(f"Key pair saved to: {output_path}", file=sys.stderr)
         print(f"Address: {account.address}", file=sys.stderr)
+        print(f"Public Key: {public_key.to_hex()}", file=sys.stderr)
         return keypair_data
     except Exception as e:
         print(f"Error saving key pair: {str(e)}", file=sys.stderr)
