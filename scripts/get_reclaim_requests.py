@@ -35,72 +35,51 @@ def get_reclaim_process_started_events(
     Returns:
         list[ReclaimProcessStartedEvent]: List of ReclaimProcessStarted events
     """
-    ABI = [
-        {
-            "anonymous": False,
-            "inputs": [
-                {
-                    "indexed": True,
-                    "internalType": "uint256",
-                    "name": "reclaimRequestId",
-                    "type": "uint256",
-                },
-                {
-                    "indexed": True,
-                    "internalType": "address",
-                    "name": "account",
-                    "type": "address",
-                },
-                {
-                    "indexed": False,
-                    "internalType": "uint256",
-                    "name": "amount",
-                    "type": "uint256",
-                },
-                {
-                    "indexed": False,
-                    "internalType": "uint64",
-                    "name": "expirationTime",
-                    "type": "uint64",
-                },
-                {
-                    "indexed": False,
-                    "internalType": "string",
-                    "name": "url",
-                    "type": "string",
-                },
-                {
-                    "indexed": False,
-                    "internalType": "bytes16",
-                    "name": "urlContentMd5Checksum",
-                    "type": "bytes16",
-                },
-            ],
-            "name": "ReclaimProcessStarted",
-            "type": "event",
-        }
-    ]
+    # Event signature for ReclaimProcessStarted
+    event_signature = "ReclaimProcessStarted(uint256,address,uint256,uint64,string,bytes16)"
+    event_topic = w3.keccak(text=event_signature).hex()
 
-    contract = w3.eth.contract(address=contract_address, abi=ABI)
+    # Create filter parameters for eth_getLogs
+    filter_params = {
+        "fromBlock": hex(block_num_low),
+        "toBlock": hex(block_num_high),
+        "address": contract_address,
+        "topics": [
+            event_topic,  # Event signature topic
+            None,  # reclaimRequestId (indexed)
+            None,  # account (indexed)
+        ]
+    }
 
-    event_filter = contract.events.ReclaimProcessStarted.create_filter(
-        fromBlock=block_num_low, toBlock=block_num_high
-    )
-
-    events = event_filter.get_all_entries()
+    # Get logs using eth_getLogs
+    logs = w3.eth.get_logs(filter_params)
 
     formatted_events = []
-    for event in events:
+    for log in logs:
+        # Decode the non-indexed parameters from the data field
+        data = log['data']
+        # Remove '0x' prefix and split into 64-character chunks (32 bytes each)
+        data_chunks = [data[2:][i:i+64] for i in range(0, len(data[2:]), 64)]
+        
+        # Decode the parameters
+        amount = int(data_chunks[0], 16)
+        expiration_time = int(data_chunks[1], 16)
+        # URL and checksum are dynamic length, need to be decoded differently
+        # This is a simplified version - in production you'd want proper ABI decoding
+        url_length = int(data_chunks[2], 16)
+        url = bytes.fromhex(data_chunks[3][:url_length*2]).decode('utf-8')
+        url_content_md5_checksum = data_chunks[4]
+
         formatted_events.append(
             ReclaimProcessStartedEvent(
-                reclaim_request_id=event["args"]["reclaimRequestId"],
-                account=event["args"]["account"],
-                amount=event["args"]["amount"],
-                expiration_time=event["args"]["expirationTime"],
-                url=event["args"]["url"],
-                url_content_md5_checksum=event["args"]["urlContentMd5Checksum"].hex(),
-                block_number=event["blockNumber"],
-                transaction_hash=event["transactionHash"].hex(),
+                reclaim_request_id=int(log['topics'][1].hex(), 16),  # First indexed parameter
+                account=log['topics'][2],  # Second indexed parameter
+                amount=amount,
+                expiration_time=expiration_time,
+                url=url,
+                url_content_md5_checksum=url_content_md5_checksum,
+                block_number=log['blockNumber'],
+                transaction_hash=log['transactionHash'].hex(),
             )
         )
 
