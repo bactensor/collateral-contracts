@@ -34,12 +34,10 @@ def finalize_reclaim(w3, account, reclaim_request_id, contract_address):
             w3,
             contract,
             contract.functions.finalizeReclaim(reclaim_request_id),
-            account
+            account,
         )
 
         receipt = wait_for_receipt(w3, tx_hash)
-
-        # Get the Reclaimed event from the receipt
         reclaim_event = contract.events.Reclaimed().process_receipt(receipt)[0]
 
         return reclaim_event, receipt
@@ -50,9 +48,15 @@ def finalize_reclaim(w3, account, reclaim_request_id, contract_address):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Finalize a reclaim request on the Collateral contract')
-    parser.add_argument('contract_address', help='Address of the deployed Collateral contract')
-    parser.add_argument('reclaim_request_id', type=int, help='ID of the reclaim request to finalize')
+    parser = argparse.ArgumentParser(
+        description="Finalize a reclaim request on the Collateral contract"
+    )
+    parser.add_argument(
+        "contract_address", help="Address of the deployed Collateral contract"
+    )
+    parser.add_argument(
+        "reclaim_request_id", type=int, help="ID of the reclaim request to finalize"
+    )
     args = parser.parse_args()
 
     w3 = get_web3_connection()
@@ -62,7 +66,7 @@ def main():
         w3=w3,
         account=account,
         reclaim_request_id=args.reclaim_request_id,
-        contract_address=args.contract_address
+        contract_address=args.contract_address,
     )
 
     print(f"Successfully finalized reclaim request {args.reclaim_request_id}")
@@ -74,5 +78,5 @@ def main():
     print(f"  Block number: {receipt['blockNumber']}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

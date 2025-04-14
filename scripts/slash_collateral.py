@@ -21,7 +21,7 @@ def slash_collateral(
     url,
 ):
     """Slash collateral from a miner.
-    
+
     Args:
         w3 (Web3): Web3 instance
         account: The account to use for the transaction
@@ -29,10 +29,10 @@ def slash_collateral(
         amount_tao (float): Amount of TAO to slash
         contract_address (str): Address of the collateral contract
         url (str): URL containing information about the slash
-        
+
     Returns:
         dict: Transaction receipt with slash event details
-        
+
     Raises:
         Exception: If the transaction fails
     """
@@ -41,8 +41,8 @@ def slash_collateral(
     print(contract)
 
     # Calculate MD5 checksum if URL is valid
-    md5_checksum = '0' * 32
-    if url.startswith(('http://', 'https://')):
+    md5_checksum = "0" * 32
+    if url.startswith(("http://", "https://")):
         print("Calculating MD5 checksum of URL content...", file=sys.stderr)
         md5_checksum = calculate_md5_checksum(url)
         print(f"MD5 checksum: {md5_checksum}", file=sys.stderr)
@@ -52,7 +52,7 @@ def slash_collateral(
         contract,
         contract.functions.slashCollateral(
             miner_address,
-            w3.to_wei(amount_tao, 'ether'),
+            w3.to_wei(amount_tao, "ether"),
             url,
             bytes.fromhex(md5_checksum),
         ),
@@ -61,20 +61,15 @@ def slash_collateral(
     )
 
     receipt = wait_for_receipt(w3, tx_hash)
-    print(receipt)
-
-    # Get the Slashed event from the receipt
     slash_event = contract.events.Slashed().process_receipt(receipt)[0]
-    print(slash_event)
 
     return {
-        'receipt': receipt,
-        'event': slash_event,
+        "receipt": receipt,
+        "event": slash_event,
     }
 
 
 def main():
-    # Check command line arguments
     if len(sys.argv) != 5:
         print(
             "Usage: python slash_collateral.py "
@@ -108,7 +103,7 @@ def main():
             contract_address,
             url,
         )
-        
+
         print(f"Successfully slashed {amount_tao} TAO from {miner_address}")
         print("Event details:")
         print(f"  Account: {result['event']['args']['account']}")

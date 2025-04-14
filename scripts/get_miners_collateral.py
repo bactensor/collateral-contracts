@@ -28,10 +28,12 @@ def main():
     validate_address_format(miner_address)
 
     w3 = get_web3_connection()
-    
+
     collateral = get_miner_collateral(w3, contract_address, miner_address)
-    print(f"Collateral for miner {miner_address}: {w3.from_wei(collateral, 'ether')} TAO")
+    print(
+        f"Collateral for miner {miner_address}: {w3.from_wei(collateral, 'ether')} TAO"
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
