@@ -5,7 +5,7 @@ import sys
 from web3 import Web3
 from eth_account import Account
 from address_conversion import ss58_to_pubkey
-from common import get_web3_connection, get_account
+from common import get_web3_connection, get_account, wait_for_receipt
 
 
 def send_tao_to_ss58(w3: Web3, sender_account: Account, recipient_ss58: str, amount_wei: int) -> dict:
@@ -60,7 +60,7 @@ def send_tao_to_ss58(w3: Web3, sender_account: Account, recipient_ss58: str, amo
     print(f"Transaction sent! Hash: {tx_hash.hex()}")
 
     # Wait for transaction receipt
-    receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+    receipt = wait_for_receipt(w3, tx_hash)
     return receipt
 
 
