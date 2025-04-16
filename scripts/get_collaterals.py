@@ -15,7 +15,10 @@ def main():
     parser.add_argument(
         "block_start", type=int, help="Starting block number (inclusive)"
     )
-    parser.add_argument("block_end", type=int, help="Ending block number (inclusive)")
+    parser.add_argument(
+        "block_end",
+        type=int,
+        help="Ending block number (inclusive)")
     args = parser.parse_args()
 
     w3 = get_web3_connection()
@@ -31,8 +34,10 @@ def main():
     miner_addresses = set(event.account for event in deposit_events)
     results = []
     for miner_address in miner_addresses:
-        collateral = get_miner_collateral(w3, args.contract_address, miner_address)
-        results.append([miner_address, cumulative_deposits[miner_address], collateral])
+        collateral = get_miner_collateral(
+            w3, args.contract_address, miner_address)
+        results.append(
+            [miner_address, cumulative_deposits[miner_address], collateral])
 
     writer = csv.writer(sys.stdout)
     writer.writerow(

@@ -115,7 +115,8 @@ def main():
             f"  URL Content MD5: "
             f"{result['event']['args']['urlContentMd5Checksum'].hex()}",
         )
-        print(f"  Transaction hash: {result['receipt']['transactionHash'].hex()}")
+        print(
+            f"  Transaction hash: {result['receipt']['transactionHash'].hex()}")
         print(f"  Block number: {result['receipt']['blockNumber']}")
 
     except Exception as e:

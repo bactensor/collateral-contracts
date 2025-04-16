@@ -71,7 +71,8 @@ def verify_contract(contract_address):
         deployed_bytecode = get_deployed_bytecode(w3, contract_address)
 
         # Get the bytecode with constructor arguments
-        source_bytecode = deploy_on_devnet_and_get_bytecode(w3, contract_address)
+        source_bytecode = deploy_on_devnet_and_get_bytecode(
+            w3, contract_address)
 
         # Compare the bytecodes
         if deployed_bytecode == source_bytecode:

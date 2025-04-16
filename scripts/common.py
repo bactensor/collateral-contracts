@@ -185,7 +185,7 @@ def get_deposit_events(w3, contract_address, block_num_low, block_num_high):
         list[DepositEvent]: List of Deposit events
     """
     contract_abi = load_contract_abi()
-    
+
     contract = w3.eth.contract(address=contract_address, abi=contract_abi)
 
     checksum_address = w3.to_checksum_address(contract_address)
@@ -206,9 +206,9 @@ def get_deposit_events(w3, contract_address, block_num_low, block_num_high):
     for log in logs:
         account_address = "0x" + log["topics"][1].hex()[-40:]
         account = w3.to_checksum_address(account_address)
-        
+
         decoded_event = contract.events.Deposit().process_log(log)
-        
+
         formatted_events.append(
             DepositEvent(
                 account=account,

@@ -48,13 +48,14 @@ def send_tao_to_ss58(
         }
     )
 
-    signed_txn = w3.eth.account.sign_transaction(transaction, sender_account.key)
+    signed_txn = w3.eth.account.sign_transaction(
+        transaction, sender_account.key)
     tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
     print(f"Transaction sent! Hash: {tx_hash.hex()}")
 
     # Wait for transaction receipt
     receipt = wait_for_receipt(w3, tx_hash)
-    
+
     return receipt
 
 

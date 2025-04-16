@@ -3,6 +3,7 @@ from substrateinterface import Keypair
 from substrateinterface.utils.ss58 import ss58_encode
 import hashlib
 
+
 def ss58_to_pubkey(ss58_address: str) -> bytes:
     """
     Convert SS58 address to public key bytes.
@@ -22,7 +23,8 @@ def ss58_to_pubkey(ss58_address: str) -> bytes:
         return keypair.public_key
 
     except Exception as e:
-        raise ValueError(f"Error converting SS58 address to public key: {str(e)}")
+        raise ValueError(
+            f"Error converting SS58 address to public key: {str(e)}")
 
 
 # https://github.com/opentensor/evm-bittensor/blob/main/examples/address-mapping.js
@@ -46,4 +48,3 @@ def h160_to_ss58(h160_address: str, ss58_format: int = 42) -> str:
     checksum = hashlib.blake2b(prefixed_address, digest_size=32).digest()
 
     return ss58_encode(checksum, ss58_format=ss58_format)
-

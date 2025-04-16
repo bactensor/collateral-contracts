@@ -23,9 +23,9 @@ def generate_and_save_keypair(output_path: str) -> dict:
     account = Account.create()
     private_key = keys.PrivateKey(account.key)
     public_key = private_key.public_key
-    
+
     keypair_data = {
-        "address": account.address, 
+        "address": account.address,
         "private_key": account.key.hex(),
         "public_key": public_key.to_hex()
     }

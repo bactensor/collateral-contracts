@@ -94,7 +94,8 @@ def main():
     account = get_account()
 
     try:
-        result = reclaim_collateral(w3, account, amount_tao, contract_address, url)
+        result = reclaim_collateral(
+            w3, account, amount_tao, contract_address, url)
 
         print(f"Successfully initiated reclaim of {result['amount_tao']} TAO")
         print("Event details:")
@@ -104,13 +105,15 @@ def main():
             f"  Amount: "
             f"{w3.from_wei(result['event']['args']['amount'], 'ether')} TAO",
         )
-        print(f"  Expiration Time: {result['event']['args']['expirationTime']}")
+        print(
+            f"  Expiration Time: {result['event']['args']['expirationTime']}")
         print(f"  URL: {result['event']['args']['url']}")
         print(
             f"  URL Content MD5: "
             f"{result['event']['args']['urlContentMd5Checksum'].hex()}",
         )
-        print(f"  Transaction hash: {result['receipt']['transactionHash'].hex()}")
+        print(
+            f"  Transaction hash: {result['receipt']['transactionHash'].hex()}")
         print(f"  Block number: {result['receipt']['blockNumber']}")
 
     except Exception as e:

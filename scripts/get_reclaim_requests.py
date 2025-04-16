@@ -36,9 +36,9 @@ def get_reclaim_process_started_events(
         list[ReclaimProcessStartedEvent]: List of ReclaimProcessStarted events
     """
     contract_abi = load_contract_abi()
-    
+
     contract = w3.eth.contract(address=contract_address, abi=contract_abi)
-    
+
     checksum_address = w3.to_checksum_address(contract_address)
 
     event_signature = "ReclaimProcessStarted(uint256,address,uint256,uint64,string,bytes16)"
@@ -58,13 +58,13 @@ def get_reclaim_process_started_events(
 
     formatted_events = []
     for log in logs:
-        reclaim_request_id = int(log["topics"][1].hex(), 16)   
+        reclaim_request_id = int(log["topics"][1].hex(), 16)
 
         account_address = "0x" + log["topics"][2].hex()[-40:]
         account = w3.to_checksum_address(account_address)
 
         decoded_event = contract.events.ReclaimProcessStarted().process_log(log)
-        
+
         formatted_events.append(
             ReclaimProcessStartedEvent(
                 reclaim_request_id=reclaim_request_id,
@@ -72,7 +72,8 @@ def get_reclaim_process_started_events(
                 amount=decoded_event['args']['amount'],
                 expiration_time=decoded_event['args']['expirationTime'],
                 url=decoded_event['args']['url'],
-                url_content_md5_checksum=decoded_event['args']['urlContentMd5Checksum'].hex(),
+                url_content_md5_checksum=decoded_event['args']['urlContentMd5Checksum'].hex(
+                ),
                 block_number=log["blockNumber"],
                 transaction_hash=log["transactionHash"].hex(),
             )
@@ -91,7 +92,10 @@ def main():
     parser.add_argument(
         "block_start", type=int, help="Starting block number (inclusive)"
     )
-    parser.add_argument("block_end", type=int, help="Ending block number (inclusive)")
+    parser.add_argument(
+        "block_end",
+        type=int,
+        help="Ending block number (inclusive)")
 
     args = parser.parse_args()
 

@@ -73,7 +73,8 @@ def main():
     print("Event details:")
     print(f"  Reclaim ID: {reclaim_event['args']['reclaimRequestId']}")
     print(f"  Account: {reclaim_event['args']['account']}")
-    print(f"  Amount: {w3.from_wei(reclaim_event['args']['amount'], 'ether')} TAO")
+    print(
+        f"  Amount: {w3.from_wei(reclaim_event['args']['amount'], 'ether')} TAO")
     print(f"  Transaction hash: {receipt['transactionHash'].hex()}")
     print(f"  Block number: {receipt['blockNumber']}")
 

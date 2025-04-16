@@ -13,7 +13,8 @@ from common import (
 )
 
 
-def deny_reclaim_request(w3, account, reclaim_request_id, url, contract_address):
+def deny_reclaim_request(
+        w3, account, reclaim_request_id, url, contract_address):
     """Deny a reclaim request on the contract.
 
     Args:
@@ -86,7 +87,8 @@ def main():
     print("Event details:")
     print(f"  Reclaim ID: {deny_event['args']['reclaimRequestId']}")
     print(f"  URL: {deny_event['args']['url']}")
-    print(f"  URL Content MD5: {deny_event['args']['urlContentMd5Checksum'].hex()}")
+    print(
+        f"  URL Content MD5: {deny_event['args']['urlContentMd5Checksum'].hex()}")
     print(f"  Transaction hash: {receipt['transactionHash'].hex()}")
     print(f"  Block number: {receipt['blockNumber']}")
 

@@ -37,7 +37,8 @@ def verify_trustee(contract, expected_trustee):
         sys.exit(1)
 
 
-def deposit_collateral(w3, account, amount_tao, contract_address, trustee_address):
+def deposit_collateral(w3, account, amount_tao,
+                       contract_address, trustee_address):
     """Deposit collateral into the contract.
 
     Args:
@@ -109,7 +110,8 @@ def main():
     print(f"Successfully deposited {amount_tao} TAO")
     print("Event details:")
     print(f"  Account: {deposit_event['args']['account']}")
-    print(f"  Amount: {w3.from_wei(deposit_event['args']['amount'], 'ether')} TAO")
+    print(
+        f"  Amount: {w3.from_wei(deposit_event['args']['amount'], 'ether')} TAO")
     print(f"  Transaction hash: {receipt['transactionHash'].hex()}")
     print(f"  Block number: {receipt['blockNumber']}")
 
