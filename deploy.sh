@@ -63,4 +63,7 @@ forge create src/Collateral.sol:Collateral \
     --broadcast \
     --rpc-url "$RPC_URL" \
     --private-key "$DEPLOYER_PRIVATE_KEY" \
-    --constructor-args "$NETUID" "$TRUSTEE_ADDRESS" "$MIN_COLLATERAL_INCREASE" "$DENY_TIMEOUT"
+    --constructor-args "$NETUID" "$TRUSTEE_ADDRESS" "$MIN_COLLATERAL_INCREASE" "$DENY_TIMEOUT" #\
+#    --verify \
+#    --verifier blockscout \
+#    --verifier-url 'https://evm-testscan.dev.opentensor.ai/api/'
