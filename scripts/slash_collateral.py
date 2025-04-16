@@ -38,7 +38,6 @@ def slash_collateral(
     """
     contract_abi = load_contract_abi()
     contract = w3.eth.contract(address=contract_address, abi=contract_abi)
-    print(contract)
 
     # Calculate MD5 checksum if URL is valid
     md5_checksum = "0" * 32
