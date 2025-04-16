@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+"""
+Contract Verification Script
+
+This script verifies the Collateral smart contract on the blockchain explorer.
+It works by deploying the contract on a local Anvil instance, comparing the
+bytecode with the deployed contract, and submitting verification to the explorer.
+"""
+
 import subprocess
 import sys
 import time
@@ -79,10 +87,10 @@ def verify_contract(contract_address):
             print("✅ Contract verification successful!")
             print("The deployed contract matches the source code.")
             return True
-        else:
-            print("❌ Contract verification failed!")
-            print("The deployed contract does not match the source code.")
-            return False
+
+        print("❌ Contract verification failed!")
+        print("The deployed contract does not match the source code.")
+        return False
 
     except Exception as e:
         print(f"Error during verification: {str(e)}")

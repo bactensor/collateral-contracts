@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+"""
+Collateral Reclaim Script
+
+This script allows users to initiate the process of reclaiming their collateral
+from the Collateral smart contract. It handles the creation of reclaim requests
+with associated URLs for verification purposes.
+"""
+
 import sys
 from common import (
     load_contract_abi,
@@ -48,7 +56,6 @@ def reclaim_collateral(
 
     tx_hash = build_and_send_transaction(
         w3,
-        contract,
         contract.functions.reclaimCollateral(
             amount_wei,
             url,

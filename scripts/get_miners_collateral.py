@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
 
+"""
+Miner Collateral Query Tool
+
+This script allows users to query the collateral amount for a specific miner
+in a given smart contract. It connects to a blockchain network, validates
+the provided addresses, and retrieves the collateral information.
+
+The script will output the collateral amount in TAO (the native token).
+"""
+
 import sys
 
 from common import (

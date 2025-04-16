@@ -1,3 +1,11 @@
+"""
+Collateral Retrieval Script
+
+This script retrieves and displays collateral information for miners who have
+deposited within a specified block range. It aggregates deposit events and
+calculates the current collateral amounts for each miner.
+"""
+
 import argparse
 import csv
 import sys

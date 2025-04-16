@@ -1,7 +1,15 @@
 #!/usr/bin/env python3
+"""
+Address Conversion Utilities
+
+This module provides functions for converting between different address formats
+used in blockchain systems. It supports conversion between SS58 addresses (used
+in Substrate-based chains) and H160 addresses (Ethereum-style addresses).
+"""
+
+import hashlib
 from substrateinterface import Keypair
 from substrateinterface.utils.ss58 import ss58_encode
-import hashlib
 
 
 def ss58_to_pubkey(ss58_address: str) -> bytes:

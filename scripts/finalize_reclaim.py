@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+"""
+Reclaim Finalization Script
+
+This script allows users to finalize their collateral reclaim requests after
+the waiting period has elapsed. It processes the reclaim request and returns
+the collateral to the user's address.
+"""
+
 import sys
 import argparse
 from common import (
@@ -32,7 +40,6 @@ def finalize_reclaim(w3, account, reclaim_request_id, contract_address):
     try:
         tx_hash = build_and_send_transaction(
             w3,
-            contract,
             contract.functions.finalizeReclaim(reclaim_request_id),
             account,
         )

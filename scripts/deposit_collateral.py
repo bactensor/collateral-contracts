@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+"""
+Collateral Deposit Script
+
+This script allows users to deposit collateral into the Collateral smart contract.
+It handles validation of minimum collateral amounts, trustee verification, and
+executes the deposit transaction on the blockchain.
+"""
+
 import sys
 from web3 import Web3
 from common import (
@@ -65,7 +73,7 @@ def deposit_collateral(w3, account, amount_tao,
         check_minimum_collateral(contract, amount_wei)
 
         tx_hash = build_and_send_transaction(
-            w3, contract, contract.functions.deposit(), account, value=amount_wei
+            w3, contract.functions.deposit(), account, value=amount_wei
         )
 
         receipt = wait_for_receipt(w3, tx_hash)

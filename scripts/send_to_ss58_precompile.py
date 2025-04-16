@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 
-import os
+"""
+SS58 Precompile Transfer Script
+
+This script enables sending TAO tokens to SS58 addresses using the precompile
+contract at address 0x0000000000000000000000000000000000000800. It handles
+the conversion of SS58 addresses to the appropriate format for the precompile.
+"""
+
 import sys
 from web3 import Web3
 from eth_account import Account

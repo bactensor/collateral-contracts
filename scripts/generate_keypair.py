@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+"""
+Keypair Generation Script
+
+This script generates a new Ethereum keypair (private key, public key, and address)
+and saves it to a specified file. It's useful for creating new accounts for
+interacting with the Collateral smart contract.
+"""
+
 import os
 import sys
 import json

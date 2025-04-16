@@ -1,9 +1,21 @@
+"""
+Common Utilities for Collateral Management
+
+This module provides shared functionality for interacting with the Collateral smart contract.
+It includes utilities for:
+- Loading contract ABIs
+- Establishing Web3 connections
+- Managing accounts and transactions
+- Retrieving and processing blockchain events
+- Validating addresses and calculating checksums
+"""
+
 import os
 import sys
 import json
 import hashlib
-import requests
 from dataclasses import dataclass
+import requests
 from web3 import Web3
 from eth_account import Account
 
@@ -106,13 +118,12 @@ def validate_address_format(address):
 
 
 def build_and_send_transaction(
-    w3, contract, function_call, account, gas_limit=100000, value=0
+    w3, function_call, account, gas_limit=100000, value=0
 ):
     """Build, sign and send a transaction.
 
     Args:
         w3: Web3 instance
-        contract: Contract instance
         function_call: Contract function call to execute
         account: Account to send transaction from
         gas_limit: Maximum gas to use for the transaction

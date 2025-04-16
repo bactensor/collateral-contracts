@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+"""
+Reclaim Request Denial Script
+
+This script allows trustees to deny collateral reclaim requests. It requires
+a URL that explains the reason for denial, which is stored on-chain for
+transparency and accountability.
+"""
+
 import sys
 import argparse
 from common import (
@@ -42,7 +50,6 @@ def deny_reclaim_request(
 
         tx_hash = build_and_send_transaction(
             w3,
-            contract,
             contract.functions.denyReclaimRequest(
                 reclaim_request_id, url, bytes.fromhex(md5_checksum)
             ),

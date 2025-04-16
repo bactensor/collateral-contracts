@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+"""
+Reclaim Request Retrieval Script
+
+This script retrieves and displays information about reclaim requests from the
+Collateral smart contract. It fetches ReclaimProcessStarted events within a
+specified block range and provides details about each reclaim request.
+"""
+
 import sys
 import csv
 import argparse
@@ -18,7 +26,6 @@ class ReclaimProcessStartedEvent:
     url: str
     url_content_md5_checksum: str
     block_number: int
-    transaction_hash: str
 
 
 def get_reclaim_process_started_events(
@@ -72,20 +79,16 @@ def get_reclaim_process_started_events(
                 amount=decoded_event['args']['amount'],
                 expiration_time=decoded_event['args']['expirationTime'],
                 url=decoded_event['args']['url'],
-                url_content_md5_checksum=decoded_event['args']['urlContentMd5Checksum'].hex(
-                ),
+                url_content_md5_checksum=decoded_event['args']['urlContentMd5Checksum'].hex(),
                 block_number=log["blockNumber"],
-                transaction_hash=log["transactionHash"].hex(),
-            )
-        )
+            ))
 
     return formatted_events
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Fetch ReclaimProcessStarted events from Collateral contract"
-    )
+        description="Fetch ReclaimProcessStarted events from Collateral contract")
     parser.add_argument(
         "contract_address", help="Address of the deployed Collateral contract"
     )
@@ -112,7 +115,6 @@ def main():
         "url",
         "url_content_md5_checksum",
         "block_number",
-        "transaction_hash",
     ]
 
     writer = csv.DictWriter(sys.stdout, fieldnames=fieldnames)
@@ -128,7 +130,6 @@ def main():
                 "url": event.url,
                 "url_content_md5_checksum": event.url_content_md5_checksum,
                 "block_number": event.block_number,
-                "transaction_hash": event.transaction_hash,
             }
         )
 

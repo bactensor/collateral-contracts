@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+"""
+Collateral Slashing Script
+
+This script allows trustees to slash collateral from miners who have violated
+protocol rules. It handles the creation of slashing requests with associated
+URLs for verification purposes.
+"""
+
 import sys
 from common import (
     load_contract_abi,
@@ -48,7 +56,6 @@ def slash_collateral(
 
     tx_hash = build_and_send_transaction(
         w3,
-        contract,
         contract.functions.slashCollateral(
             miner_address,
             w3.to_wei(amount_tao, "ether"),
