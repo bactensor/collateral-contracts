@@ -53,6 +53,9 @@ This contract creates a **trust-minimized interaction** between miners and valid
 > - Refer to [`scripts/transfer_ss58_h160.py`](todo-link) (and similarly [`scripts/transfer_tao_from_eth.py`](todo-link))
 >   for examples of how to move TAO between your Bittensor SS58 wallet and your H160 wallet.
 
+## Demo
+
+[![asciicast](https://asciinema.org/a/TwXIpf0SffBjg8mZstaFUuA2L.svg)](https://asciinema.org/a/TwXIpf0SffBjg8mZstaFUuA2L)
 
 ## Collateral Smart Contract Lifecycle
 
