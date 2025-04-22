@@ -54,7 +54,7 @@ def deposit_collateral(w3, account, amount_tao,
         account: Account to use for the transaction
         amount_tao: Amount to deposit in TAO
         contract_address: Address of the contract
-        trustee_address: Optional trustee address to verify
+        trustee_address: Trustee address to verify
 
     Returns:
         tuple: (deposit_event, receipt)
