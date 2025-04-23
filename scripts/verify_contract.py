@@ -12,12 +12,55 @@ import subprocess
 import sys
 import time
 from web3 import Web3
-from common import get_web3_connection, get_contract_config
+from common import get_web3_connection
 
 ANVIL_PORT = 8555
 ANVIL_RPC_URL = f"http://127.0.0.1:{ANVIL_PORT}"
 # the first preset private key available in anvil
 ANVIL_PRIVATE_KEY = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+
+
+def get_contract_config(w3, contract_address):
+    # minimal ABI for the functions we need
+    ABI = [
+        {
+            "inputs": [],
+            "name": "NETUID",
+            "outputs": [{"internalType": "uint16", "name": "", "type": "uint16"}],
+            "stateMutability": "view",
+            "type": "function",
+        },
+        {
+            "inputs": [],
+            "name": "TRUSTEE",
+            "outputs": [{"internalType": "address", "name": "", "type": "address"}],
+            "stateMutability": "view",
+            "type": "function",
+        },
+        {
+            "inputs": [],
+            "name": "DECISION_TIMEOUT",
+            "outputs": [{"internalType": "uint64", "name": "", "type": "uint64"}],
+            "stateMutability": "view",
+            "type": "function",
+        },
+        {
+            "inputs": [],
+            "name": "MIN_COLLATERAL_INCREASE",
+            "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+            "stateMutability": "view",
+            "type": "function",
+        },
+    ]
+
+    contract = w3.eth.contract(address=contract_address, abi=ABI)
+
+    netuid = contract.functions.NETUID().call()
+    trustee = contract.functions.TRUSTEE().call()
+    decision_timeout = contract.functions.DECISION_TIMEOUT().call()
+    min_collateral_increase = contract.functions.MIN_COLLATERAL_INCREASE().call()
+
+    return netuid, trustee, decision_timeout, min_collateral_increase
 
 
 def get_deployed_bytecode(w3, contract_address):

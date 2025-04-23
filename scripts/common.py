@@ -57,59 +57,6 @@ def get_account():
     return Account.from_key(private_key)
 
 
-def get_contract_config(w3, contract_address):
-    """
-    Get the configuration parameters from a deployed Collateral contract.
-
-    Args:
-        w3 (Web3): Web3 instance to use for blockchain interaction
-        contract_address (str): The address of the deployed Collateral contract
-
-    Returns:
-        tuple: (trustee, decision_timeout, min_collateral_increase, netuid)
-    """
-    # minimal ABI for the functions we need
-    ABI = [
-        {
-            "inputs": [],
-            "name": "NETUID",
-            "outputs": [{"internalType": "uint16", "name": "", "type": "uint16"}],
-            "stateMutability": "view",
-            "type": "function",
-        },
-        {
-            "inputs": [],
-            "name": "TRUSTEE",
-            "outputs": [{"internalType": "address", "name": "", "type": "address"}],
-            "stateMutability": "view",
-            "type": "function",
-        },
-        {
-            "inputs": [],
-            "name": "DECISION_TIMEOUT",
-            "outputs": [{"internalType": "uint64", "name": "", "type": "uint64"}],
-            "stateMutability": "view",
-            "type": "function",
-        },
-        {
-            "inputs": [],
-            "name": "MIN_COLLATERAL_INCREASE",
-            "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-            "stateMutability": "view",
-            "type": "function",
-        },
-    ]
-
-    contract = w3.eth.contract(address=contract_address, abi=ABI)
-
-    netuid = contract.functions.NETUID().call()
-    trustee = contract.functions.TRUSTEE().call()
-    decision_timeout = contract.functions.DECISION_TIMEOUT().call()
-    min_collateral_increase = contract.functions.MIN_COLLATERAL_INCREASE().call()
-
-    return netuid, trustee, decision_timeout, min_collateral_increase
-
-
 def validate_address_format(address):
     """Validate if the given address is a valid Ethereum address."""
     if not Web3.is_address(address):
@@ -181,55 +128,6 @@ class DepositEvent:
     amount: int
     block_number: int
     transaction_hash: str
-
-
-def get_deposit_events(w3, contract_address, block_num_low, block_num_high):
-    """Fetch all Deposit events emitted by the Collateral contract within a block range.
-
-    Args:
-        w3 (Web3): Web3 instance to use for blockchain interaction
-        contract_address (str): The address of the deployed Collateral contract
-        block_num_low (int): The starting block number (inclusive)
-        block_num_high (int): The ending block number (inclusive)
-
-    Returns:
-        list[DepositEvent]: List of Deposit events
-    """
-    contract_abi = load_contract_abi()
-
-    contract = w3.eth.contract(address=contract_address, abi=contract_abi)
-
-    checksum_address = w3.to_checksum_address(contract_address)
-
-    event_signature = "Deposit(address,uint256)"
-    event_topic = w3.keccak(text=event_signature).hex()
-
-    filter_params = {
-        "fromBlock": hex(block_num_low),
-        "toBlock": hex(block_num_high),
-        "address": checksum_address,
-        "topics": [event_topic]
-    }
-
-    logs = w3.eth.get_logs(filter_params)
-
-    formatted_events = []
-    for log in logs:
-        account_address = "0x" + log["topics"][1].hex()[-40:]
-        account = w3.to_checksum_address(account_address)
-
-        decoded_event = contract.events.Deposit().process_log(log)
-
-        formatted_events.append(
-            DepositEvent(
-                account=account,
-                amount=decoded_event['args']['amount'],
-                block_number=log["blockNumber"],
-                transaction_hash=log["transactionHash"].hex(),
-            )
-        )
-
-    return formatted_events
 
 
 def get_miner_collateral(w3, contract_address, miner_address):
