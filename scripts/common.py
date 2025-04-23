@@ -15,7 +15,6 @@ import pathlib
 import sys
 import json
 import hashlib
-from dataclasses import dataclass
 import requests
 from web3 import Web3
 from eth_account import Account
@@ -118,16 +117,6 @@ def calculate_md5_checksum(url):
     except requests.RequestException as e:
         print(f"Error fetching URL content: {str(e)}", file=sys.stderr)
         sys.exit(1)
-
-
-@dataclass
-class DepositEvent:
-    """Represents a Deposit event emitted by the Collateral contract."""
-
-    account: str
-    amount: int
-    block_number: int
-    transaction_hash: str
 
 
 def get_miner_collateral(w3, contract_address, miner_address):

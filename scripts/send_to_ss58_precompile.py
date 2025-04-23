@@ -8,6 +8,7 @@ contract at address 0x0000000000000000000000000000000000000800. It handles
 the conversion of SS58 addresses to the appropriate format for the precompile.
 """
 
+import argparse
 import sys
 from web3 import Web3
 from eth_account import Account
@@ -67,11 +68,20 @@ def send_tao_to_ss58(
 
 
 def main():
-    if len(sys.argv) != 3:
-        print("Usage: python send_to_ss58.py <recipient_ss58_address> <amount_wei>")
-        sys.exit(1)
-    recipient_ss58_address = sys.argv[1]
-    amount_wei = int(sys.argv[2])
+    parser = argparse.ArgumentParser(
+        description="Send TAO tokens to an SS58 address using the precompile contract"
+    )
+    parser.add_argument(
+        "recipient_ss58_address",
+        help="The SS58 address of the recipient"
+    )
+    parser.add_argument(
+        "amount_wei",
+        type=int,
+        help="The amount to send in wei (smallest unit of TAO)"
+    )
+    
+    args = parser.parse_args()
 
     try:
         w3 = get_web3_connection()
@@ -81,8 +91,8 @@ def main():
         receipt = send_tao_to_ss58(
             w3=w3,
             sender_account=account,
-            recipient_ss58=recipient_ss58_address,
-            amount_wei=amount_wei,
+            recipient_ss58=args.recipient_ss58_address,
+            amount_wei=args.amount_wei,
         )
 
         print(

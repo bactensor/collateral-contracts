@@ -10,7 +10,18 @@ import argparse
 import csv
 import sys
 from collections import defaultdict
-from common import get_web3_connection, get_miner_collateral
+from common import load_contract_abi, get_web3_connection, get_miner_collateral
+from dataclasses import dataclass
+
+
+@dataclass
+class DepositEvent:
+    """Represents a Deposit event emitted by the Collateral contract."""
+
+    account: str
+    amount: int
+    block_number: int
+    transaction_hash: str
 
 
 def get_deposit_events(w3, contract_address, block_num_low, block_num_high):

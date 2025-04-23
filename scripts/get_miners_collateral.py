@@ -10,7 +10,7 @@ the provided addresses, and retrieves the collateral information.
 The script will output the collateral amount in TAO (the native token).
 """
 
-import sys
+import argparse
 
 from common import (
     get_web3_connection,
@@ -21,27 +21,28 @@ from common import (
 
 def main():
     """Main function to handle command line arguments and display collateral."""
-    if len(sys.argv) != 3:
-        print(
-            "Usage: python get_miners_collateral.py <contract_address> <miner_address>",
-            file=sys.stderr,
-        )
-        print(
-            "Example: python get_miners_collateral.py 0x123... 0x456... ",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-    contract_address = sys.argv[1]
-    miner_address = sys.argv[2]
-
-    validate_address_format(contract_address)
-    validate_address_format(miner_address)
+    parser = argparse.ArgumentParser(
+        description="Query the collateral amount for a specific miner in a smart contract"
+    )
+    parser.add_argument(
+        "contract_address",
+        help="The address of the smart contract"
+    )
+    parser.add_argument(
+        "miner_address",
+        help="The address of the miner to query"
+    )
+    
+    args = parser.parse_args()
+    
+    validate_address_format(args.contract_address)
+    validate_address_format(args.miner_address)
 
     w3 = get_web3_connection()
 
-    collateral = get_miner_collateral(w3, contract_address, miner_address)
+    collateral = get_miner_collateral(w3, args.contract_address, args.miner_address)
     print(
-        f"Collateral for miner {miner_address}: {w3.from_wei(collateral, 'ether')} TAO"
+        f"Collateral for miner {args.miner_address}: {w3.from_wei(collateral, 'ether')} TAO"
     )
 
 

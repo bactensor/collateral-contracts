@@ -9,6 +9,7 @@ URLs for verification purposes.
 """
 
 import sys
+import argparse
 from common import (
     load_contract_abi,
     get_web3_connection,
@@ -73,26 +74,31 @@ def slash_collateral(
 
 
 def main():
-    if len(sys.argv) != 5:
-        print(
-            "Usage: python slash_collateral.py "
-            "<contract_address> <miner_address> <amount_in_tao> <url>",
-            file=sys.stderr,
-        )
-        print(
-            "Example: python slash_collateral.py "
-            "0x123... 0x456... 1.5 https://example.com/slash-info",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+    parser = argparse.ArgumentParser(
+        description="Slash collateral from a miner."
+    )
+    parser.add_argument(
+        "contract_address",
+        help="Address of the collateral contract"
+    )
+    parser.add_argument(
+        "miner_address",
+        help="Address of the miner to slash"
+    )
+    parser.add_argument(
+        "amount_tao",
+        type=float,
+        help="Amount of TAO to slash"
+    )
+    parser.add_argument(
+        "url",
+        help="URL containing information about the slash"
+    )
 
-    contract_address = sys.argv[1]
-    miner_address = sys.argv[2]
-    amount_tao = float(sys.argv[3])
-    url = sys.argv[4]
+    args = parser.parse_args()
 
-    validate_address_format(contract_address)
-    validate_address_format(miner_address)
+    validate_address_format(args.contract_address)
+    validate_address_format(args.miner_address)
 
     w3 = get_web3_connection()
     account = get_account()
@@ -101,13 +107,13 @@ def main():
         receipt, event = slash_collateral(
             w3,
             account,
-            miner_address,
-            amount_tao,
-            contract_address,
-            url,
+            args.miner_address,
+            args.amount_tao,
+            args.contract_address,
+            args.url,
         )
 
-        print(f"Successfully slashed {amount_tao} TAO from {miner_address}")
+        print(f"Successfully slashed {args.amount_tao} TAO from {args.miner_address}")
         print("Event details:")
         print(f"  Account: {event['args']['account']}")
         print(

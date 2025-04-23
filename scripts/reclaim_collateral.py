@@ -9,6 +9,7 @@ with associated URLs for verification purposes.
 """
 
 import sys
+import argparse
 from common import (
     load_contract_abi,
     get_web3_connection,
@@ -74,33 +75,35 @@ def reclaim_collateral(
 
 
 def main():
-    if len(sys.argv) != 4:
-        print(
-            "Usage: python reclaim_collateral.py "
-            "<contract_address> <amount_in_tao> <url>",
-            file=sys.stderr,
-        )
-        print(
-            "Example: python reclaim_collateral.py "
-            "0x123... 1.5 https://example.com/reclaim-info",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+    parser = argparse.ArgumentParser(
+        description="Initiate the process of reclaiming collateral."
+    )
+    parser.add_argument(
+        "contract_address",
+        help="Address of the collateral contract"
+    )
+    parser.add_argument(
+        "amount_tao",
+        type=float,
+        help="Amount of TAO to reclaim"
+    )
+    parser.add_argument(
+        "url",
+        help="URL for reclaim information"
+    )
 
-    contract_address = sys.argv[1]
-    amount_tao = float(sys.argv[2])
-    url = sys.argv[3]
+    args = parser.parse_args()
 
-    validate_address_format(contract_address)
+    validate_address_format(args.contract_address)
 
     w3 = get_web3_connection()
     account = get_account()
 
     try:
         receipt, event = reclaim_collateral(
-            w3, account, amount_tao, contract_address, url)
+            w3, account, args.amount_tao, args.contract_address, args.url)
 
-        print(f"Successfully initiated reclaim of {amount_tao} TAO")
+        print(f"Successfully initiated reclaim of {args.amount_tao} TAO")
         print("Event details:")
         print(f"  Reclaim ID: {event['args']['reclaimRequestId']}")
         print(f"  Account: {event['args']['account']}")

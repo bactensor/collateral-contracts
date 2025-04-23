@@ -9,6 +9,7 @@ executes the deposit transaction on the blockchain.
 """
 
 import sys
+import argparse
 from web3 import Web3
 from common import (
     load_contract_abi,
@@ -88,21 +89,24 @@ def deposit_collateral(w3, account, amount_tao,
 
 def main():
     """Handle command line arguments and execute deposit."""
-    if len(sys.argv) != 4:
-        print(
-            "Usage: ./deposit_collateral.py <contract_address> "
-            "<amount_in_tao> <trustee_address>",
-            file=sys.stderr,
-        )
-        print(
-            "Example: python deposit_collateral.py 0x123... 1.5 0x456...",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+    parser = argparse.ArgumentParser(
+        description="Deposit collateral into the Collateral smart contract"
+    )
+    parser.add_argument(
+        "contract_address",
+        help="Address of the Collateral contract"
+    )
+    parser.add_argument(
+        "amount_tao",
+        type=float,
+        help="Amount of TAO to deposit"
+    )
+    parser.add_argument(
+        "trustee_address",
+        help="Expected trustee address to verify"
+    )
 
-    contract_address = sys.argv[1]
-    amount_tao = float(sys.argv[2])
-    trustee_address = sys.argv[3]
+    args = parser.parse_args()
 
     w3 = get_web3_connection()
     account = get_account()
@@ -110,12 +114,12 @@ def main():
     deposit_event, receipt = deposit_collateral(
         w3=w3,
         account=account,
-        amount_tao=amount_tao,
-        contract_address=contract_address,
-        trustee_address=trustee_address,
+        amount_tao=args.amount_tao,
+        contract_address=args.contract_address,
+        trustee_address=args.trustee_address,
     )
 
-    print(f"Successfully deposited {amount_tao} TAO")
+    print(f"Successfully deposited {args.amount_tao} TAO")
     print("Event details:")
     print(f"  Account: {deposit_event['args']['account']}")
     print(
