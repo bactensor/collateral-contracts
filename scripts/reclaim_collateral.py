@@ -70,11 +70,7 @@ def reclaim_collateral(
         receipt,
     )[0]
 
-    return {
-        "receipt": receipt,
-        "event": reclaim_event,
-        "amount_tao": amount_tao,
-    }
+    return receipt, reclaim_event
 
 
 def main():
@@ -101,27 +97,27 @@ def main():
     account = get_account()
 
     try:
-        result = reclaim_collateral(
+        receipt, event = reclaim_collateral(
             w3, account, amount_tao, contract_address, url)
 
-        print(f"Successfully initiated reclaim of {result['amount_tao']} TAO")
+        print(f"Successfully initiated reclaim of {amount_tao} TAO")
         print("Event details:")
-        print(f"  Reclaim ID: {result['event']['args']['reclaimRequestId']}")
-        print(f"  Account: {result['event']['args']['account']}")
+        print(f"  Reclaim ID: {event['args']['reclaimRequestId']}")
+        print(f"  Account: {event['args']['account']}")
         print(
             f"  Amount: "
-            f"{w3.from_wei(result['event']['args']['amount'], 'ether')} TAO",
+            f"{w3.from_wei(event['args']['amount'], 'ether')} TAO",
         )
         print(
-            f"  Expiration Time: {result['event']['args']['expirationTime']}")
-        print(f"  URL: {result['event']['args']['url']}")
+            f"  Expiration Time: {event['args']['expirationTime']}")
+        print(f"  URL: {event['args']['url']}")
         print(
             f"  URL Content MD5: "
-            f"{result['event']['args']['urlContentMd5Checksum'].hex()}",
+            f"{event['args']['urlContentMd5Checksum'].hex()}",
         )
         print(
-            f"  Transaction hash: {result['receipt']['transactionHash'].hex()}")
-        print(f"  Block number: {result['receipt']['blockNumber']}")
+            f"  Transaction hash: {receipt['transactionHash'].hex()}")
+        print(f"  Block number: {receipt['blockNumber']}")
 
     except Exception as e:
         print(f"Error: {str(e)}", file=sys.stderr)

@@ -69,10 +69,7 @@ def slash_collateral(
     receipt = wait_for_receipt(w3, tx_hash)
     slash_event = contract.events.Slashed().process_receipt(receipt)[0]
 
-    return {
-        "receipt": receipt,
-        "event": slash_event,
-    }
+    return receipt, slash_event
 
 
 def main():
@@ -101,7 +98,7 @@ def main():
     account = get_account()
 
     try:
-        result = slash_collateral(
+        receipt, event = slash_collateral(
             w3,
             account,
             miner_address,
@@ -112,19 +109,19 @@ def main():
 
         print(f"Successfully slashed {amount_tao} TAO from {miner_address}")
         print("Event details:")
-        print(f"  Account: {result['event']['args']['account']}")
+        print(f"  Account: {event['args']['account']}")
         print(
             f"  Amount: "
-            f"{w3.from_wei(result['event']['args']['amount'], 'ether')} TAO",
+            f"{w3.from_wei(event['args']['amount'], 'ether')} TAO",
         )
-        print(f"  URL: {result['event']['args']['url']}")
+        print(f"  URL: {event['args']['url']}")
         print(
             f"  URL Content MD5: "
-            f"{result['event']['args']['urlContentMd5Checksum'].hex()}",
+            f"{event['args']['urlContentMd5Checksum'].hex()}",
         )
         print(
-            f"  Transaction hash: {result['receipt']['transactionHash'].hex()}")
-        print(f"  Block number: {result['receipt']['blockNumber']}")
+            f"  Transaction hash: {receipt['transactionHash'].hex()}")
+        print(f"  Block number: {receipt['blockNumber']}")
 
     except Exception as e:
         print(f"Error: {str(e)}", file=sys.stderr)
