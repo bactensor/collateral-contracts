@@ -11,6 +11,7 @@ It includes utilities for:
 """
 
 import os
+import pathlib
 import sys
 import json
 import hashlib
@@ -23,9 +24,8 @@ from eth_account import Account
 def load_contract_abi():
     """Load the contract ABI from the artifacts file."""
     try:
-        with open("../out/Collateral.sol/Collateral.json", "r") as f:
-            contract_json = json.load(f)
-            return contract_json["abi"]
+        abi_file = pathlib.Path(__file__).parent.parent / "abi.json"
+        return json.loads(abi_file.read_text())
     except FileNotFoundError:
         print(
             "Error: Contract ABI not found. Please run 'forge build' first.",
