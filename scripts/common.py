@@ -87,7 +87,7 @@ def build_and_send_transaction(
     )
 
     signed_txn = w3.eth.account.sign_transaction(transaction, account.key)
-    print(f"Signed transaction: {signed_txn}", file=sys.stderr)
+    
     tx_hash = w3.eth.send_raw_transaction(signed_txn.raw_transaction)
     print(f"Transaction sent: {tx_hash.hex()}", file=sys.stderr)
     return tx_hash
