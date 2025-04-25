@@ -8,6 +8,7 @@ It works by deploying the contract on a local Anvil instance, comparing the
 bytecode with the deployed contract, and submitting verification to the explorer.
 """
 
+import argparse
 import subprocess
 import sys
 import time
@@ -114,16 +115,35 @@ def deploy_on_devnet_and_get_bytecode(w3, contract_address):
         anvil_process.wait()
 
 
-def verify_contract(contract_address):
-    """Verify if the deployed contract matches the source code."""
+def verify_contract(contract_address, expected_trustee, expected_netuid):
+    """Verify if the deployed contract matches the source code and expected values."""
     try:
         w3 = get_web3_connection()
+
+        # Get contract configuration
+        netuid, trustee, _decision_timeout, _min_collateral_increase = get_contract_config(w3, contract_address)
+
+        # Verify expected values if provided
+        if expected_trustee is not None:
+            if Web3.to_checksum_address(trustee) != Web3.to_checksum_address(expected_trustee):
+                print(f"❌ Trustee verification failed!")
+                print(f"Expected: {expected_trustee}")
+                print(f"Actual: {trustee}")
+                return False
+            print(f"✅ Trustee verification successful!")
+
+        if expected_netuid is not None:
+            if int(netuid) != int(expected_netuid):
+                print(f"❌ NetUID verification failed!")
+                print(f"Expected: {expected_netuid}")
+                print(f"Actual: {netuid}")
+                return False
+            print(f"✅ NetUID verification successful!")
 
         deployed_bytecode = get_deployed_bytecode(w3, contract_address)
 
         # Get the bytecode with constructor arguments
-        source_bytecode = deploy_on_devnet_and_get_bytecode(
-            w3, contract_address)
+        source_bytecode = deploy_on_devnet_and_get_bytecode(w3, contract_address)
 
         # Compare the bytecodes
         if deployed_bytecode == source_bytecode:
@@ -141,19 +161,18 @@ def verify_contract(contract_address):
 
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: python verify_contract.py <contract_address>")
-        print("Example: python verify_contract.py 0x123...abc")
-        print("Note: Set RPC_URL environment variable for the blockchain endpoint")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description='Verify Collateral smart contract')
+    parser.add_argument('contract_address', help='The address of the deployed contract')
+    parser.add_argument('expected_trustee', help='Expected trustee address to verify')
+    parser.add_argument('expected_netuid', type=int, help='Expected netuid to verify')
+    
+    args = parser.parse_args()
 
-    contract_address = sys.argv[1]
-
-    if not Web3.is_address(contract_address):
+    if not Web3.is_address(args.contract_address):
         print("Error: Invalid contract address")
         sys.exit(1)
 
-    verify_contract(contract_address)
+    assert(verify_contract(args.contract_address, args.expected_trustee, args.expected_netuid))
 
 
 if __name__ == "__main__":
