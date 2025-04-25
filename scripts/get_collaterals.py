@@ -105,11 +105,11 @@ def main():
         collateral = get_miner_collateral(
             w3, args.contract_address, miner_address)
         results.append(
-            [miner_address, cumulative_deposits[miner_address], collateral])
+            [miner_address, w3.from_wei(cumulative_deposits[miner_address], 'ether'), w3.from_wei(collateral, 'ether')])
 
     writer = csv.writer(sys.stdout)
     writer.writerow(
-        ["miner_address", "cumulative_amount_of_deposits", "total_collateral_amount"]
+        ["miner_address", "cumulative_amount_of_deposits_tao", "total_collateral_amount_tao"]
     )
     writer.writerows(results)
 
