@@ -25,12 +25,10 @@ def check_minimum_collateral(contract, amount_wei):
     """Check if the amount meets minimum collateral requirement."""
     min_collateral = contract.functions.MIN_COLLATERAL_INCREASE().call()
     if amount_wei < min_collateral:
-        print(
+        raise ValueError(
             f"Error: Amount {Web3.from_wei(amount_wei, 'ether')} TAO is less than "
-            f"minimum required {Web3.from_wei(min_collateral, 'ether')} TAO",
-            file=sys.stderr,
+            f"minimum required {Web3.from_wei(min_collateral, 'ether')} TAO"
         )
-        sys.exit(1)
     return min_collateral
 
 
@@ -38,12 +36,10 @@ def verify_trustee(contract, expected_trustee):
     """Verify if the provided trustee address matches the contract's trustee."""
     trustee = contract.functions.TRUSTEE().call()
     if trustee.lower() != expected_trustee.lower():
-        print(
+        raise ValueError(
             f"Error: Trustee address mismatch. Expected: {expected_trustee}, "
-            f"Got: {trustee}",
-            file=sys.stderr,
+            f"Got: {trustee}"
         )
-        sys.exit(1)
 
 
 def deposit_collateral(w3, account, amount_tao,
@@ -69,22 +65,16 @@ def deposit_collateral(w3, account, amount_tao,
     verify_trustee(contract, trustee_address)
 
     amount_wei = w3.to_wei(amount_tao, "ether")
+    check_minimum_collateral(contract, amount_wei)
 
-    try:
-        check_minimum_collateral(contract, amount_wei)
+    tx_hash = build_and_send_transaction(
+        w3, contract.functions.deposit(), account, value=amount_wei
+    )
 
-        tx_hash = build_and_send_transaction(
-            w3, contract.functions.deposit(), account, value=amount_wei
-        )
+    receipt = wait_for_receipt(w3, tx_hash)
+    deposit_event = contract.events.Deposit().process_receipt(receipt)[0]
 
-        receipt = wait_for_receipt(w3, tx_hash)
-        deposit_event = contract.events.Deposit().process_receipt(receipt)[0]
-
-        return deposit_event, receipt
-
-    except Exception as e:
-        print(f"Error: {str(e)}", file=sys.stderr)
-        sys.exit(1)
+    return deposit_event, receipt
 
 
 def main():
@@ -129,4 +119,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"Error: {str(e)}", file=sys.stderr)
+        sys.exit(1)

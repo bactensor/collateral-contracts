@@ -103,36 +103,35 @@ def main():
     w3 = get_web3_connection()
     account = get_account()
 
-    try:
-        receipt, event = slash_collateral(
-            w3,
-            account,
-            args.miner_address,
-            args.amount_tao,
-            args.contract_address,
-            args.url,
-        )
+    receipt, event = slash_collateral(
+        w3,
+        account,
+        args.miner_address,
+        args.amount_tao,
+        args.contract_address,
+        args.url,
+    )
 
-        print(f"Successfully slashed {args.amount_tao} TAO from {args.miner_address}")
-        print("Event details:")
-        print(f"  Account: {event['args']['account']}")
-        print(
-            f"  Amount: "
-            f"{w3.from_wei(event['args']['amount'], 'ether')} TAO",
-        )
-        print(f"  URL: {event['args']['url']}")
-        print(
-            f"  URL Content MD5: "
-            f"{event['args']['urlContentMd5Checksum'].hex()}",
-        )
-        print(
-            f"  Transaction hash: {receipt['transactionHash'].hex()}")
-        print(f"  Block number: {receipt['blockNumber']}")
-
-    except Exception as e:
-        print(f"Error: {str(e)}", file=sys.stderr)
-        sys.exit(1)
+    print(f"Successfully slashed {args.amount_tao} TAO from {args.miner_address}")
+    print("Event details:")
+    print(f"  Account: {event['args']['account']}")
+    print(
+        f"  Amount: "
+        f"{w3.from_wei(event['args']['amount'], 'ether')} TAO",
+    )
+    print(f"  URL: {event['args']['url']}")
+    print(
+        f"  URL Content MD5: "
+        f"{event['args']['urlContentMd5Checksum'].hex()}",
+    )
+    print(
+        f"  Transaction hash: {receipt['transactionHash'].hex()}")
+    print(f"  Block number: {receipt['blockNumber']}")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"Error: {str(e)}", file=sys.stderr)
+        sys.exit(1)

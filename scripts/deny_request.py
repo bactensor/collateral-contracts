@@ -40,30 +40,25 @@ def deny_reclaim_request(
     contract_abi = load_contract_abi()
     contract = w3.eth.contract(address=contract_address, abi=contract_abi)
 
-    try:
-        # Calculate MD5 checksum of the URL content
-        md5_checksum = "0" * 32
-        if url.startswith(("http://", "https://")):
-            print("Calculating MD5 checksum of URL content...", file=sys.stderr)
-            md5_checksum = calculate_md5_checksum(url)
-            print(f"MD5 checksum: {md5_checksum}", file=sys.stderr)
+    # Calculate MD5 checksum of the URL content
+    md5_checksum = "0" * 32
+    if url.startswith(("http://", "https://")):
+        print("Calculating MD5 checksum of URL content...", file=sys.stderr)
+        md5_checksum = calculate_md5_checksum(url)
+        print(f"MD5 checksum: {md5_checksum}", file=sys.stderr)
 
-        tx_hash = build_and_send_transaction(
-            w3,
-            contract.functions.denyReclaimRequest(
-                reclaim_request_id, url, bytes.fromhex(md5_checksum)
-            ),
-            account,
-        )
+    tx_hash = build_and_send_transaction(
+        w3,
+        contract.functions.denyReclaimRequest(
+            reclaim_request_id, url, bytes.fromhex(md5_checksum)
+        ),
+        account,
+    )
 
-        receipt = wait_for_receipt(w3, tx_hash)
-        deny_event = contract.events.Denied().process_receipt(receipt)[0]
+    receipt = wait_for_receipt(w3, tx_hash)
+    deny_event = contract.events.Denied().process_receipt(receipt)[0]
 
-        return deny_event, receipt
-
-    except Exception as e:
-        print(f"Error: {str(e)}", file=sys.stderr)
-        sys.exit(1)
+    return deny_event, receipt
 
 
 def main():
@@ -101,4 +96,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"Error: {str(e)}", file=sys.stderr)
+        sys.exit(1)

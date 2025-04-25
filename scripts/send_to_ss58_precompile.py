@@ -83,27 +83,26 @@ def main():
     
     args = parser.parse_args()
 
-    try:
-        w3 = get_web3_connection()
-        account = get_account()
-        print(f"Using account: {account.address}")
+    w3 = get_web3_connection()
+    account = get_account()
+    print(f"Using account: {account.address}")
 
-        receipt = send_tao_to_ss58(
-            w3=w3,
-            sender_account=account,
-            recipient_ss58=args.recipient_ss58_address,
-            amount_wei=args.amount_wei,
-        )
+    receipt = send_tao_to_ss58(
+        w3=w3,
+        sender_account=account,
+        recipient_ss58=args.recipient_ss58_address,
+        amount_wei=args.amount_wei,
+    )
 
-        print(
-            f"Transaction status: {'Success' if receipt['status'] == 1 else 'Failed'}"
-        )
-        print(f"Gas used: {receipt['gasUsed']}")
-
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        sys.exit(1)
+    print(
+        f"Transaction status: {'Success' if receipt['status'] == 1 else 'Failed'}"
+    )
+    print(f"Gas used: {receipt['gasUsed']}")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"Error: {str(e)}", file=sys.stderr)
+        sys.exit(1)

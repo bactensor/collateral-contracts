@@ -99,33 +99,32 @@ def main():
     w3 = get_web3_connection()
     account = get_account()
 
-    try:
-        receipt, event = reclaim_collateral(
-            w3, account, args.amount_tao, args.contract_address, args.url)
+    receipt, event = reclaim_collateral(
+        w3, account, args.amount_tao, args.contract_address, args.url)
 
-        print(f"Successfully initiated reclaim of {args.amount_tao} TAO")
-        print("Event details:")
-        print(f"  Reclaim ID: {event['args']['reclaimRequestId']}")
-        print(f"  Account: {event['args']['account']}")
-        print(
-            f"  Amount: "
-            f"{w3.from_wei(event['args']['amount'], 'ether')} TAO",
-        )
-        print(
-            f"  Expiration Time: {event['args']['expirationTime']}")
-        print(f"  URL: {event['args']['url']}")
-        print(
-            f"  URL Content MD5: "
-            f"{event['args']['urlContentMd5Checksum'].hex()}",
-        )
-        print(
-            f"  Transaction hash: {receipt['transactionHash'].hex()}")
-        print(f"  Block number: {receipt['blockNumber']}")
-
-    except Exception as e:
-        print(f"Error: {str(e)}", file=sys.stderr)
-        sys.exit(1)
+    print(f"Successfully initiated reclaim of {args.amount_tao} TAO")
+    print("Event details:")
+    print(f"  Reclaim ID: {event['args']['reclaimRequestId']}")
+    print(f"  Account: {event['args']['account']}")
+    print(
+        f"  Amount: "
+        f"{w3.from_wei(event['args']['amount'], 'ether')} TAO",
+    )
+    print(
+        f"  Expiration Time: {event['args']['expirationTime']}")
+    print(f"  URL: {event['args']['url']}")
+    print(
+        f"  URL Content MD5: "
+        f"{event['args']['urlContentMd5Checksum'].hex()}",
+    )
+    print(
+        f"  Transaction hash: {receipt['transactionHash'].hex()}")
+    print(f"  Block number: {receipt['blockNumber']}")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"Error: {str(e)}", file=sys.stderr)
+        sys.exit(1)

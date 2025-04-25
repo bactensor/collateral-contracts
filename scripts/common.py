@@ -22,28 +22,19 @@ from eth_account import Account
 
 def load_contract_abi():
     """Load the contract ABI from the artifacts file."""
-    try:
-        abi_file = pathlib.Path(__file__).parent.parent / "abi.json"
-        return json.loads(abi_file.read_text())
-    except FileNotFoundError:
-        print(
-            "Error: Contract ABI not found. Please run 'forge build' first.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+    abi_file = pathlib.Path(__file__).parent.parent / "abi.json"
+    return json.loads(abi_file.read_text())
 
 
 def get_web3_connection():
     """Get Web3 connection from RPC_URL environment variable."""
     rpc_url = os.getenv("RPC_URL")
     if not rpc_url:
-        print("Error: RPC_URL environment variable is not set", file=sys.stderr)
-        sys.exit(1)
+        raise KeyError("RPC_URL environment variable is not set")
 
     w3 = Web3(Web3.HTTPProvider(rpc_url))
     if not w3.is_connected():
-        print("Error: Failed to connect to the network", file=sys.stderr)
-        sys.exit(1)
+        raise ConnectionError("Failed to connect to the network")
     return w3
 
 
@@ -51,16 +42,14 @@ def get_account():
     """Get account from PRIVATE_KEY environment variable."""
     private_key = os.getenv("PRIVATE_KEY")
     if not private_key:
-        print("Error: PRIVATE_KEY environment variable not set", file=sys.stderr)
-        sys.exit(1)
+        raise KeyError("PRIVATE_KEY environment variable not set")
     return Account.from_key(private_key)
 
 
 def validate_address_format(address):
     """Validate if the given address is a valid Ethereum address."""
     if not Web3.is_address(address):
-        print("Error: Invalid address", file=sys.stderr)
-        sys.exit(1)
+        raise ValueError("Invalid address")
 
 
 def build_and_send_transaction(
@@ -110,13 +99,9 @@ def calculate_md5_checksum(url):
     Raises:
         SystemExit: If there's an error fetching the URL content.
     """
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        return hashlib.md5(response.content).hexdigest()
-    except requests.RequestException as e:
-        print(f"Error fetching URL content: {str(e)}", file=sys.stderr)
-        sys.exit(1)
+    response = requests.get(url)
+    response.raise_for_status()
+    return hashlib.md5(response.content).hexdigest()
 
 
 def get_miner_collateral(w3, contract_address, miner_address):
@@ -136,8 +121,4 @@ def get_miner_collateral(w3, contract_address, miner_address):
     contract_abi = load_contract_abi()
     contract = w3.eth.contract(address=contract_address, abi=contract_abi)
 
-    try:
-        return contract.functions.collaterals(miner_address).call()
-    except Exception as e:
-        print(f"Error querying collateral: {str(e)}", file=sys.stderr)
-        sys.exit(1)
+    return contract.functions.collaterals(miner_address).call()

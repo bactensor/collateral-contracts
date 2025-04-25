@@ -39,16 +39,12 @@ def generate_and_save_keypair(output_path: str) -> dict:
     }
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
-    try:
-        with open(output_path, "w") as f:
-            json.dump(keypair_data, f, indent=2)
-        print(f"Key pair saved to: {output_path}", file=sys.stderr)
-        print(f"Address: {account.address}", file=sys.stderr)
-        print(f"Public Key: {public_key.to_hex()}", file=sys.stderr)
-        return keypair_data
-    except Exception as e:
-        print(f"Error saving key pair: {str(e)}", file=sys.stderr)
-        sys.exit(1)
+    with open(output_path, "w") as f:
+        json.dump(keypair_data, f, indent=2)
+    print(f"Key pair saved to: {output_path}", file=sys.stderr)
+    print(f"Address: {account.address}", file=sys.stderr)
+    print(f"Public Key: {public_key.to_hex()}", file=sys.stderr)
+    return keypair_data
 
 
 def main():
@@ -62,4 +58,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"Error: {str(e)}", file=sys.stderr)
+        sys.exit(1)

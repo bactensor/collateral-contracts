@@ -37,21 +37,18 @@ def finalize_reclaim(w3, account, reclaim_request_id, contract_address):
     contract_abi = load_contract_abi()
     contract = w3.eth.contract(address=contract_address, abi=contract_abi)
 
-    try:
-        tx_hash = build_and_send_transaction(
-            w3,
-            contract.functions.finalizeReclaim(reclaim_request_id),
-            account,
-        )
+    tx_hash = build_and_send_transaction(
+        w3,
+        contract.functions.finalizeReclaim(reclaim_request_id),
+        account,
+    )
 
-        receipt = wait_for_receipt(w3, tx_hash)
-        reclaim_event = contract.events.Reclaimed().process_receipt(receipt)[0]
+    receipt = wait_for_receipt(w3, tx_hash)
+    reclaim_events = contract.events.Reclaimed().process_receipt(receipt)
 
-        return reclaim_event, receipt
+    reclaim_event = contract.events.Reclaimed().process_receipt(receipt)[0]
 
-    except Exception as e:
-        print(f"Error: {str(e)}", file=sys.stderr)
-        sys.exit(1)
+    return reclaim_event, receipt
 
 
 def main():
@@ -87,4 +84,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"Error: {str(e)}", file=sys.stderr)
+        sys.exit(1)
