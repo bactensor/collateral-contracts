@@ -13,7 +13,7 @@ import sys
 from web3 import Web3
 from eth_account import Account
 from address_conversion import ss58_to_pubkey
-from common import get_web3_connection, get_account, wait_for_receipt
+from common import get_web3_connection, get_account, wait_for_receipt, build_and_send_transaction
 
 
 def send_tao_to_ss58(
@@ -44,22 +44,12 @@ def send_tao_to_ss58(
     contract = w3.eth.contract(address=contract_address, abi=abi)
     pubkey = ss58_to_pubkey(recipient_ss58)
 
-    nonce = w3.eth.get_transaction_count(sender_account.address)
-    gas_price = w3.eth.gas_price
-    transaction = contract.functions.transfer(pubkey).build_transaction(
-        {
-            "from": sender_account.address,
-            "value": amount_wei,
-            "gas": 100000,
-            "gasPrice": gas_price,
-            "nonce": nonce,
-        }
+    tx_hash = build_and_send_transaction(
+        w3,
+        contract.functions.transfer(pubkey),
+        sender_account,
+        value=amount_wei,
     )
-
-    signed_txn = w3.eth.account.sign_transaction(
-        transaction, sender_account.key)
-    tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
-    print(f"Transaction sent! Hash: {tx_hash.hex()}")
 
     # Wait for transaction receipt
     receipt = wait_for_receipt(w3, tx_hash)
