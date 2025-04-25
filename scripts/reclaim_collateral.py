@@ -21,6 +21,11 @@ from common import (
 )
 
 
+class ReclaimCollateralError(Exception):
+    """Exception raised when there is an error during the collateral reclaim process."""
+    pass
+
+
 def reclaim_collateral(
     w3,
     account,
@@ -67,6 +72,8 @@ def reclaim_collateral(
     )
 
     receipt = wait_for_receipt(w3, tx_hash)
+    if receipt['status'] == 0:
+        raise ReclaimCollateralError(f"Transaction failed for reclaiming collateral")
     reclaim_event = contract.events.ReclaimProcessStarted().process_receipt(
         receipt,
     )[0]

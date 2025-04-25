@@ -21,6 +21,11 @@ from common import (
 )
 
 
+class DepositCollateralError(Exception):
+    """Custom exception for collateral deposit related errors."""
+    pass
+
+
 def check_minimum_collateral(contract, amount_wei):
     """Check if the amount meets minimum collateral requirement."""
     min_collateral = contract.functions.MIN_COLLATERAL_INCREASE().call()
@@ -72,6 +77,8 @@ def deposit_collateral(w3, account, amount_tao,
     )
 
     receipt = wait_for_receipt(w3, tx_hash)
+    if receipt['status'] == 0:
+        raise DepositCollateralError(f"Transaction failed for depositing collateral")
     deposit_event = contract.events.Deposit().process_receipt(receipt)[0]
 
     return deposit_event, receipt

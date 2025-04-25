@@ -21,6 +21,11 @@ from common import (
 )
 
 
+class SlashCollateralError(Exception):
+    """Custom exception for errors that occur during collateral slashing operations."""
+    pass
+
+
 def slash_collateral(
     w3,
     account,
@@ -68,6 +73,8 @@ def slash_collateral(
     )
 
     receipt = wait_for_receipt(w3, tx_hash)
+    if receipt['status'] == 0:
+        raise SlashCollateralError(f"Transaction failed for slashing collateral")
     slash_event = contract.events.Slashed().process_receipt(receipt)[0]
 
     return receipt, slash_event

@@ -21,6 +21,11 @@ from common import (
 )
 
 
+class DenyReclaimRequestError(Exception):
+    """Raised when denying a reclaim request fails."""
+    pass
+
+
 def deny_reclaim_request(
         w3, account, reclaim_request_id, url, contract_address):
     """Deny a reclaim request on the contract.
@@ -56,6 +61,8 @@ def deny_reclaim_request(
     )
 
     receipt = wait_for_receipt(w3, tx_hash)
+    if receipt['status'] == 0:
+        raise DenyReclaimRequestError(f"Transaction failed for denying reclaim request {reclaim_request_id}")
     deny_event = contract.events.Denied().process_receipt(receipt)[0]
 
     return deny_event, receipt

@@ -20,6 +20,11 @@ from common import (
 )
 
 
+class FinalizeReclaimError(Exception):
+    """Raised when finalizing a reclaim request fails."""
+    pass
+
+
 def finalize_reclaim(w3, account, reclaim_request_id, contract_address):
     """Finalize a reclaim request on the contract.
 
@@ -31,6 +36,9 @@ def finalize_reclaim(w3, account, reclaim_request_id, contract_address):
 
     Returns:
         tuple: (reclaim_event, receipt)
+
+    Raises:
+        FinalizeReclaimError: If the transaction fails for any reason
     """
     validate_address_format(contract_address)
 
@@ -44,10 +52,11 @@ def finalize_reclaim(w3, account, reclaim_request_id, contract_address):
     )
 
     receipt = wait_for_receipt(w3, tx_hash)
-    reclaim_events = contract.events.Reclaimed().process_receipt(receipt)
+    
+    if receipt['status'] == 0:
+        raise FinalizeReclaimError(f"Transaction failed for reclaim request {reclaim_request_id}")
 
     reclaim_event = contract.events.Reclaimed().process_receipt(receipt)[0]
-
     return reclaim_event, receipt
 
 
@@ -66,26 +75,29 @@ def main():
     w3 = get_web3_connection()
     account = get_account()
 
-    reclaim_event, receipt = finalize_reclaim(
-        w3=w3,
-        account=account,
-        reclaim_request_id=args.reclaim_request_id,
-        contract_address=args.contract_address,
-    )
+    try:
+        reclaim_event, receipt = finalize_reclaim(
+            w3=w3,
+            account=account,
+            reclaim_request_id=args.reclaim_request_id,
+            contract_address=args.contract_address,
+        )
 
-    print(f"Successfully finalized reclaim request {args.reclaim_request_id}")
-    print("Event details:")
-    print(f"  Reclaim ID: {reclaim_event['args']['reclaimRequestId']}")
-    print(f"  Account: {reclaim_event['args']['account']}")
-    print(
-        f"  Amount: {w3.from_wei(reclaim_event['args']['amount'], 'ether')} TAO")
-    print(f"  Transaction hash: {receipt['transactionHash'].hex()}")
-    print(f"  Block number: {receipt['blockNumber']}")
+        print(f"Successfully finalized reclaim request {args.reclaim_request_id}")
+        print("Event details:")
+        print(f"  Reclaim ID: {reclaim_event['args']['reclaimRequestId']}")
+        print(f"  Account: {reclaim_event['args']['account']}")
+        print(
+            f"  Amount: {w3.from_wei(reclaim_event['args']['amount'], 'ether')} TAO")
+        print(f"  Transaction hash: {receipt['transactionHash'].hex()}")
+        print(f"  Block number: {receipt['blockNumber']}")
+    except FinalizeReclaimError as e:
+        print(f"Error: {str(e)}", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"Unexpected error: {str(e)}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        print(f"Error: {str(e)}", file=sys.stderr)
-        sys.exit(1)
+    main()
