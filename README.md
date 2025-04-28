@@ -43,15 +43,14 @@ This contract creates a **trust-minimized interaction** between miners and valid
 > This contract uses **H160 (Ethereum) addresses** for both miner and validator identities.
 > - Before interacting with the contract (depositing, slashing, reclaiming, etc.), **all parties must have an Ethereum wallet** (including a plain text private key) to sign the required transactions.
 > - An association between these H160 wallet addresses and the respective **SS58 hotkeys** (used in Bittensor) is **strongly recommended** so validators can reliably identify miners.
-> - Best practices for managing and verifying these address associations are still under development within the broader Bittensor ecosystem.
+> - Best practices for managing and verifying these address associations are still under development within the broader Bittensor ecosystem, but Subtensor is now able to [associate H160 with an UID](https://github.com/opentensor/subtensor/pull/1487)
 
 > **Transaction Fees**
 >
 > All on-chain actions (deposits, slashes, reclaims, etc.) consume gas, so **both miners and validators must hold enough TAO in their Ethereum (H160) wallets** to cover transaction fees.
 > - Make sure to keep a sufficient balance to handle any deposits, reclaims, or slashes you need to perform.
-> - You can transfer TAO back to your SS58 wallet when no more contract interactions are required.
-> - Refer to [`scripts/transfer_ss58_h160.py`](todo-link) (and similarly [`scripts/transfer_tao_from_eth.py`](todo-link))
->   for examples of how to move TAO between your Bittensor SS58 wallet and your H160 wallet.
+> - Convert H160 to SS58 ([`scripts/h160_to_ss58.py`](/scripts/h160_to_ss58.py) to transfer TAO to it.
+> - You can transfer TAO back to your SS58 wallet when no more contract interactions are required. See [`scripts/send_to_ss58_precompile.py`](/script/send_to_ss58_precompile.py).
 
 ## Demo
 
@@ -87,21 +86,21 @@ Below is a typical sequence for integrating and using this collateral contract w
 ## Usage Guides
 
 Below are step-by-step instructions tailored to **miners**, **validators**, and **subnet owners**.
-Refer to the repository's [`scripts/`](todo-link) folder for sample implementations and helper scripts.
+Refer to the repository's [`scripts/`](/scripts/) folder for sample implementations and helper scripts.
 
 ## As a Miner, you can:
 
 - **Deposit Collateral**
   If you plan to stake for multiple validators, simply repeat these steps for each one:
   - Obtain the validator's contract address (usually via tools provided by the subnet owner).
-  - Run [`scripts/deposit.py`](todo-link) (or a similar tool) to initiate the deposit transaction.
-    This script verifies that code deployed at the address is indeed the collateral smart contract, and calls the `deposit()` function with your specified amount of $TAO.
-  - Confirm on-chain that your collateral has been successfully locked for that validator.
+  - Verify that code deployed at the address is indeed the collateral smart contract, the trustee and netuid kept inside are as expected - see [`scripts/verify_contract.py`](/scripts/verify_contract.py).
+  - Run [`scripts/deposit_collateral.py`](/scripts/deposit_collateral.py) to initiate the deposit transaction with your specified amount of $TAO.
+  - Confirm on-chain that your collateral has been successfully locked for that validator - [`scripts/get_miners_collateral.py`](/scripts/get_miners_collateral.py)
 
 - **Reclaim Collateral**
-  - Initiate the reclaim process by running [`scripts/start_reclaim_process.py`](todo-link) with your desired withdrawal amount.
+  - Initiate the reclaim process by running [`scripts/reclaim_collateral.py`](/scripts/reclaim_collateral.py) with your desired withdrawal amount.
   - Wait for the validator's response or for the configured inactivity timeout to pass.
-  - If the validator does not deny your request by the deadline, run [`scripts/finalize_reclaim.py`](todo-link) to unlock and retrieve your collateral.
+  - If the validator does not deny your request by the deadline, run [`scripts/finalize_reclaim.py`](/scripts/finalize_reclaim.py) to unlock and retrieve your collateral.
   - Verify on-chain that your balance has been updated accordingly.
 
 
@@ -110,7 +109,7 @@ Refer to the repository's [`scripts/`](todo-link) folder for sample implementati
 - **Deploy the Contract**
   - Install [Foundry](https://book.getfoundry.sh/).
   - Clone this repository.
-  - Compile and deploy the contract, use [`scripts/deploy.sh`](todo-link) with your details as arguments.
+  - Compile and deploy the contract, use [`deploy.sh`](/deploy.sh) with your details as arguments.
   - Record the deployed contract address and publish it via a subnet-owner-provided tool so that miners can discover and verify it.
 
 - **Enable Regular Operation**
@@ -125,12 +124,12 @@ Refer to the repository's [`scripts/`](todo-link) folder for sample implementati
 
 - **Manually Deny a Reclaim**
   - Identify the relevant `reclaimRequestId` (from `ReclaimProcessStarted` event, for example).
-  - Use [`scripts/deny_reclaim.py`](todo-link) (calling the contract's `denyReclaim(reclaimRequestId)`) before the deadline.
+  - Use [`scripts/deny_reclaim.py`](/scripts/deny_reclaim.py) (calling the contract's `denyReclaim(reclaimRequestId)`) before the deadline.
   - Verify on-chain that the reclaim request is removed and the miner's `hasPendingReclaim` is reset to `false`.
 
 - **Manually Slash Collateral**
   - Confirm miner misconduct based on subnetwork rules (e.g., invalid blocks, spam, protocol violations).
-  - Use [`scripts/slash_collateral.py`](todo-link) (calling the contract's `slashCollateral(miner, slashAmount)`) to penalize the miner by reducing their staked amount.
+  - Use [`scripts/slash_collateral.py`](/scripts/slash_collateral.py) (calling the contract's `slashCollateral(miner, slashAmount)`) to penalize the miner by reducing their staked amount.
   - Verify the transaction on-chain and confirm the miner's `collaterals[miner]` value has changed.
 
 ### As a Subnet Owner, you can
@@ -138,6 +137,8 @@ Refer to the repository's [`scripts/`](todo-link) folder for sample implementati
 - **Provide Deployment Tools for Validators**
   
   Offer a script <!--(e.g. built on top of [`scripts/deploy.sh`](todo-link))--> to help validators:
+  - Create H160 wallet & assosiate it with their SS58.
+  - Transfer Tao.
   - Deploy the contract.
   - Publish the resulting contract address (e.g., as a knowledge commitment) so miners can easily verify and deposit collateral.
 
@@ -147,15 +148,15 @@ Refer to the repository's [`scripts/`](todo-link) folder for sample implementati
   This helps miners discover the correct contract for depositing collateral.
 
 - **Track Miner Collateral Usage**
-  - Query each validator's contract <!---(using, for example, an off-chain script based on [`scripts/query.py`](todo-link))--> to see how much collateral is staked by each miner.
+  - Query each validator's contract (using, for example, a script based on [`scripts/get_collaterals.py`](/scripts/get_collaterals.py)) to see how much collateral is staked by each miner.
   - Aggregate this data into a subnet-wide dashboard for real-time oversight of miner participation.
     <!-- - Check out the [ComputeHorde Grafana chart](https://grafana.bactensor.io/d/subnet/metagraph-subnet?var-subnet=12) for a real-world example.-->
 
 - **Facilitate Result-Based Slashing**
   
   Provide validators with automated checks that periodically verify a small subset (e.g., 1–2%) of the miner's submissions.
-  If a miner's responses fall below the desired quality threshold, the code calls `slashCollateral()` to penalize substandard performance.
-  <!--For example, in the [ComputeHorde SDK](todo-link), slashing is triggered via the `report_cheated_job()` method.-->
+  If a miner's responses fall below the desired quality threshold, the code should call `slashCollateral()` to penalize substandard performance.
+  For example, in the [ComputeHorde SDK](https://sdk.computehorde.io/), slashing is triggered via the [`report_cheated_job()`](https://sdk.computehorde.io/master/api/client.html#compute_horde_sdk.v1.ComputeHordeClient.report_cheated_job) method.
 
 - **Facilitate Collateral Verification**
   
