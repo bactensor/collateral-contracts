@@ -43,15 +43,14 @@ This contract creates a **trust-minimized interaction** between miners and valid
 > This contract uses **H160 (Ethereum) addresses** for both miner and validator identities.
 > - Before interacting with the contract (depositing, slashing, reclaiming, etc.), **all parties must have an Ethereum wallet** (including a plain text private key) to sign the required transactions.
 > - An association between these H160 wallet addresses and the respective **SS58 hotkeys** (used in Bittensor) is **strongly recommended** so validators can reliably identify miners.
-> - Best practices for managing and verifying these address associations are still under development within the broader Bittensor ecosystem.
+> - Best practices for managing and verifying these address associations are still under development within the broader Bittensor ecosystem, but Subtensor is now able to [associate H160 with an UID](https://github.com/opentensor/subtensor/pull/1487)
 
 > **Transaction Fees**
 >
 > All on-chain actions (deposits, slashes, reclaims, etc.) consume gas, so **both miners and validators must hold enough TAO in their Ethereum (H160) wallets** to cover transaction fees.
 > - Make sure to keep a sufficient balance to handle any deposits, reclaims, or slashes you need to perform.
-> - You can transfer TAO back to your SS58 wallet when no more contract interactions are required.
-> - Refer to [`scripts/transfer_ss58_h160.py`](todo-link) (and similarly [`scripts/transfer_tao_from_eth.py`](todo-link))
->   for examples of how to move TAO between your Bittensor SS58 wallet and your H160 wallet.
+> - Convert H160 to SS58 ([`scripts/h160_to_ss58.py`](/scripts/h160_to_ss58.py) to transfer TAO to it.
+> - You can transfer TAO back to your SS58 wallet when no more contract interactions are required. See [`scripts/send_to_ss58_precompile.py`](/script/send_to_ss58_precompile.py).
 
 ## Demo
 
@@ -138,6 +137,8 @@ Refer to the repository's [`scripts/`](/scripts/) folder for sample implementati
 - **Provide Deployment Tools for Validators**
   
   Offer a script <!--(e.g. built on top of [`scripts/deploy.sh`](todo-link))--> to help validators:
+  - Create H160 wallet & assosiate it with their SS58.
+  - Transfer Tao.
   - Deploy the contract.
   - Publish the resulting contract address (e.g., as a knowledge commitment) so miners can easily verify and deposit collateral.
 
@@ -147,15 +148,15 @@ Refer to the repository's [`scripts/`](/scripts/) folder for sample implementati
   This helps miners discover the correct contract for depositing collateral.
 
 - **Track Miner Collateral Usage**
-  - Query each validator's contract <!---(using, for example, an off-chain script based on [`scripts/query.py`](todo-link))--> to see how much collateral is staked by each miner.
+  - Query each validator's contract (using, for example, a script based on [`scripts/get_collaterals.py`](/scripts/get_collaterals.py)) to see how much collateral is staked by each miner.
   - Aggregate this data into a subnet-wide dashboard for real-time oversight of miner participation.
     <!-- - Check out the [ComputeHorde Grafana chart](https://grafana.bactensor.io/d/subnet/metagraph-subnet?var-subnet=12) for a real-world example.-->
 
 - **Facilitate Result-Based Slashing**
   
   Provide validators with automated checks that periodically verify a small subset (e.g., 1–2%) of the miner's submissions.
-  If a miner's responses fall below the desired quality threshold, the code calls `slashCollateral()` to penalize substandard performance.
-  <!--For example, in the [ComputeHorde SDK](todo-link), slashing is triggered via the `report_cheated_job()` method.-->
+  If a miner's responses fall below the desired quality threshold, the code should call `slashCollateral()` to penalize substandard performance.
+  For example, in the [ComputeHorde SDK](https://sdk.computehorde.io/), slashing is triggered via the [`report_cheated_job()`](https://sdk.computehorde.io/master/api/client.html#compute_horde_sdk.v1.ComputeHordeClient.report_cheated_job) method.
 
 - **Facilitate Collateral Verification**
   
