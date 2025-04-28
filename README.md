@@ -87,21 +87,21 @@ Below is a typical sequence for integrating and using this collateral contract w
 ## Usage Guides
 
 Below are step-by-step instructions tailored to **miners**, **validators**, and **subnet owners**.
-Refer to the repository's [`scripts/`](todo-link) folder for sample implementations and helper scripts.
+Refer to the repository's [`scripts/`](/scripts/) folder for sample implementations and helper scripts.
 
 ## As a Miner, you can:
 
 - **Deposit Collateral**
   If you plan to stake for multiple validators, simply repeat these steps for each one:
   - Obtain the validator's contract address (usually via tools provided by the subnet owner).
-  - Run [`scripts/deposit.py`](todo-link) (or a similar tool) to initiate the deposit transaction.
-    This script verifies that code deployed at the address is indeed the collateral smart contract, and calls the `deposit()` function with your specified amount of $TAO.
-  - Confirm on-chain that your collateral has been successfully locked for that validator.
+  - Verify that code deployed at the address is indeed the collateral smart contract, the trustee and netuid kept inside are as expected - see [`scripts/verify_contract.py`](/scripts/verify_contract.py).
+  - Run [`scripts/deposit_collateral.py`](/scripts/deposit_collateral.py) to initiate the deposit transaction with your specified amount of $TAO.
+  - Confirm on-chain that your collateral has been successfully locked for that validator - [`scripts/get_miners_collateral.py`](/scripts/get_miners_collateral.py)
 
 - **Reclaim Collateral**
-  - Initiate the reclaim process by running [`scripts/start_reclaim_process.py`](todo-link) with your desired withdrawal amount.
+  - Initiate the reclaim process by running [`scripts/reclaim_collateral.py`](/scripts/reclaim_collateral.py) with your desired withdrawal amount.
   - Wait for the validator's response or for the configured inactivity timeout to pass.
-  - If the validator does not deny your request by the deadline, run [`scripts/finalize_reclaim.py`](todo-link) to unlock and retrieve your collateral.
+  - If the validator does not deny your request by the deadline, run [`scripts/finalize_reclaim.py`](/scripts/finalize_reclaim.py) to unlock and retrieve your collateral.
   - Verify on-chain that your balance has been updated accordingly.
 
 
@@ -110,7 +110,7 @@ Refer to the repository's [`scripts/`](todo-link) folder for sample implementati
 - **Deploy the Contract**
   - Install [Foundry](https://book.getfoundry.sh/).
   - Clone this repository.
-  - Compile and deploy the contract, use [`scripts/deploy.sh`](todo-link) with your details as arguments.
+  - Compile and deploy the contract, use [`deploy.sh`](/deploy.sh) with your details as arguments.
   - Record the deployed contract address and publish it via a subnet-owner-provided tool so that miners can discover and verify it.
 
 - **Enable Regular Operation**
@@ -125,12 +125,12 @@ Refer to the repository's [`scripts/`](todo-link) folder for sample implementati
 
 - **Manually Deny a Reclaim**
   - Identify the relevant `reclaimRequestId` (from `ReclaimProcessStarted` event, for example).
-  - Use [`scripts/deny_reclaim.py`](todo-link) (calling the contract's `denyReclaim(reclaimRequestId)`) before the deadline.
+  - Use [`scripts/deny_reclaim.py`](/scripts/deny_reclaim.py) (calling the contract's `denyReclaim(reclaimRequestId)`) before the deadline.
   - Verify on-chain that the reclaim request is removed and the miner's `hasPendingReclaim` is reset to `false`.
 
 - **Manually Slash Collateral**
   - Confirm miner misconduct based on subnetwork rules (e.g., invalid blocks, spam, protocol violations).
-  - Use [`scripts/slash_collateral.py`](todo-link) (calling the contract's `slashCollateral(miner, slashAmount)`) to penalize the miner by reducing their staked amount.
+  - Use [`scripts/slash_collateral.py`](/scripts/slash_collateral.py) (calling the contract's `slashCollateral(miner, slashAmount)`) to penalize the miner by reducing their staked amount.
   - Verify the transaction on-chain and confirm the miner's `collaterals[miner]` value has changed.
 
 ### As a Subnet Owner, you can
