@@ -86,7 +86,8 @@ Below is a typical sequence for integrating and using this collateral contract w
 ## Usage Guides
 
 Below are step-by-step instructions tailored to **miners**, **validators**, and **subnet owners**.
-Refer to the repository's [`scripts/`](/scripts/) folder for sample implementations and helper scripts.
+Refer to the repository's [`scripts/`](/scripts/) folder for sample implementations and helper scripts. 
+All the scripts are described in the [Sample scripts](#sample-scripts) section.
 
 ## As a Miner, you can:
 
@@ -165,3 +166,5 @@ Refer to the repository's [`scripts/`](/scripts/) folder for sample implementati
   - Reject miners who do not meet a minimum collateral requirement.
 
   By coupling task assignment with the collateral balance, the subnetwork ensures more consistent performance and discourages low-quality or malicious contributions.
+
+### Sample scripts
