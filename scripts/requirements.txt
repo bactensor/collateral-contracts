@@ -5,4 +5,3 @@ web3==7.10.0
 requests==2.31.0
 
 bittensor==9.4.0
-substrate-interface==1.7.11

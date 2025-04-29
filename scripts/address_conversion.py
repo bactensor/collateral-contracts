@@ -8,8 +8,9 @@ in Substrate-based chains) and H160 addresses (Ethereum-style addresses).
 """
 
 import hashlib
-from substrateinterface import Keypair
-from substrateinterface.utils.ss58 import ss58_encode
+
+import bittensor_wallet
+import scalecodec
 
 
 def ss58_to_pubkey(ss58_address: str) -> bytes:
@@ -26,7 +27,7 @@ def ss58_to_pubkey(ss58_address: str) -> bytes:
         ValueError: If the SS58 address is invalid
     """
     try:
-        keypair = Keypair(ss58_address=ss58_address)
+        keypair = bittensor_wallet.Keypair(ss58_address=ss58_address)
 
         return keypair.public_key
 
@@ -55,4 +56,4 @@ def h160_to_ss58(h160_address: str, ss58_format: int = 42) -> str:
 
     checksum = hashlib.blake2b(prefixed_address, digest_size=32).digest()
 
-    return ss58_encode(checksum, ss58_format=ss58_format)
+    return scalecodec.ss58_encode(checksum, ss58_format=ss58_format)
