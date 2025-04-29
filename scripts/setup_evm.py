@@ -1,4 +1,5 @@
 import argparse
+import json
 import os.path
 import subprocess
 import sys
@@ -131,7 +132,11 @@ def main():
             subtensor.commit(
                 wallet,
                 netuid=args.netuid,
-                data=contract_address,
+                data=json.dumps({
+                    "contract": {
+                        "address": contract_address,
+                    },
+                }),
             )
         except bittensor.MetadataError as e:
             print(f"Unable to Publish Contract Address. {e}", file=sys.stderr)
