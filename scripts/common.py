@@ -26,9 +26,9 @@ def load_contract_abi():
     return json.loads(abi_file.read_text())
 
 
-def get_web3_connection():
+def get_web3_connection(rpc_url = None):
     """Get Web3 connection from RPC_URL environment variable."""
-    rpc_url = os.getenv("RPC_URL")
+    rpc_url = rpc_url or os.getenv("RPC_URL")
     if not rpc_url:
         raise KeyError("RPC_URL environment variable is not set")
 
