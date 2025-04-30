@@ -65,11 +65,7 @@ async def main():
     _, network_url = bittensor.utils.determine_chain_endpoint_and_network(
         args.network,
     )
-    w3 = get_web3_connection(
-        network_url.replace("ws", "http", 1)
-        if network_url.startswith(("ws://", "wss://"))
-        else network_url
-    )
+    w3 = get_web3_connection(network_url)
 
     async with bittensor.AsyncSubtensor(
         network=network_url,
