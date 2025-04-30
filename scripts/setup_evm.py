@@ -1,6 +1,6 @@
 import argparse
 import json
-import os.path
+import pathlib
 import subprocess
 import sys
 
@@ -64,8 +64,7 @@ def main():
         args.network,
     )
     keypair = generate_and_save_keypair(
-        output_path=os.path.join(
-            os.path.expanduser(wallet.path),
+        output_path=pathlib.Path(wallet.path).expanduser().joinpath(
             wallet.name,
             "h160",
             wallet.hotkey_str,
@@ -104,7 +103,7 @@ def main():
         try:
             contract = subprocess.run(
                 [
-                    "../deploy.sh",
+                    "./deploy.sh",
                     str(args.netuid),
                     keypair["address"],
                     str(MIN_COLLATERAL_INCREASE),
@@ -112,7 +111,7 @@ def main():
                 ],
                 capture_output=True,
                 check=True,
-                cwd=os.path.dirname(__file__),
+                cwd=pathlib.Path(__file__).parents[1],
                 env={
                     "RPC_URL": network_url,
                     "DEPLOYER_PRIVATE_KEY": keypair["private_key"],
