@@ -132,11 +132,13 @@ def main():
             subtensor.commit(
                 wallet,
                 netuid=args.netuid,
-                data=json.dumps({
-                    "contract": {
-                        "address": contract_address,
-                    },
-                }),
+                data=json.dumps(
+                    {
+                        "contract": {
+                            "address": contract_address,
+                        },
+                    }
+                ),
             )
         except bittensor.MetadataError as e:
             print(f"Unable to Publish Contract Address. {e}", file=sys.stderr)
