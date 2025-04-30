@@ -104,7 +104,7 @@ def main():
         try:
             contract = subprocess.run(
                 [
-                    "./deploy.sh",
+                    "../deploy.sh",
                     str(args.netuid),
                     keypair["address"],
                     str(MIN_COLLATERAL_INCREASE),
@@ -112,6 +112,7 @@ def main():
                 ],
                 capture_output=True,
                 check=True,
+                cwd=os.path.dirname(__file__),
                 env={
                     "RPC_URL": network_url,
                     "DEPLOYER_PRIVATE_KEY": keypair["private_key"],
