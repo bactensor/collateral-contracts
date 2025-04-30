@@ -144,6 +144,8 @@ def main():
             print(f"Unable to Publish Contract Address. {e}", file=sys.stderr)
             sys.exit(1)
 
+        print(f"Published Contract Address: {contract_address}")
+
 
 if __name__ == "__main__":
     main()
