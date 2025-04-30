@@ -12,6 +12,10 @@ from common import get_miner_collateral, get_web3_connection
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
+        "--check-collateral",
+        action="store_true",
+    )
+    parser.add_argument(
         "--netuid",
         help="Netuid of the Subnet in the Network.",
         required=True,
@@ -125,16 +129,19 @@ async def main():
             except KeyError:
                 continue
 
-            collateral = get_miner_collateral(
-                w3,
-                contract_address,
-                keypair["address"],
-            )
-
             print(f"HotKey {hotkey}")
             print(f"- EVM Address: {evm_address}")
             print(f"- Contract Address: {contract_address}")
-            print(f"- My Collateral: {w3.from_wei(collateral, 'ether')} TAO")
+
+            # collateral checking is a blocking function so we make it optional
+            if args.check_collateral:
+                collateral = get_miner_collateral(
+                    w3,
+                    contract_address,
+                    keypair["address"],
+                )
+
+                print(f"- My Collateral: {w3.from_wei(collateral, 'ether')} TAO")
 
 
 if __name__ == "__main__":
