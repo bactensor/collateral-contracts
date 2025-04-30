@@ -1,7 +1,7 @@
 import argparse
 import asyncio
 import json
-import os
+import pathlib
 import sys
 
 import bittensor.utils
@@ -51,8 +51,9 @@ async def main():
 
     try:
         with open(
-            os.path.join(
-                os.path.expanduser(wallet.path),
+            pathlib.Path(wallet.path)
+            .expanduser()
+            .joinpath(
                 wallet.name,
                 "h160",
                 wallet.hotkey_str,
