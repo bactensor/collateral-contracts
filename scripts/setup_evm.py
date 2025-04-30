@@ -19,7 +19,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "amount_tao",
-        help="Amount of TAO to transfer",
+        help="Amount of TAO to transfer to the EVM wallet",
         type=float,
     )
     parser.add_argument(
