@@ -18,6 +18,7 @@ from common import (
     build_and_send_transaction,
     wait_for_receipt,
     calculate_md5_checksum,
+    get_revert_reason,
 )
 
 
@@ -73,7 +74,8 @@ def reclaim_collateral(
 
     receipt = wait_for_receipt(w3, tx_hash)
     if receipt['status'] == 0:
-        raise ReclaimCollateralError(f"Transaction failed for reclaiming collateral")
+        revert_reason = get_revert_reason(w3, tx_hash, receipt['blockNumber'])
+        raise ReclaimCollateralError(f"Transaction failed for reclaiming collateral. Revert reason: {revert_reason}")
     reclaim_event = contract.events.ReclaimProcessStarted().process_receipt(
         receipt,
     )[0]

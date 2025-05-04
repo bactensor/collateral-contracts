@@ -17,7 +17,10 @@ from common import (
     validate_address_format,
     build_and_send_transaction,
     wait_for_receipt,
+    get_revert_reason,
 )
+import json
+from web3.exceptions import ContractLogicError
 
 
 class FinalizeReclaimError(Exception):
@@ -54,7 +57,9 @@ def finalize_reclaim(w3, account, reclaim_request_id, contract_address):
     receipt = wait_for_receipt(w3, tx_hash)
     
     if receipt['status'] == 0:
-        raise FinalizeReclaimError(f"Transaction failed for reclaim request {reclaim_request_id}")
+        # Try to get revert reason
+        revert_reason = get_revert_reason(w3, tx_hash, receipt['blockNumber'])
+        raise FinalizeReclaimError(f"Transaction failed for finalizing reclaim request {reclaim_request_id}. Revert reason: {revert_reason}")
 
     reclaim_event = contract.events.Reclaimed().process_receipt(receipt)[0]
     return reclaim_event, receipt

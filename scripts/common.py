@@ -18,6 +18,7 @@ import hashlib
 import requests
 from web3 import Web3
 from eth_account import Account
+from web3.exceptions import ContractLogicError
 
 
 def load_contract_abi():
@@ -122,3 +123,34 @@ def get_miner_collateral(w3, contract_address, miner_address):
     contract = w3.eth.contract(address=contract_address, abi=contract_abi)
 
     return contract.functions.collaterals(miner_address).call()
+
+
+def get_revert_reason(w3, tx_hash, block_number):
+    """Returns the custom Solidity error name for a failed transaction, or 'Could not parse error' if not decodable."""
+    tx = w3.eth.get_transaction(tx_hash)
+    try:
+        w3.eth.call({
+            'to': tx['to'],
+            'from': tx['from'],
+            'data': tx['input'],
+            'value': tx['value'],
+        }, block_identifier=block_number)
+    except ContractLogicError as e:
+        import re
+        msg = str(e)
+        hex_pattern = re.compile(r'(0x[a-fA-F0-9]{8,})')
+        match = hex_pattern.search(msg)
+        revert_data = match.group(1) if match else None
+        if revert_data and len(revert_data) >= 10:
+            selector = revert_data[:10]
+            contract_abi = load_contract_abi()
+            for item in contract_abi:
+                if item.get('type') == 'error':
+                    sig = item['name'] + '(' + ','.join([input['type'] for input in item.get('inputs', [])]) + ')'
+                    import eth_utils
+                    selector_bytes = eth_utils.keccak(text=sig)[:4]
+                    selector_hex = '0x' + selector_bytes.hex()
+                    if selector == selector_hex:
+                        return item['name']
+        return "Could not parse error"
+    return "Could not parse error"
