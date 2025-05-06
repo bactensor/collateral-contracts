@@ -39,23 +39,29 @@ def main():
         help="The Subtensor Network to connect to.",
     )
     parser.add_argument(
-        "--overwrite",
-        action="store_true",
-        help="Overwrite the existing H160 file with the new one.",
-    )
-    parser.add_argument(
         "--wallet-hotkey",
         default="default",
         help="Hotkey of the Wallet",
     )
     parser.add_argument(
         "--wallet-name",
-        default="default",
+        required=True,
         help="Name of the Wallet.",
     )
     parser.add_argument(
         "--wallet-path",
         help="Path where the Wallets are located.",
+    )
+    override_or_reuse = parser.add_mutually_exclusive_group()
+    override_or_reuse.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="Overwrite the existing H160 file with the new one.",
+    )
+    override_or_reuse.add_argument(
+        "--reuse",
+        action="store_true",
+        help="Reuse the existing H160 file if it already exists.",
     )
 
     args = parser.parse_args()
@@ -69,22 +75,25 @@ def main():
         args.network,
     )
 
-    try:
-        keypair = generate_and_save_keypair(
-            output_path=(
-                pathlib.Path(wallet.path)
-                .expanduser()
-                .joinpath(
-                    wallet.name,
-                    "h160",
-                    wallet.hotkey_str,
-                )
-            ),
-            overwrite=args.overwrite,
-        )
-    except FileExistsError as e:
-        print(f"File {e.filename} already exists. Use --overwrite", file=sys.stderr)
-        sys.exit(1)
+    keypair_path = (
+        pathlib.Path(wallet.path).expanduser().joinpath(wallet.name, "h160", wallet.hotkey_str)
+    )
+
+    if args.reuse:
+        try:
+            keypair = json.loads(keypair_path.read_text())
+        except FileNotFoundError:
+            print(
+                f"File {keypair_path} does not exists. Run the script without --reuse to generate a new keypair.",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+    else:
+        try:
+            keypair = generate_and_save_keypair(output_path=keypair_path, overwrite=args.overwrite)
+        except FileExistsError as e:
+            print(f"File {e.filename} already exists. Use --overwrite", file=sys.stderr)
+            sys.exit(1)
 
     with bittensor.Subtensor(
         network=network_url,
@@ -92,7 +101,6 @@ def main():
         success, error = associate_evm_key(
             subtensor,
             wallet,
-            keypair["address"],
             keypair["private_key"],
             args.netuid,
         )
@@ -110,6 +118,7 @@ def main():
         )
 
         if not success:
+            print(f"Unable to Transfer TAO to generated EVM wallet. {error}", file=sys.stderr)
             sys.exit(1)
 
         if not args.deploy:
