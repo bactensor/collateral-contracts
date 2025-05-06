@@ -55,7 +55,7 @@ def finalize_reclaim(w3, account, reclaim_request_id, contract_address):
     )
 
     receipt = wait_for_receipt(w3, tx_hash)
-    
+
     if receipt['status'] == 0:
         # Try to get revert reason
         revert_reason = get_revert_reason(w3, tx_hash, receipt['blockNumber'])
@@ -75,10 +75,11 @@ def main():
     parser.add_argument(
         "--reclaim-request-id", required=True, type=int, help="ID of the reclaim request to finalize"
     )
+    parser.add_argument("--keyfile", help="Path to keypair file")
     args = parser.parse_args()
 
     w3 = get_web3_connection()
-    account = get_account()
+    account = get_account(args.keyfile)
 
     try:
         reclaim_event, receipt = finalize_reclaim(

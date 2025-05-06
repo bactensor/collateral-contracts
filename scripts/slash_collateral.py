@@ -107,6 +107,7 @@ def main():
         required=True,
         help="URL containing information about the slash"
     )
+    parser.add_argument("--keyfile", help="Path to keypair file")
 
     args = parser.parse_args()
 
@@ -114,7 +115,7 @@ def main():
     validate_address_format(args.miner_address)
 
     w3 = get_web3_connection()
-    account = get_account()
+    account = get_account(args.keyfile)
 
     receipt, event = slash_collateral(
         w3,

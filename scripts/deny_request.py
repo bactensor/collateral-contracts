@@ -84,10 +84,11 @@ def main():
         "--reclaim-request-id", required=True, type=int, help="ID of the reclaim request to deny"
     )
     parser.add_argument("--url", required=True, help="URL containing the reason for denial")
+    parser.add_argument("--keyfile", help="Path to keypair file")
     args = parser.parse_args()
 
     w3 = get_web3_connection()
-    account = get_account()
+    account = get_account(args.keyfile)
 
     deny_event, receipt = deny_reclaim_request(
         w3=w3,

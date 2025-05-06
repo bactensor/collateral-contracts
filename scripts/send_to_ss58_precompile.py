@@ -72,11 +72,11 @@ def main():
         type=int,
         help="The amount to send in wei (smallest unit of TAO)"
     )
-    
+    parser.add_argument("--keyfile", help="Path to keypair file")
     args = parser.parse_args()
 
     w3 = get_web3_connection()
-    account = get_account()
+    account = get_account(args.keyfile)
     print(f"Using account: {account.address}")
 
     receipt = send_tao_to_ss58(

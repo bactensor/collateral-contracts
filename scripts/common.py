@@ -40,9 +40,13 @@ def get_web3_connection(rpc_url=None):
     return w3
 
 
-def get_account():
-    """Get account from PRIVATE_KEY environment variable."""
-    private_key = os.getenv("PRIVATE_KEY")
+def get_account(keyfile=None):
+    """Get the account from the keyfile or PRIVATE_KEY environment variable."""
+    if keyfile:
+        account_data = json.loads(pathlib.Path(keyfile).expanduser().read_text())
+        private_key = account_data.get("private_key")
+    else:
+        private_key = os.getenv("PRIVATE_KEY")
     if not private_key:
         raise KeyError("PRIVATE_KEY environment variable not set")
     return Account.from_key(private_key)

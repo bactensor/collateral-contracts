@@ -103,13 +103,14 @@ def main():
         required=True,
         help="URL for reclaim information"
     )
+    parser.add_argument("--keyfile", help="Path to keypair file")
 
     args = parser.parse_args()
 
     validate_address_format(args.contract_address)
 
     w3 = get_web3_connection()
-    account = get_account()
+    account = get_account(args.keyfile)
 
     receipt, event = reclaim_collateral(
         w3, account, args.amount_tao, args.contract_address, args.url)
