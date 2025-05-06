@@ -162,10 +162,10 @@ def verify_contract(contract_address, expected_trustee, expected_netuid):
 
 def main():
     parser = argparse.ArgumentParser(description='Verify Collateral smart contract')
-    parser.add_argument('contract_address', help='The address of the deployed contract')
-    parser.add_argument('expected_trustee', help='Expected trustee address to verify')
-    parser.add_argument('expected_netuid', type=int, help='Expected netuid to verify')
-    
+    parser.add_argument('--contract-address', required=True, help='The address of the deployed contract')
+    parser.add_argument('--expected-trustee', required=True, help='Expected trustee address to verify')
+    parser.add_argument('--expected-netuid', required=True, type=int, help='Expected netuid to verify')
+
     args = parser.parse_args()
 
     if not Web3.is_address(args.contract_address):

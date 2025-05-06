@@ -18,7 +18,8 @@ MIN_COLLATERAL_INCREASE = 10000000000000  # 0.01 TAO
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "amount_tao",
+        "--amount-tao",
+        required=True,
         help="Amount of TAO to transfer to the EVM wallet",
         type=float,
     )

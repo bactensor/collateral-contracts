@@ -90,15 +90,14 @@ def main():
     parser = argparse.ArgumentParser(
         description="Fetch ReclaimProcessStarted events from Collateral contract")
     parser.add_argument(
-        "contract_address", help="Address of the deployed Collateral contract"
+        "--contract-address", required=True, help="Address of the deployed Collateral contract"
     )
     parser.add_argument(
-        "block_start", type=int, help="Starting block number (inclusive)"
+        "--block-start", required=True, type=int, help="Starting block number (inclusive)"
     )
     parser.add_argument(
-        "block_end",
-        type=int,
-        help="Ending block number (inclusive)")
+        "--block-end", required=True, type=int, help="Ending block number (inclusive)"
+    )
 
     args = parser.parse_args()
 

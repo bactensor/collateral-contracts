@@ -62,11 +62,13 @@ def main():
         description="Send TAO tokens to an SS58 address using the precompile contract"
     )
     parser.add_argument(
-        "recipient_ss58_address",
+        "--recipient-ss58-address",
+        required=True,
         help="The SS58 address of the recipient"
     )
     parser.add_argument(
-        "amount_wei",
+        "--amount-wei",
+        required=True,
         type=int,
         help="The amount to send in wei (smallest unit of TAO)"
     )

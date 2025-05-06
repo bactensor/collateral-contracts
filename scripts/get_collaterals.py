@@ -78,15 +78,14 @@ def main():
         description="Get collaterals for miners who deposited in a given block range"
     )
     parser.add_argument(
-        "contract_address", help="The address of the deployed Collateral contract"
+        "--contract-address", required=True, help="The address of the deployed Collateral contract"
     )
     parser.add_argument(
-        "block_start", type=int, help="Starting block number (inclusive)"
+        "--block-start", required=True, type=int, help="Starting block number (inclusive)"
     )
     parser.add_argument(
-        "block_end",
-        type=int,
-        help="Ending block number (inclusive)")
+        "--block-end", required=True, type=int, help="Ending block number (inclusive)"
+    )
     args = parser.parse_args()
 
     w3 = get_web3_connection()

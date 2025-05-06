@@ -25,11 +25,13 @@ def main():
         description="Query the collateral amount for a specific miner in a smart contract"
     )
     parser.add_argument(
-        "contract_address",
+        "--contract-address",
+        required=True,
         help="The address of the smart contract"
     )
     parser.add_argument(
-        "miner_address",
+        "--miner-address",
+        required=True,
         help="The address of the miner to query"
     )
     

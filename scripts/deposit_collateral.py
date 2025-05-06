@@ -92,16 +92,19 @@ def main():
         description="Deposit collateral into the Collateral smart contract"
     )
     parser.add_argument(
-        "contract_address",
+        "--contract-address",
+        required=True,
         help="Address of the Collateral contract"
     )
     parser.add_argument(
-        "amount_tao",
+        "--amount-tao",
+        required=True,
         type=float,
         help="Amount of TAO to deposit"
     )
     parser.add_argument(
-        "trustee_address",
+        "--trustee-address",
+        required=True,
         help="Expected trustee address to verify"
     )
 

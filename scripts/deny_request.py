@@ -78,12 +78,12 @@ def main():
         description="Deny a reclaim request on the Collateral contract"
     )
     parser.add_argument(
-        "contract_address", help="Address of the deployed Collateral contract"
+        "--contract-address", required=True, help="Address of the deployed Collateral contract"
     )
     parser.add_argument(
-        "reclaim_request_id", type=int, help="ID of the reclaim request to deny"
+        "--reclaim-request-id", required=True, type=int, help="ID of the reclaim request to deny"
     )
-    parser.add_argument("url", help="URL containing the reason for denial")
+    parser.add_argument("--url", required=True, help="URL containing the reason for denial")
     args = parser.parse_args()
 
     w3 = get_web3_connection()

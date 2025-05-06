@@ -88,16 +88,19 @@ def main():
         description="Initiate the process of reclaiming collateral."
     )
     parser.add_argument(
-        "contract_address",
+        "--contract-address",
+        required=True,
         help="Address of the collateral contract"
     )
     parser.add_argument(
-        "amount_tao",
+        "--amount-tao",
+        required=True,
         type=float,
         help="Amount of TAO to reclaim"
     )
     parser.add_argument(
-        "url",
+        "--url",
+        required=True,
         help="URL for reclaim information"
     )
 

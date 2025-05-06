@@ -70,10 +70,10 @@ def main():
         description="Finalize a reclaim request on the Collateral contract"
     )
     parser.add_argument(
-        "contract_address", help="Address of the deployed Collateral contract"
+        "--contract-address", required=True, help="Address of the deployed Collateral contract"
     )
     parser.add_argument(
-        "reclaim_request_id", type=int, help="ID of the reclaim request to finalize"
+        "--reclaim-request-id", required=True, type=int, help="ID of the reclaim request to finalize"
     )
     args = parser.parse_args()
 
