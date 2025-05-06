@@ -39,6 +39,11 @@ def main():
         help="The Subtensor Network to connect to.",
     )
     parser.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="Overwrite the existing H160 file with the new one.",
+    )
+    parser.add_argument(
         "--wallet-hotkey",
         default="default",
         help="Hotkey of the Wallet",
@@ -63,13 +68,23 @@ def main():
     _, network_url = bittensor.utils.determine_chain_endpoint_and_network(
         args.network,
     )
-    keypair = generate_and_save_keypair(
-        output_path=pathlib.Path(wallet.path).expanduser().joinpath(
-            wallet.name,
-            "h160",
-            wallet.hotkey_str,
-        ),
-    )
+
+    try:
+        keypair = generate_and_save_keypair(
+            output_path=(
+                pathlib.Path(wallet.path)
+                .expanduser()
+                .joinpath(
+                    wallet.name,
+                    "h160",
+                    wallet.hotkey_str,
+                )
+            ),
+            overwrite=args.overwrite,
+        )
+    except FileExistsError as e:
+        print(f"File {e.filename} already exists. Use --overwrite", file=sys.stderr)
+        sys.exit(1)
 
     with bittensor.Subtensor(
         network=network_url,
