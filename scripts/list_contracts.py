@@ -6,6 +6,7 @@ import sys
 
 import bittensor.utils
 import bittensor_wallet
+from bittensor import rao
 from common import get_miner_collateral, get_web3_connection
 
 
@@ -105,7 +106,7 @@ async def main():
                 metagraph.hotkeys,
                 metagraph.total_stake,
             )
-            if stake >= stake_threshold.value
+            if stake >= rao(stake_threshold.value).tao
         }
         associations = {
             uid: bytes(association.value[0][0]).hex()
