@@ -15,7 +15,7 @@ from eth_account import Account
 from eth_keys import keys
 
 
-def generate_and_save_keypair(output_path: str) -> dict:
+def generate_and_save_keypair(output_path: str, overwrite: bool = True) -> dict:
     """
     Generate a new Ethereum key pair and save it to a file.
 
@@ -39,7 +39,7 @@ def generate_and_save_keypair(output_path: str) -> dict:
     }
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
-    with open(output_path, "w") as f:
+    with open(output_path, "w" if overwrite else "x") as f:
         json.dump(keypair_data, f, indent=2)
     print(f"Key pair saved to: {output_path}", file=sys.stderr)
     print(f"Address: {account.address}", file=sys.stderr)
