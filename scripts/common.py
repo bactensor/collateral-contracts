@@ -16,6 +16,7 @@ import sys
 import json
 import hashlib
 import requests
+import web3.providers.auto
 from web3 import Web3
 from eth_account import Account
 
@@ -26,13 +27,13 @@ def load_contract_abi():
     return json.loads(abi_file.read_text())
 
 
-def get_web3_connection():
+def get_web3_connection(rpc_url=None):
     """Get Web3 connection from RPC_URL environment variable."""
-    rpc_url = os.getenv("RPC_URL")
+    rpc_url = rpc_url or os.getenv("RPC_URL")
     if not rpc_url:
         raise KeyError("RPC_URL environment variable is not set")
 
-    w3 = Web3(Web3.HTTPProvider(rpc_url))
+    w3 = Web3(web3.providers.auto.load_provider_from_uri(rpc_url))
     if not w3.is_connected():
         raise ConnectionError("Failed to connect to the network")
     return w3
