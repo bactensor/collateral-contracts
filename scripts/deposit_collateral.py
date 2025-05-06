@@ -11,6 +11,7 @@ executes the deposit transaction on the blockchain.
 import sys
 import argparse
 from web3 import Web3
+import bittensor.utils
 from common import (
     load_contract_abi,
     get_web3_connection,
@@ -108,10 +109,12 @@ def main():
         help="Expected trustee address to verify"
     )
     parser.add_argument("--keyfile", help="Path to keypair file")
+    parser.add_argument("--network", default="finney", help="The Subtensor Network to connect to.")
 
     args = parser.parse_args()
 
-    w3 = get_web3_connection()
+    _, network_url = bittensor.utils.determine_chain_endpoint_and_network(args.network)
+    w3 = get_web3_connection(network_url)
     account = get_account(args.keyfile)
 
     deposit_event, receipt = deposit_collateral(

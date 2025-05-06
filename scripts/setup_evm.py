@@ -93,7 +93,7 @@ def main():
         try:
             keypair = generate_and_save_keypair(output_path=keypair_path, overwrite=args.overwrite)
         except FileExistsError as e:
-            print(f"File {e.filename} already exists. Use --overwrite", file=sys.stderr)
+            print(f"File {e.filename} already exists. Use --overwrite or --reuse.", file=sys.stderr)
             sys.exit(1)
 
     with bittensor.Subtensor(
@@ -128,6 +128,7 @@ def main():
         try:
             contract = subprocess.run(
                 [
+                    "bash",
                     "./deploy.sh",
                     str(args.netuid),
                     keypair["address"],

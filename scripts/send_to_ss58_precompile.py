@@ -12,6 +12,7 @@ import argparse
 import sys
 from web3 import Web3
 from eth_account import Account
+import bittensor.utils
 from address_conversion import ss58_to_pubkey
 from common import get_web3_connection, get_account, wait_for_receipt, build_and_send_transaction
 
@@ -73,9 +74,15 @@ def main():
         help="The amount to send in wei (smallest unit of TAO)"
     )
     parser.add_argument("--keyfile", help="Path to keypair file")
+    parser.add_argument(
+        "--network",
+        default="finney",
+        help="The Subtensor Network to connect to.",
+    )
     args = parser.parse_args()
 
-    w3 = get_web3_connection()
+    _, network_url = bittensor.utils.determine_chain_endpoint_and_network(args.network)
+    w3 = get_web3_connection(network_url)
     account = get_account(args.keyfile)
     print(f"Using account: {account.address}")
 

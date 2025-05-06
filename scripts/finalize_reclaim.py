@@ -10,6 +10,7 @@ the collateral to the user's address.
 
 import sys
 import argparse
+import bittensor.utils
 from common import (
     load_contract_abi,
     get_web3_connection,
@@ -76,9 +77,11 @@ def main():
         "--reclaim-request-id", required=True, type=int, help="ID of the reclaim request to finalize"
     )
     parser.add_argument("--keyfile", help="Path to keypair file")
+    parser.add_argument("--network", default="finney", help="The Subtensor Network to connect to.")
     args = parser.parse_args()
 
-    w3 = get_web3_connection()
+    _, network_url = bittensor.utils.determine_chain_endpoint_and_network(args.network)
+    w3 = get_web3_connection(network_url)
     account = get_account(args.keyfile)
 
     try:

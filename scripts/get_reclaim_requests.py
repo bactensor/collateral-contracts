@@ -12,6 +12,7 @@ import sys
 import csv
 import argparse
 from dataclasses import dataclass
+import bittensor.utils
 from common import get_web3_connection, load_contract_abi
 
 
@@ -98,10 +99,16 @@ def main():
     parser.add_argument(
         "--block-end", required=True, type=int, help="Ending block number (inclusive)"
     )
+    parser.add_argument(
+        "--network",
+        default="finney",
+        help="The Subtensor Network to connect to.",
+    )
 
     args = parser.parse_args()
 
-    w3 = get_web3_connection()
+    _, network_url = bittensor.utils.determine_chain_endpoint_and_network(args.network)
+    w3 = get_web3_connection(network_url)
     events = get_reclaim_process_started_events(
         w3, args.contract_address, args.block_start, args.block_end
     )

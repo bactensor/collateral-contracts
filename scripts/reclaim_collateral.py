@@ -10,6 +10,7 @@ with associated URLs for verification purposes.
 
 import sys
 import argparse
+import bittensor.utils
 from common import (
     load_contract_abi,
     get_web3_connection,
@@ -104,12 +105,18 @@ def main():
         help="URL for reclaim information"
     )
     parser.add_argument("--keyfile", help="Path to keypair file")
+    parser.add_argument(
+        "--network",
+        default="finney",
+        help="The Subtensor Network to connect to.",
+    )
 
     args = parser.parse_args()
 
     validate_address_format(args.contract_address)
 
-    w3 = get_web3_connection()
+    _, network_url = bittensor.utils.determine_chain_endpoint_and_network(args.network)
+    w3 = get_web3_connection(network_url)
     account = get_account(args.keyfile)
 
     receipt, event = reclaim_collateral(
