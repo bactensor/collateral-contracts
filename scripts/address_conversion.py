@@ -6,7 +6,6 @@ This module provides functions for converting between different address formats
 used in blockchain systems. It supports conversion between SS58 addresses (used
 in Substrate-based chains) and H160 addresses (Ethereum-style addresses).
 """
-
 import hashlib
 
 import bittensor_wallet
