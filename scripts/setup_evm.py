@@ -54,6 +54,18 @@ def main():
         "--wallet-path",
         help="Path where the Wallets are located.",
     )
+    parser.add_argument(
+        "--deny-timeout",
+        type=int,
+        default=DENY_TIMEOUT,
+        help="Timeout for validators to deny a reclaim request in seconds. Default is 3 days.",
+    )
+    parser.add_argument(
+        "--min-collateral-increase",
+        type=int,
+        default=MIN_COLLATERAL_INCREASE,
+        help="Minimum collateral increase for miners for deposits in Wei. Default is 10000000000000, which is 0.01 TAO.",
+    )
     override_or_reuse = parser.add_mutually_exclusive_group()
     override_or_reuse.add_argument(
         "--overwrite",
@@ -133,8 +145,8 @@ def main():
                     "./deploy.sh",
                     str(args.netuid),
                     keypair["address"],
-                    str(MIN_COLLATERAL_INCREASE),
-                    str(DENY_TIMEOUT),
+                    str(args.min_collateral_increase),
+                    str(args.deny_timeout),
                 ],
                 capture_output=True,
                 check=True,
