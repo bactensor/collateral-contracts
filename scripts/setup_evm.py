@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 import pathlib
 import subprocess
 import sys
@@ -139,6 +140,7 @@ def main():
                 check=True,
                 cwd=pathlib.Path(__file__).parents[1],
                 env={
+                    **os.environ,
                     "RPC_URL": network_url,
                     "DEPLOYER_PRIVATE_KEY": keypair["private_key"],
                 },
