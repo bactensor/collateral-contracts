@@ -18,6 +18,7 @@ from common import (
     build_and_send_transaction,
     wait_for_receipt,
     calculate_md5_checksum,
+    get_revert_reason,
 )
 
 
@@ -74,7 +75,8 @@ def slash_collateral(
 
     receipt = wait_for_receipt(w3, tx_hash)
     if receipt['status'] == 0:
-        raise SlashCollateralError(f"Transaction failed for slashing collateral")
+        revert_reason = get_revert_reason(w3, tx_hash, receipt['blockNumber'])
+        raise SlashCollateralError(f"Transaction failed for slashing collateral. Revert reason: {revert_reason}")
     slash_event = contract.events.Slashed().process_receipt(receipt)[0]
 
     return receipt, slash_event

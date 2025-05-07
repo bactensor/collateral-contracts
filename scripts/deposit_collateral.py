@@ -18,6 +18,7 @@ from common import (
     validate_address_format,
     build_and_send_transaction,
     wait_for_receipt,
+    get_revert_reason,
 )
 
 
@@ -78,7 +79,8 @@ def deposit_collateral(w3, account, amount_tao,
 
     receipt = wait_for_receipt(w3, tx_hash)
     if receipt['status'] == 0:
-        raise DepositCollateralError(f"Transaction failed for depositing collateral")
+        revert_reason = get_revert_reason(w3, tx_hash, receipt['blockNumber'])
+        raise DepositCollateralError(f"Transaction failed for depositing collateral. Revert reason: {revert_reason}")
     deposit_event = contract.events.Deposit().process_receipt(receipt)[0]
 
     return deposit_event, receipt

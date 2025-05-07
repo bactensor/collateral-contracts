@@ -18,6 +18,7 @@ from common import (
     build_and_send_transaction,
     wait_for_receipt,
     calculate_md5_checksum,
+    get_revert_reason,
 )
 
 
@@ -62,7 +63,11 @@ def deny_reclaim_request(
 
     receipt = wait_for_receipt(w3, tx_hash)
     if receipt['status'] == 0:
-        raise DenyReclaimRequestError(f"Transaction failed for denying reclaim request {reclaim_request_id}")
+        # Get revert reason for failed transaction
+        revert_reason = get_revert_reason(w3, tx_hash, receipt['blockNumber'])
+        raise DenyReclaimRequestError(
+            f"Transaction failed for denying reclaim request {reclaim_request_id}. Revert reason: {revert_reason}"
+        )
     deny_event = contract.events.Denied().process_receipt(receipt)[0]
 
     return deny_event, receipt
