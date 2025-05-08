@@ -15,6 +15,8 @@ import pathlib
 import sys
 import json
 import hashlib
+
+import bittensor
 import requests
 import web3.providers.auto
 from web3 import Web3
@@ -28,21 +30,21 @@ def load_contract_abi():
     return json.loads(abi_file.read_text())
 
 
-def get_web3_connection(rpc_url=None):
+def get_web3_connection(rpc_url):
     """Get Web3 connection from RPC_URL environment variable."""
-    rpc_url = rpc_url or os.getenv("RPC_URL")
-    if not rpc_url:
-        raise KeyError("RPC_URL environment variable is not set")
-
     w3 = Web3(web3.providers.auto.load_provider_from_uri(rpc_url))
     if not w3.is_connected():
         raise ConnectionError("Failed to connect to the network")
     return w3
 
 
-def get_account():
-    """Get account from PRIVATE_KEY environment variable."""
-    private_key = os.getenv("PRIVATE_KEY")
+def get_account(keyfile=None):
+    """Get the account from the keyfile or PRIVATE_KEY environment variable."""
+    if keyfile:
+        account_data = json.loads(pathlib.Path(keyfile).expanduser().read_text())
+        private_key = account_data.get("private_key")
+    else:
+        private_key = os.getenv("PRIVATE_KEY")
     if not private_key:
         raise KeyError("PRIVATE_KEY environment variable not set")
     return Account.from_key(private_key)
@@ -155,3 +157,28 @@ def get_revert_reason(w3, tx_hash, block_number):
                         return item['name']
         return "Could not parse error"
     return "Could not parse error"
+
+
+def get_evm_key_associations(
+    subtensor: bittensor.Subtensor, netuid: int, block: int | None = None
+) -> dict[int, str]:
+    """
+    Retrieve all EVM key associations for a specific subnet.
+
+    Arguments:
+        subtensor (bittensor.Subtensor): The Subtensor object to use for querying the network.
+        netuid (int): The NetUID for which to retrieve EVM key associations.
+        block (int | None, optional): The block number to query. Defaults to None, which queries the latest block.
+
+    Returns:
+        dict: A dictionary mapping UIDs (int) to their associated EVM key addresses (str).
+    """
+    associations = subtensor.query_map_subtensor(
+        "AssociatedEvmAddress", block=block, params=[netuid]
+    )
+    uid_evm_address_map = {}
+    for uid, scale_obj in associations:
+        evm_address_raw, block = scale_obj.value
+        evm_address = "0x" + bytes(evm_address_raw[0]).hex()
+        uid_evm_address_map[uid] = evm_address
+    return uid_evm_address_map

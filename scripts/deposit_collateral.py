@@ -11,6 +11,7 @@ executes the deposit transaction on the blockchain.
 import sys
 import argparse
 from web3 import Web3
+import bittensor.utils
 from common import (
     load_contract_abi,
     get_web3_connection,
@@ -92,23 +93,29 @@ def main():
         description="Deposit collateral into the Collateral smart contract"
     )
     parser.add_argument(
-        "contract_address",
+        "--contract-address",
+        required=True,
         help="Address of the Collateral contract"
     )
     parser.add_argument(
-        "amount_tao",
+        "--amount-tao",
+        required=True,
         type=float,
         help="Amount of TAO to deposit"
     )
     parser.add_argument(
-        "trustee_address",
+        "--trustee-address",
+        required=True,
         help="Expected trustee address to verify"
     )
+    parser.add_argument("--keyfile", help="Path to keypair file")
+    parser.add_argument("--network", default="finney", help="The Subtensor Network to connect to.")
 
     args = parser.parse_args()
 
-    w3 = get_web3_connection()
-    account = get_account()
+    _, network_url = bittensor.utils.determine_chain_endpoint_and_network(args.network)
+    w3 = get_web3_connection(network_url)
+    account = get_account(args.keyfile)
 
     deposit_event, receipt = deposit_collateral(
         w3=w3,
