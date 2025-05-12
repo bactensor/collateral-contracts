@@ -68,13 +68,10 @@ async def main():
         print(f"Unable to decode H160 keyfile. {e}")
         sys.exit(1)
 
-    _, network_url = bittensor.utils.determine_chain_endpoint_and_network(
-        args.network,
-    )
-    w3 = get_web3_connection(network_url)
+    w3 = get_web3_connection(args.network)
 
     async with bittensor.AsyncSubtensor(
-        network=network_url,
+        network=args.network,
     ) as subtensor:
         block = await subtensor.get_current_block()
 

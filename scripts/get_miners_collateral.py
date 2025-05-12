@@ -46,8 +46,7 @@ def main():
     validate_address_format(args.contract_address)
     validate_address_format(args.miner_address)
 
-    _, network_url = bittensor.utils.determine_chain_endpoint_and_network(args.network)
-    w3 = get_web3_connection(network_url)
+    w3 = get_web3_connection(args.network)
 
     collateral = get_miner_collateral(w3, args.contract_address, args.miner_address)
     print(

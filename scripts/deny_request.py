@@ -89,8 +89,7 @@ def main():
     parser.add_argument("--network", default="finney", help="The Subtensor Network to connect to.")
     args = parser.parse_args()
 
-    _, network_url = bittensor.utils.determine_chain_endpoint_and_network(args.network)
-    w3 = get_web3_connection(network_url)
+    w3 = get_web3_connection(args.network)
     account = get_account(args.keyfile)
 
     deny_event, receipt = deny_reclaim_request(

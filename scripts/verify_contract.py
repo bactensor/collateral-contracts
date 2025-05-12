@@ -119,8 +119,7 @@ def deploy_on_devnet_and_get_bytecode(w3, contract_address):
 def verify_contract(contract_address, expected_trustee, expected_netuid, network="finney"):
     """Verify if the deployed contract matches the source code and expected values."""
     try:
-        _, network_url = bittensor.utils.determine_chain_endpoint_and_network(network)
-        w3 = get_web3_connection(network_url)
+        w3 = get_web3_connection(network)
 
         # Get contract configuration
         netuid, trustee, _decision_timeout, _min_collateral_increase = get_contract_config(w3, contract_address)

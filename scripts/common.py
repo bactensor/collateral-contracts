@@ -19,6 +19,7 @@ import hashlib
 import bittensor
 import requests
 import web3.providers.auto
+from eth_typing import URI
 from web3 import Web3
 from eth_account import Account
 from web3.exceptions import ContractLogicError
@@ -30,9 +31,10 @@ def load_contract_abi():
     return json.loads(abi_file.read_text())
 
 
-def get_web3_connection(rpc_url):
-    """Get Web3 connection from RPC_URL environment variable."""
-    w3 = Web3(web3.providers.auto.load_provider_from_uri(rpc_url))
+def get_web3_connection(network: str) -> Web3:
+    """Get Web3 connection for the specified network."""
+    _, network_url = bittensor.utils.determine_chain_endpoint_and_network(network)
+    w3 = Web3(web3.providers.auto.load_provider_from_uri(URI(network_url)))
     if not w3.is_connected():
         raise ConnectionError("Failed to connect to the network")
     return w3
@@ -80,7 +82,7 @@ def build_and_send_transaction(
     )
 
     signed_txn = w3.eth.account.sign_transaction(transaction, account.key)
-    
+
     tx_hash = w3.eth.send_raw_transaction(signed_txn.raw_transaction)
     print(f"Transaction sent: {tx_hash.hex()}", file=sys.stderr)
     return tx_hash
