@@ -31,9 +31,18 @@ def load_contract_abi():
     return json.loads(abi_file.read_text())
 
 
+RPC_URLS = {
+    "finney": "https://lite.chain.opentensor.ai",
+    "test": "https://test.chain.opentensor.ai",
+}
+
+
 def get_web3_connection(network: str) -> Web3:
     """Get Web3 connection for the specified network."""
-    _, network_url = bittensor.utils.determine_chain_endpoint_and_network(network)
+    if network in RPC_URLS:
+        network_url = RPC_URLS[network]
+    else:
+        _, network_url = bittensor.utils.determine_chain_endpoint_and_network(network)
     w3 = Web3(web3.providers.auto.load_provider_from_uri(URI(network_url)))
     if not w3.is_connected():
         raise ConnectionError("Failed to connect to the network")
