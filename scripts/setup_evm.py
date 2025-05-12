@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 import pathlib
 import subprocess
 import sys
@@ -18,7 +19,8 @@ MIN_COLLATERAL_INCREASE = 10000000000000  # 0.01 TAO
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "amount_tao",
+        "--amount-tao",
+        required=True,
         help="Amount of TAO to transfer to the EVM wallet",
         type=float,
     )
@@ -39,23 +41,41 @@ def main():
         help="The Subtensor Network to connect to.",
     )
     parser.add_argument(
-        "--overwrite",
-        action="store_true",
-        help="Overwrite the existing H160 file with the new one.",
-    )
-    parser.add_argument(
         "--wallet-hotkey",
         default="default",
         help="Hotkey of the Wallet",
     )
     parser.add_argument(
         "--wallet-name",
-        default="default",
+        required=True,
         help="Name of the Wallet.",
     )
     parser.add_argument(
         "--wallet-path",
         help="Path where the Wallets are located.",
+    )
+    parser.add_argument(
+        "--deny-timeout",
+        type=int,
+        default=DENY_TIMEOUT,
+        help="Timeout for validators to deny a reclaim request in seconds. Default is 3 days.",
+    )
+    parser.add_argument(
+        "--min-collateral-increase",
+        type=int,
+        default=MIN_COLLATERAL_INCREASE,
+        help="Minimum collateral increase for miners for deposits in Wei. Default is 10000000000000, which is 0.01 TAO.",
+    )
+    override_or_reuse = parser.add_mutually_exclusive_group()
+    override_or_reuse.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="Overwrite the existing H160 file with the new one.",
+    )
+    override_or_reuse.add_argument(
+        "--reuse",
+        action="store_true",
+        help="Reuse the existing H160 file if it already exists.",
     )
 
     args = parser.parse_args()
@@ -69,22 +89,25 @@ def main():
         args.network,
     )
 
-    try:
-        keypair = generate_and_save_keypair(
-            output_path=(
-                pathlib.Path(wallet.path)
-                .expanduser()
-                .joinpath(
-                    wallet.name,
-                    "h160",
-                    wallet.hotkey_str,
-                )
-            ),
-            overwrite=args.overwrite,
-        )
-    except FileExistsError as e:
-        print(f"File {e.filename} already exists. Use --overwrite", file=sys.stderr)
-        sys.exit(1)
+    keypair_path = (
+        pathlib.Path(wallet.path).expanduser().joinpath(wallet.name, "h160", wallet.hotkey_str)
+    )
+
+    if args.reuse:
+        try:
+            keypair = json.loads(keypair_path.read_text())
+        except FileNotFoundError:
+            print(
+                f"File {keypair_path} does not exists. Run the script without --reuse to generate a new keypair.",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+    else:
+        try:
+            keypair = generate_and_save_keypair(output_path=keypair_path, overwrite=args.overwrite)
+        except FileExistsError as e:
+            print(f"File {e.filename} already exists. Use --overwrite or --reuse.", file=sys.stderr)
+            sys.exit(1)
 
     with bittensor.Subtensor(
         network=network_url,
@@ -92,7 +115,6 @@ def main():
         success, error = associate_evm_key(
             subtensor,
             wallet,
-            keypair["address"],
             keypair["private_key"],
             args.netuid,
         )
@@ -110,6 +132,7 @@ def main():
         )
 
         if not success:
+            print(f"Unable to Transfer TAO to generated EVM wallet. {error}", file=sys.stderr)
             sys.exit(1)
 
         if not args.deploy:
@@ -118,16 +141,18 @@ def main():
         try:
             contract = subprocess.run(
                 [
+                    "bash",
                     "./deploy.sh",
                     str(args.netuid),
                     keypair["address"],
-                    str(MIN_COLLATERAL_INCREASE),
-                    str(DENY_TIMEOUT),
+                    str(args.min_collateral_increase),
+                    str(args.deny_timeout),
                 ],
                 capture_output=True,
                 check=True,
                 cwd=pathlib.Path(__file__).parents[1],
                 env={
+                    **os.environ,
                     "RPC_URL": network_url,
                     "DEPLOYER_PRIVATE_KEY": keypair["private_key"],
                 },

@@ -1,5 +1,6 @@
 import bittensor
 import bittensor_wallet
+import eth_account
 import eth_utils
 import eth_keys.datatypes
 
@@ -7,7 +8,6 @@ import eth_keys.datatypes
 def associate_evm_key(
     subtensor: bittensor.Subtensor,
     wallet: bittensor_wallet.Wallet,
-    evm_address: str,
     evm_private_key: str,
     netuid: int,
 ) -> tuple[bool, str]:
@@ -15,16 +15,14 @@ def associate_evm_key(
     Associate an EVM key with a given wallet for a specific subnet.
 
     Args:
+        subtensor (bittensor.Subtensor): The Subtensor object to use for the transaction.
         wallet (bittensor.wallet): The wallet object containing the hotkey for signing
             the transaction. The wallet.hotkey will be associated with the EVM key.
-        evm_address (str): The Ethereum Virtual Machine (EVM) address to be associated
-            with the wallet.
         evm_private_key (str): The private key corresponding to the EVM address, used
             for signing the message.
-        network (str): The name of the Subtensor network where the EVM key is to be
-            associated.
         netuid (int): The numerical identifier (UID) of the Subtensor network.
     """
+    evm_address = eth_account.Account.from_key(evm_private_key).address
     eth_private_key = eth_keys.datatypes.PrivateKey(bytes.fromhex(evm_private_key))
 
     # subtensor encodes the u64 block number as little endian bytes before hashing

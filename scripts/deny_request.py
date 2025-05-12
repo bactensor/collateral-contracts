@@ -10,6 +10,7 @@ transparency and accountability.
 
 import sys
 import argparse
+import bittensor.utils
 from common import (
     load_contract_abi,
     get_web3_connection,
@@ -78,16 +79,18 @@ def main():
         description="Deny a reclaim request on the Collateral contract"
     )
     parser.add_argument(
-        "contract_address", help="Address of the deployed Collateral contract"
+        "--contract-address", required=True, help="Address of the deployed Collateral contract"
     )
     parser.add_argument(
-        "reclaim_request_id", type=int, help="ID of the reclaim request to deny"
+        "--reclaim-request-id", required=True, type=int, help="ID of the reclaim request to deny"
     )
-    parser.add_argument("url", help="URL containing the reason for denial")
+    parser.add_argument("--url", required=True, help="URL containing the reason for denial")
+    parser.add_argument("--keyfile", help="Path to keypair file")
+    parser.add_argument("--network", default="finney", help="The Subtensor Network to connect to.")
     args = parser.parse_args()
 
-    w3 = get_web3_connection()
-    account = get_account()
+    w3 = get_web3_connection(args.network)
+    account = get_account(args.keyfile)
 
     deny_event, receipt = deny_reclaim_request(
         w3=w3,

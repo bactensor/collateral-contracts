@@ -6,6 +6,7 @@ import sys
 
 import bittensor.utils
 import bittensor_wallet
+from bittensor import rao
 from common import get_miner_collateral, get_web3_connection
 
 
@@ -67,13 +68,10 @@ async def main():
         print(f"Unable to decode H160 keyfile. {e}")
         sys.exit(1)
 
-    _, network_url = bittensor.utils.determine_chain_endpoint_and_network(
-        args.network,
-    )
-    w3 = get_web3_connection(network_url)
+    w3 = get_web3_connection(args.network)
 
     async with bittensor.AsyncSubtensor(
-        network=network_url,
+        network=args.network,
     ) as subtensor:
         block = await subtensor.get_current_block()
 
@@ -105,7 +103,7 @@ async def main():
                 metagraph.hotkeys,
                 metagraph.total_stake,
             )
-            if stake >= stake_threshold.value
+            if stake >= rao(stake_threshold.value).tao
         }
         associations = {
             uid: bytes(association.value[0][0]).hex()

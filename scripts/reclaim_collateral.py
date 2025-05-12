@@ -10,6 +10,7 @@ with associated URLs for verification purposes.
 
 import sys
 import argparse
+import bittensor.utils
 from common import (
     load_contract_abi,
     get_web3_connection,
@@ -88,25 +89,34 @@ def main():
         description="Initiate the process of reclaiming collateral."
     )
     parser.add_argument(
-        "contract_address",
+        "--contract-address",
+        required=True,
         help="Address of the collateral contract"
     )
     parser.add_argument(
-        "amount_tao",
+        "--amount-tao",
+        required=True,
         type=float,
         help="Amount of TAO to reclaim"
     )
     parser.add_argument(
-        "url",
+        "--url",
+        required=True,
         help="URL for reclaim information"
+    )
+    parser.add_argument("--keyfile", help="Path to keypair file")
+    parser.add_argument(
+        "--network",
+        default="finney",
+        help="The Subtensor Network to connect to.",
     )
 
     args = parser.parse_args()
 
     validate_address_format(args.contract_address)
 
-    w3 = get_web3_connection()
-    account = get_account()
+    w3 = get_web3_connection(args.network)
+    account = get_account(args.keyfile)
 
     receipt, event = reclaim_collateral(
         w3, account, args.amount_tao, args.contract_address, args.url)

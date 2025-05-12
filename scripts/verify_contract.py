@@ -13,6 +13,7 @@ import subprocess
 import sys
 import time
 from web3 import Web3
+import bittensor.utils
 from common import get_web3_connection
 
 ANVIL_PORT = 8555
@@ -115,10 +116,10 @@ def deploy_on_devnet_and_get_bytecode(w3, contract_address):
         anvil_process.wait()
 
 
-def verify_contract(contract_address, expected_trustee, expected_netuid):
+def verify_contract(contract_address, expected_trustee, expected_netuid, network="finney"):
     """Verify if the deployed contract matches the source code and expected values."""
     try:
-        w3 = get_web3_connection()
+        w3 = get_web3_connection(network)
 
         # Get contract configuration
         netuid, trustee, _decision_timeout, _min_collateral_increase = get_contract_config(w3, contract_address)
@@ -162,17 +163,18 @@ def verify_contract(contract_address, expected_trustee, expected_netuid):
 
 def main():
     parser = argparse.ArgumentParser(description='Verify Collateral smart contract')
-    parser.add_argument('contract_address', help='The address of the deployed contract')
-    parser.add_argument('expected_trustee', help='Expected trustee address to verify')
-    parser.add_argument('expected_netuid', type=int, help='Expected netuid to verify')
-    
+    parser.add_argument('--contract-address', required=True, help='The address of the deployed contract')
+    parser.add_argument('--expected-trustee', required=True, help='Expected trustee address to verify')
+    parser.add_argument('--expected-netuid', required=True, type=int, help='Expected netuid to verify')
+    parser.add_argument("--network", default="finney", help="The Subtensor Network to connect to.")
+
     args = parser.parse_args()
 
     if not Web3.is_address(args.contract_address):
         print("Error: Invalid contract address")
         sys.exit(1)
 
-    assert(verify_contract(args.contract_address, args.expected_trustee, args.expected_netuid))
+    assert(verify_contract(args.contract_address, args.expected_trustee, args.expected_netuid, args.network))
 
 
 if __name__ == "__main__":

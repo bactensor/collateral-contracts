@@ -10,6 +10,7 @@ import argparse
 import csv
 import sys
 from collections import defaultdict
+import bittensor.utils
 from common import load_contract_abi, get_web3_connection, get_miner_collateral
 from dataclasses import dataclass
 
@@ -78,18 +79,18 @@ def main():
         description="Get collaterals for miners who deposited in a given block range"
     )
     parser.add_argument(
-        "contract_address", help="The address of the deployed Collateral contract"
+        "--contract-address", required=True, help="The address of the deployed Collateral contract"
     )
     parser.add_argument(
-        "block_start", type=int, help="Starting block number (inclusive)"
+        "--block-start", required=True, type=int, help="Starting block number (inclusive)"
     )
     parser.add_argument(
-        "block_end",
-        type=int,
-        help="Ending block number (inclusive)")
+        "--block-end", required=True, type=int, help="Ending block number (inclusive)"
+    )
+    parser.add_argument("--network", default="finney", help="The Subtensor Network to connect to.")
     args = parser.parse_args()
 
-    w3 = get_web3_connection()
+    w3 = get_web3_connection(args.network)
 
     deposit_events = get_deposit_events(
         w3, args.contract_address, args.block_start, args.block_end

@@ -10,6 +10,7 @@ the collateral to the user's address.
 
 import sys
 import argparse
+import bittensor.utils
 from common import (
     load_contract_abi,
     get_web3_connection,
@@ -55,7 +56,7 @@ def finalize_reclaim(w3, account, reclaim_request_id, contract_address):
     )
 
     receipt = wait_for_receipt(w3, tx_hash)
-    
+
     if receipt['status'] == 0:
         # Try to get revert reason
         revert_reason = get_revert_reason(w3, tx_hash, receipt['blockNumber'])
@@ -70,15 +71,17 @@ def main():
         description="Finalize a reclaim request on the Collateral contract"
     )
     parser.add_argument(
-        "contract_address", help="Address of the deployed Collateral contract"
+        "--contract-address", required=True, help="Address of the deployed Collateral contract"
     )
     parser.add_argument(
-        "reclaim_request_id", type=int, help="ID of the reclaim request to finalize"
+        "--reclaim-request-id", required=True, type=int, help="ID of the reclaim request to finalize"
     )
+    parser.add_argument("--keyfile", help="Path to keypair file")
+    parser.add_argument("--network", default="finney", help="The Subtensor Network to connect to.")
     args = parser.parse_args()
 
-    w3 = get_web3_connection()
-    account = get_account()
+    w3 = get_web3_connection(args.network)
+    account = get_account(args.keyfile)
 
     try:
         reclaim_event, receipt = finalize_reclaim(

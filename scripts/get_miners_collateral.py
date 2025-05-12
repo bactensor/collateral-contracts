@@ -12,6 +12,7 @@ The script will output the collateral amount in TAO (the native token).
 
 import argparse
 import sys
+import bittensor.utils
 from common import (
     get_web3_connection,
     get_miner_collateral,
@@ -25,20 +26,27 @@ def main():
         description="Query the collateral amount for a specific miner in a smart contract"
     )
     parser.add_argument(
-        "contract_address",
+        "--contract-address",
+        required=True,
         help="The address of the smart contract"
     )
     parser.add_argument(
-        "miner_address",
+        "--miner-address",
+        required=True,
         help="The address of the miner to query"
     )
-    
+    parser.add_argument(
+        "--network",
+        default="finney",
+        help="The Subtensor Network to connect to.",
+    )
+
     args = parser.parse_args()
-    
+
     validate_address_format(args.contract_address)
     validate_address_format(args.miner_address)
 
-    w3 = get_web3_connection()
+    w3 = get_web3_connection(args.network)
 
     collateral = get_miner_collateral(w3, args.contract_address, args.miner_address)
     print(
