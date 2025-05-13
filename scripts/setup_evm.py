@@ -112,6 +112,7 @@ def main():
     with bittensor.Subtensor(
         network=network_url,
     ) as subtensor:
+        print(f"Assosiating {keypair['address']} with your hotkey.")
         success, error = associate_evm_key(
             subtensor,
             wallet,
@@ -123,21 +124,26 @@ def main():
             print(f"Unable to Associate EVM Key. {error}", file=sys.stderr)
             sys.exit(1)
 
-        success = subtensor.transfer(
-            wallet,
-            dest=h160_to_ss58(keypair["address"]),
-            amount=bittensor.Balance.from_tao(args.amount_tao),
-            wait_for_inclusion=True,
-            wait_for_finalization=True,
-        )
+        if args.amount_tao > 0:
+            print(f"Transfering {args.amount_tao} to {keypair['address']}.")
+            success = subtensor.transfer(
+                wallet,
+                dest=h160_to_ss58(keypair["address"]),
+                amount=bittensor.Balance.from_tao(args.amount_tao),
+                wait_for_inclusion=True,
+                wait_for_finalization=True,
+            )
 
-        if not success:
-            print(f"Unable to Transfer TAO to generated EVM wallet. {error}", file=sys.stderr)
-            sys.exit(1)
+            if not success:
+                print(f"Unable to Transfer TAO to generated EVM wallet. {error}", file=sys.stderr)
+                sys.exit(1)
 
         if not args.deploy:
             return
 
+        print(f"Deploying new collateral contract(netuid={args.netuid}, min_collateral_increase={args.min_collateral_increase}, deny_timeout={args.deny_timeout}).\n"
+              f"Using RPC_URL={network_url}"
+        )
         try:
             contract = subprocess.run(
                 [
