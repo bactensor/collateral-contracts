@@ -129,7 +129,7 @@ async def main():
                 continue
 
             print(f"HotKey {hotkey}")
-            print(f"- EVM Address: {evm_address}")
+            print(f"- EVM Address: 0x{evm_address}")
             print(f"- Contract Address: {contract_address}")
 
             # collateral checking is a blocking function so we make it optional
