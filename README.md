@@ -42,8 +42,8 @@ This contract creates a **trust-minimized interaction** between miners and valid
 >
 > This contract uses **H160 (Ethereum) addresses** for both miner and validator identities.
 > - Before interacting with the contract (depositing, slashing, reclaiming, etc.), **all parties must have an Ethereum wallet** (including a plain text private key) to sign the required transactions.
-> - An association between these H160 wallet addresses and the respective **SS58 hotkeys** (used in Bittensor) is **strongly recommended** so validators can reliably identify miners.
-> - Best practices for managing and verifying these address associations are still under development within the broader Bittensor ecosystem, but Subtensor is now able to [associate H160 with an UID](https://github.com/opentensor/subtensor/pull/1487)
+> - Each H160 wallet used with this contract **should be** explicitly associated with its corresponding **SS58 hotkey**, using on-chain mechanisms provided by Subtensor. 
+>   This ensures that validators and miners can reliably link wallet actions to Bittensor identities.
 
 > **Transaction Fees**
 >
@@ -65,13 +65,13 @@ Below is a typical sequence for integrating and using this collateral contract w
    - Validators adopt this updated code and prepare to enforce collateral requirements.
 
 - **Validator Deployment**
-   - The validator **creates an Ethereum (H160) wallet**, links it to their hotkey, and funds it with enough TAO to cover transaction fees.
+   - The validator **creates an Ethereum (H160) wallet**, associates it with their hotkey, and funds it with enough TAO to cover transaction fees.
    - The validator **deploys the contract**, requiring participating miners to stake collateral.
    - The validator **publishes the contract address** on-chain, allowing miners to discover and verify it.
    - Once ready, the validator **enables collateral-required mode** and prioritizes miners based on their locked amounts.
 
 - **Miner Deposit**
-   - Each miner **creates an Ethereum (H160) wallet**, links it to their hotkey, and funds it with enough TAO for transaction fees.
+   - Each miner **creates an Ethereum (H160) wallet**, associates it with their hotkey, and funds it with enough TAO for transaction fees.
    - Miners **retrieve** the validator's contract address from the chain or another trusted source.
    - They **verify** the contract is indeed associated with the intended validator.
    - Upon confirmation, miners **deposit** collateral by calling the contract's `deposit()` function.
