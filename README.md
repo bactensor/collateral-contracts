@@ -43,7 +43,8 @@ This contract creates a **trust-minimized interaction** between miners and valid
 > This contract uses **H160 (Ethereum) addresses** for both miner and validator identities.
 > - Before interacting with the contract (depositing, slashing, reclaiming, etc.), **all parties must have an Ethereum wallet** (including a plain text private key) to sign the required transactions.
 > - Each H160 wallet used with this contract **should be** explicitly associated with its corresponding **SS58 hotkey**, using on-chain mechanisms provided by Subtensor. 
->   This ensures that validators and miners can reliably link wallet actions to Bittensor identities.
+> - Use [`scripts/associate_evm_key.py`](/scripts/associate_evm_key.py) to perform the association.
+> - This ensures that validators and miners can reliably link wallet actions to Bittensor identities.
 
 > **Transaction Fees**
 >
