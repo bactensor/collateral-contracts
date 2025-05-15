@@ -112,7 +112,7 @@ def main():
     with bittensor.Subtensor(
         network=network_url,
     ) as subtensor:
-        print(f"Assosiating {keypair['address']} with your hotkey.")
+        print(f"Associating {keypair['address']} with your hotkey.", flush=True)
         success, error = associate_evm_key(
             subtensor,
             wallet,
@@ -125,7 +125,7 @@ def main():
             sys.exit(1)
 
         if args.amount_tao > 0:
-            print(f"Transfering {args.amount_tao} to {keypair['address']}.")
+            print(f"Transfering {args.amount_tao} to {keypair['address']}.", flush=True)
             success = subtensor.transfer(
                 wallet,
                 dest=h160_to_ss58(keypair["address"]),
@@ -142,7 +142,7 @@ def main():
             return
 
         print(f"Deploying new collateral contract(netuid={args.netuid}, min_collateral_increase={args.min_collateral_increase}, deny_timeout={args.deny_timeout}).\n"
-              f"Using RPC_URL={network_url}"
+              f"Using RPC_URL={network_url}", flush=True
         )
         try:
             contract = subprocess.run(
