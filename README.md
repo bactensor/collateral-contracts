@@ -89,6 +89,71 @@ Below is a typical sequence for integrating and using this collateral contract w
 Below are step-by-step instructions tailored to **miners**, **validators**, and **subnet owners**.
 Refer to the repository's [`scripts/`](/scripts/) folder for sample implementations and helper scripts.
 
+### Recommended Miner Integration Guide (as used by ComputeHorde)
+
+<details>
+<summary>Click to expand recommended miner setup flow</summary>
+
+This is the collateral workflow currently used by **ComputeHorde** miners.
+Other subnets may follow the same process — no changes are needed beyond the `--netuid` value in setup.
+
+#### **1. Setup with `setup_evm.sh`**
+
+Run the script on a machine that has access to your **coldkey**, to:
+
+- **Create or reuse** an H160 wallet under `~/.bittensor/wallet/coldkey/h160/hotkey`.
+- **Transfer TAO** to the wallet:
+  - At least **1 TAO per validator** you plan to stake with (this is the current minimum for ComputeHorde).
+  - Plus additional TAO to cover **gas fees** for deposit, reclaim, and finalize transactions — we recommend **~0.2 TAO extra**.
+- **Associate** the H160 wallet with your miner hotkey on the appropriate `--netuid`.
+
+> Note: This is the same script validators use, but without the `--deploy` flag.
+> You do **not** need to deploy a contract or copy the private key to your miner machine.
+
+#### **2. Discover Validator Contracts**
+
+To find available validators:
+
+- Run [`scripts/list_contracts.py`](scripts/list_contracts.py) to query your subnet’s **knowledge commitments**.
+- It will list all known validator contracts along with the collateral amount you’ve deposited (if any).
+
+#### **3. Choose Trusted Validators**
+
+- Review the listed validators and decide which ones you trust to act fairly and slash responsibly.
+- You can choose one or multiple validators — just be sure to have enough TAO for each one.
+
+#### **4. Verify Contracts**
+
+Before depositing:
+
+- Use [`scripts/verify_contract.py`](scripts/verify_contract.py) to confirm that a validator’s contract:
+  - Is built from this repository,
+  - Matches the expected parameters (subnet ID, trustee, etc.).
+
+This ensures you are not locking funds into a malicious or fake contract.
+
+#### **5. Deposit Collateral**
+
+- Run [`scripts/deposit_collateral.py`](scripts/deposit_collateral.py) for each validator you trust.
+- Confirm on-chain that the deposit succeeded using [`scripts/get_miners_collateral.py`](scripts/get_miners_collateral.py).
+
+#### **6. Receive Tasks and Monitor the Network**
+
+- You will begin receiving **organic task assignments** from validators using your staked collateral as a signal.
+- Periodically re-run `list_contracts.py` to discover new validators or updated contracts you may want to deposit into.
+
+#### **7. Reclaim and Withdraw**
+
+When you want to exit:
+
+- Use [`scripts/reclaim_collateral.py`](scripts/reclaim_collateral.py) to initiate withdrawal.
+- After the timeout period (if not denied), use [`scripts/finalize_reclaim.py`](scripts/finalize_reclaim.py) to unlock your collateral.
+- Finally, use [`scripts/send_to_ss58_precompile.py`](scripts/send_to_ss58_precompile.py) to move your TAO back to your SS58 wallet.
+
+> Reminder: None of these steps require the H160 private key to be present on your miner machine.
+
+</details>
+
 ### As a Miner, you can:
 
 - **Deposit Collateral**
