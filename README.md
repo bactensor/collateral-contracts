@@ -4,6 +4,12 @@
 >
 > **Design**: One collateral contract per validator and subnet.
 
+> **About This Contract**
+>
+> This smart contract is **generic** and can be used by **any Bittensor subnet** to manage miner collateral.
+> However, the **usage guides in this README reflect the recommended integration pattern** pioneered by the [ComputeHorde](https://github.com/ComputeHorde) subnet (`sn12`).
+> Subnets adopting the same approach only need to adjust the `--netuid` parameter in setup scripts.
+
 ## Overview
 
 This contract creates a **trust-minimized interaction** between miners and validators in the Bittensor ecosystem. 
