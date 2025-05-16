@@ -166,3 +166,41 @@ Refer to the repository's [`scripts/`](/scripts/) folder for sample implementati
   - Reject miners who do not meet a minimum collateral requirement.
 
   By coupling task assignment with the collateral balance, the subnetwork ensures more consistent performance and discourages low-quality or malicious contributions.
+
+
+## Full Script Reference
+
+Below is a full list of helper scripts available in the [`scripts/`](scripts/) directory.
+Most of them are already linked inline in the **Usage Guides** above, but this section provides a complete overview for reference or discovery.
+
+### **Getting Started & Finalizing**
+
+- [`setup_evm.py`](scripts/setup_evm.py) – End-to-end setup script for both miners and validators: generates or reuses an H160 wallet, associates it with a hotkey, and funds it with TAO. Validators continue by deploying the contract and publishing its address.
+- [`send_to_ss58_precompile.py`](scripts/send_to_ss58_precompile.py) – Transfers TAO from an H160 wallet back to an SS58 address once contract interactions are complete.
+
+### **Contract Interaction – Miners**
+
+- [`deposit_collateral.py`](scripts/deposit_collateral.py) – Deposits a specified amount of TAO into a validator’s collateral contract.
+- [`reclaim_collateral.py`](scripts/reclaim_collateral.py) – Initiates the reclaim process to withdraw collateral.
+- [`finalize_reclaim.py`](scripts/finalize_reclaim.py) – Completes a reclaim after the timeout, unlocking collateral if the validator has not denied it.
+- [`verify_contract.py`](scripts/verify_contract.py) – Verifies that a validator’s contract matches expected parameters (e.g., correct subnet and trustee) before depositing.
+- [`list_contracts.py`](scripts/list_contracts.py) – Scans the on-chain knowledge commitments for a subnet and returns a list of all validator contract addresses and their associated hotkeys, along with your deposit amounts.
+
+### **Contract Interaction – Validators**
+
+- [`slash_collateral.py`](scripts/slash_collateral.py) – Penalizes a miner by slashing a specified amount of their staked collateral.
+- [`deny_request.py`](scripts/deny_request.py) – Denies a pending reclaim request, preventing the miner from recovering their stake.
+- [`get_collaterals.py`](scripts/get_collaterals.py) – Lists all collateral deposits that occurred within a given block range.
+- [`get_reclaim_requests.py`](scripts/get_reclaim_requests.py) – Lists all reclaim requests made during a specified block range.
+
+### **Address Management & General Utilities**
+
+- [`generate_keypair.py`](scripts/generate_keypair.py) – Generates a new Ethereum (H160) keypair.
+- [`associate_evm_key.py`](scripts/associate_evm_key.py) – Associates an H160 wallet with a Bittensor SS58 hotkey on-chain.
+- [`h160_to_ss58.py`](scripts/h160_to_ss58.py) – Converts an Ethereum H160 address to its corresponding SS58 format.
+- [`get_hotkey_association.py`](scripts/get_hotkey_association.py) – Retrieves the H160 address associated with a given hotkey.
+- [`get_all_associations.py`](scripts/get_all_associations.py) – Lists all H160–SS58 associations for a specific subnet.
+- [`get_current_block.py`](scripts/get_current_block.py) – Retrieves the current block number from the Ethereum network.
+- [`get_balance.py`](scripts/get_balance.py) – Checks the TAO balance of a given H160 wallet.
+- [`get_miners_collateral.py`](scripts/get_miners_collateral.py) – Retrieves the amount of collateral a given miner has deposited to a specific validator’s contract.
+  *(Used internally by other scripts like `list_contracts.py`, but can also be used directly for targeted queries.)*
