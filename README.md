@@ -89,7 +89,7 @@ Below is a typical sequence for integrating and using this collateral contract w
 Below are step-by-step instructions tailored to **miners**, **validators**, and **subnet owners**.
 Refer to the repository's [`scripts/`](/scripts/) folder for sample implementations and helper scripts.
 
-## As a Miner, you can:
+### As a Miner, you can:
 
 - **Deposit Collateral**
   If you plan to stake for multiple validators, simply repeat these steps for each one:
@@ -104,13 +104,66 @@ Refer to the repository's [`scripts/`](/scripts/) folder for sample implementati
   - If the validator does not deny your request by the deadline, run [`scripts/finalize_reclaim.py`](/scripts/finalize_reclaim.py) to unlock and retrieve your collateral.
   - Verify on-chain that your balance has been updated accordingly.
 
+### Recommended Validator Integration Guide (as used by ComputeHorde)
+
+<details>
+<summary>Click to expand recommended validator setup flow</summary>
+
+This is the validator integration flow currently used by the **ComputeHorde** subnet (`sn12`).
+Other subnets are encouraged to adopt the same model — only the `--netuid` parameter needs to be adjusted.
+
+#### **1. Setup with `setup_evm.sh --deploy`**
+
+Run the helper script on a machine that has access to your validator coldkey:
+
+- **Creates or reuses** a validator H160 wallet (`~/.bittensor/wallet/coldkey/h160/hotkey`):
+  - Use `--reuse` to keep an existing identity.
+  - Use `--overwrite` **with caution** – this deletes and replaces the private key (and thus access to any TAO previously sent to it).
+- **Transfers funds** to the wallet (recommended: at least **1 TAO** to start).
+- **Associates** the H160 with the validator’s SS58 hotkey on the target `--netuid`.
+- **Deploys the collateral contract** to Ethereum.
+- If on **mainnet**, it also **verifies the contract on [evm.taostats.io](https://evm.taostats.io)** for public transparency.
+- **Publishes the contract address** as a **knowledge commitment** on-chain, enabling miners and other tools to discover and verify it.
+
+#### **2. Transfer H160 Key to Validator Node**
+
+Move the generated H160 key file (`hotkey`) to your validator machine (e.g., `sn12`).
+You do **not** need to transfer the coldkey — the private key file is sufficient for all contract interactions.
+
+#### **3. Validator Code Uses the Contract**
+
+The validator code provided by the subnet owner:
+
+- **Reads the published knowledge commitment** to get the contract address.
+- **Prioritizes miners** based on their staked collateral.
+- **Performs automated slashing** when cross-validation detects incorrect responses:
+  - Initially slashes **tiny amounts** to calibrate the logic.
+  - Later increases slashing severity to discourage misbehavior.
+
+#### **4. Maintain Sufficient TAO for Gas**
+
+Slashing operations consume gas on Ethereum.
+Validators must keep their H160 wallet funded to support this:
+
+- A **Grafana chart** will monitor the H160 wallet balance.
+- Top up when needed to avoid disruptions in automated enforcement.
+
+#### **5. Manual Slashing & Reclaim Denials (Optional)**
+
+In rare cases where cheating is **suspected but not yet confirmed** by automation:
+
+- You may **manually deny reclaim requests** from the suspected miner.
+- If confirmed, issue a **manual slash**.
+- If false alarm, stop denying and allow the reclaim to proceed normally.
+
+</details>
 
 ### As a Validator, you can:
 
 - **Deploy the Contract**
   - Install [Foundry](https://book.getfoundry.sh/).
   - Clone this repository.
-  - Compile and deploy the contract, use [`deploy.sh`](/deploy.sh) with your details as arguments.
+  - Compile and deploy the contract, use [`deploy.sh`](deploy.sh) with your details as arguments.
   - Record the deployed contract address and publish it via a subnet-owner-provided tool so that miners can discover and verify it.
 
 - **Enable Regular Operation**
@@ -125,12 +178,12 @@ Refer to the repository's [`scripts/`](/scripts/) folder for sample implementati
 
 - **Manually Deny a Reclaim**
   - Identify the relevant `reclaimRequestId` (from `ReclaimProcessStarted` event, for example).
-  - Use [`scripts/deny_reclaim.py`](/scripts/deny_reclaim.py) (calling the contract's `denyReclaim(reclaimRequestId)`) before the deadline.
+  - Use [`scripts/deny_reclaim.py`](scripts/deny_reclaim.py) (calling the contract's `denyReclaim(reclaimRequestId)`) before the deadline.
   - Verify on-chain that the reclaim request is removed and the miner's `hasPendingReclaim` is reset to `false`.
 
 - **Manually Slash Collateral**
   - Confirm miner misconduct based on subnetwork rules (e.g., invalid blocks, spam, protocol violations).
-  - Use [`scripts/slash_collateral.py`](/scripts/slash_collateral.py) (calling the contract's `slashCollateral(miner, slashAmount)`) to penalize the miner by reducing their staked amount.
+  - Use [`scripts/slash_collateral.py`](scripts/slash_collateral.py) (calling the contract's `slashCollateral(miner, slashAmount)`) to penalize the miner by reducing their staked amount.
   - Verify the transaction on-chain and confirm the miner's `collaterals[miner]` value has changed.
 
 ### As a Subnet Owner, you can
