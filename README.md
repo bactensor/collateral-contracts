@@ -19,7 +19,7 @@ This contract creates a **trust-minimized interaction** between miners and valid
 - **Collateral-Based Prioritization**
 
   Validators may choose to favor miners with higher collateral when assigning tasks, providing mild incentives for greater stakes and reliable performance.
-Subnets should avoid turning this into an arms race — collateral should act as a minimum quality filter and help break scheduling ties, not as a barrier that escalates endlessly.
+  **Note**: Turning this into an arms race should be avoided — collateral is best used as a minimum quality filter and to break scheduling ties, not as a barrier that escalates endlessly.
 
 - **Arbitrary Slashing**
   
