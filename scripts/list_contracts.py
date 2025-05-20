@@ -1,13 +1,11 @@
 import argparse
 import asyncio
 import json
-import pathlib
 import sys
 
-import bittensor.utils
-import bittensor_wallet
+import bittensor
 from bittensor import rao
-from common import get_miner_collateral, get_web3_connection
+from common import get_miner_collateral, get_web3_connection, get_account
 
 
 async def main():
@@ -27,46 +25,18 @@ async def main():
         default="finney",
         help="The Subtensor Network to connect to.",
     )
-    parser.add_argument(
-        "--wallet-hotkey",
-        default="default",
-        help="Hotkey of the Wallet",
-    )
-    parser.add_argument(
-        "--wallet-name",
-        default="default",
-        help="Name of the Wallet.",
-    )
-    parser.add_argument(
-        "--wallet-path",
-        help="Path where the Wallets are located.",
-    )
+    parser.add_argument("--keyfile", help="Path to keypair file")
 
     args = parser.parse_args()
 
-    wallet = bittensor_wallet.Wallet(
-        name=args.wallet_name,
-        hotkey=args.wallet_hotkey,
-        path=args.wallet_path,
-    )
-
-    try:
-        with open(
-            pathlib.Path(wallet.path)
-            .expanduser()
-            .joinpath(
-                wallet.name,
-                "h160",
-                wallet.hotkey_str,
-            ),
-        ) as keyfile:
-            keypair = json.load(keyfile)
-    except OSError as e:
-        print(f"Unable to open H160 keyfile. {e}")
-        sys.exit(1)
-    except json.JSONDecodeError as e:
-        print(f"Unable to decode H160 keyfile. {e}")
-        sys.exit(1)
+    if args.check_collateral:
+        try:
+            account = get_account(args.keyfile)
+        except KeyError:
+            print("You need to pass --keyfile when --check-collateral is present.", file=sys.stderr)
+            sys.exit(1)
+    else:
+        account = None
 
     w3 = get_web3_connection(args.network)
 
@@ -137,7 +107,7 @@ async def main():
                 collateral = get_miner_collateral(
                     w3,
                     contract_address,
-                    keypair["address"],
+                    account.address,
                 )
 
                 print(f"- My Collateral: {w3.from_wei(collateral, 'ether')} TAO")
