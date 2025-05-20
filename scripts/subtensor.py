@@ -2,7 +2,7 @@ import bittensor
 import bittensor_wallet
 import eth_account
 import eth_utils
-import eth_keys.datatypes
+from eth_account import messages, Account
 
 
 def associate_evm_key(
@@ -22,8 +22,7 @@ def associate_evm_key(
             for signing the message.
         netuid (int): The numerical identifier (UID) of the Subtensor network.
     """
-    evm_address = eth_account.Account.from_key(evm_private_key).address
-    eth_private_key = eth_keys.datatypes.PrivateKey(bytes.fromhex(evm_private_key))
+    account = Account.from_key(evm_private_key)
 
     # subtensor encodes the u64 block number as little endian bytes before hashing
     # https://github.com/opentensor/subtensor/blob/6b86ebf30d3fb83f9d43ed4ce713c43204394e67/pallets/subtensor/src/tests/evm.rs#L44
@@ -35,7 +34,9 @@ def associate_evm_key(
 
     hotkey_bytes: bytes = wallet.hotkey.public_key
     message = hotkey_bytes + hashed_block_number
-    signature = eth_private_key.sign_msg(message)
+
+    signable_message = messages.encode_defunct(message)
+    signed_message = eth_account.Account.sign_message(signable_message, account.key)
 
     call = subtensor.substrate.compose_call(
         call_module="SubtensorModule",
@@ -43,9 +44,9 @@ def associate_evm_key(
         call_params={
             "netuid": netuid,
             "hotkey": wallet.hotkey.ss58_address,
-            "evm_key": evm_address,
+            "evm_key": account.address,
             "block_number": block_number,
-            "signature": signature.to_bytes(),
+            "signature": signed_message.signature.to_0x_hex(),
         },
     )
 
