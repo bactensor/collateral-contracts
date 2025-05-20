@@ -173,6 +173,8 @@ def main():
                 for line in contract.stdout.split("\n")
                 if line.startswith("Deployed to: ")
             )
+            print("Collateral smart contract deployed.")
+            print(f"Contract address: {contract_address}\n")
 
         try:
             subtensor.commit(
