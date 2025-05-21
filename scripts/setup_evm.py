@@ -174,10 +174,11 @@ def main():
                 if line.startswith("Deployed to: ")
             )
             print("Collateral smart contract deployed.")
-            print(f"Contract address: {contract_address}\n")
+            print(f"Contract address: {contract_address}")
 
         if args.network == "finney":
             try:
+                print("Verifying deployed contract with evm.taostats.io.")
                 subprocess.run(
                     [
                         "forge",
@@ -200,6 +201,7 @@ def main():
                 print("", file=sys.stderr)
 
         try:
+            print("Publishing contract address as knowledge commitment.", flush=True)
             subtensor.commit(
                 wallet,
                 netuid=args.netuid,
