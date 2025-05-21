@@ -184,6 +184,10 @@ Other subnets are encouraged to adopt the same model — only the `--netuid` par
 
 Run the helper script on a machine that has access to your validator coldkey:
 
+```bash
+scripts/setup_evm.sh --deploy --netuid <NETUID> --coldkey <COLDKEY> --hotkey <HOTKEY> --amount 1.0
+```
+
 - **Creates or reuses** a validator H160 wallet (`~/.bittensor/wallet/coldkey/h160/hotkey`):
   - Use `--reuse` to keep an existing identity.
   - Use `--overwrite` **with caution** – this deletes and replaces the private key (and thus access to any TAO previously sent to it).
@@ -195,7 +199,13 @@ Run the helper script on a machine that has access to your validator coldkey:
 
 #### **2. Transfer H160 Key to Validator Node**
 
-Move the generated H160 key file (`hotkey`) to your validator machine (e.g., `sn12`).
+Copy the generated H160 key file (`hotkey`) to your validator machine (e.g., `sn12`).
+
+```bash
+scp ~/.bittensor/wallet/coldkey/h160/my-hotkey <vali-host>:~/.bittensor/wallet/hotkeys/h160-my-hotkey
+```
+
+
 You do **not** need to transfer the coldkey — the private key file is sufficient for all contract interactions.
 
 #### **3. Validator Code Uses the Contract**
@@ -215,6 +225,22 @@ Validators must keep their H160 wallet funded to support this:
 
 - A **Grafana chart** will monitor the H160 wallet balance.
 - Top up when needed to avoid disruptions in automated enforcement.
+
+You can check the balance at any time:
+
+```bash
+scripts/get_balance.py --wallet h160
+```
+
+To top up the wallet, convert the H160 to an SS58 address:
+```bash
+scripts/h160_to_ss58.py --h160 <YOUR_H160_ADDRESS>
+```
+
+Then use btcli on a machine with your coldkey to transfer funds:
+```bash
+btcli w transfer --amount 1 --recipient <SS58_FROM_ABOVE>
+```
 
 #### **5. Manual Slashing & Reclaim Denials (Optional)**
 
