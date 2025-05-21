@@ -135,7 +135,7 @@ def main():
             )
 
             if not success:
-                print(f"Unable to Transfer TAO to generated EVM wallet. {error}", file=sys.stderr)
+                print(f"Unable to Transfer TAO to generated EVM wallet.", file=sys.stderr)
                 sys.exit(1)
 
         if not args.deploy:
