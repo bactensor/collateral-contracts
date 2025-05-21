@@ -174,11 +174,18 @@ def main():
                 if line.startswith("Deployed to: ")
             )
             print("Collateral smart contract deployed.")
+<<<<<<< HEAD
             print(f"Contract address: {contract_address}")
 
         if args.network == "finney":
             try:
                 print("Verifying deployed contract with evm.taostats.io.")
+=======
+            print(f"Contract address: {contract_address}\n")
+
+        if args.network == "finney":
+            try:
+>>>>>>> testnet
                 subprocess.run(
                     [
                         "forge",
