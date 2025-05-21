@@ -4,4 +4,4 @@ web3>=7.10.0,<8.0
 # HTTP requests for URL content fetching
 requests>=2.32.0,<3.0
 
-bittensor>=9.4.0,<10.0
+bittensor==9.4.0
