@@ -1,7 +1,0 @@
-# Web3 for Ethereum interaction
-web3==7.10.0
-
-# HTTP requests for URL content fetching
-requests==2.31.0
-
-bittensor==9.4.0

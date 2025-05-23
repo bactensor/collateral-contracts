@@ -167,6 +167,31 @@ def main():
                 for line in contract.stdout.split("\n")
                 if line.startswith("Deployed to: ")
             )
+            print("Collateral smart contract deployed.")
+            print(f"Contract address: {contract_address}\n")
+
+        if args.network == "finney":
+            try:
+                subprocess.run(
+                    [
+                        "forge",
+                        "verify-contract",
+                        "--rpc-url",
+                        "https://evm.taostats.io/api/eth-rpc",
+                        "--verifier",
+                        "blockscout",
+                        "--verifier-url",
+                        "https://evm.taostats.io/api/",
+                        contract_address,
+                        "src/Collateral.sol:Collateral"
+                    ],
+                    check=True,
+                    cwd=pathlib.Path(__file__).parents[1],
+                )
+            except subprocess.CalledProcessError as e:
+                print("Failed to verify deployed contract", file=sys.stderr)
+                print(f"Error: {e.stderr}", file=sys.stderr)
+                print("", file=sys.stderr)
 
         try:
             subtensor.commit(
@@ -183,8 +208,6 @@ def main():
         except bittensor.MetadataError as e:
             print(f"Unable to Publish Contract Address. {e}", file=sys.stderr)
             sys.exit(1)
-
-        print(f"Published Contract Address: {contract_address}")
 
 
 if __name__ == "__main__":
