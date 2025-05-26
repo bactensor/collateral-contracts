@@ -65,7 +65,8 @@ contract CollateralTest is CollateralTestBase {
 
     function testFuzz_finalizeReclaim(uint256 amount, uint64 decisionTimeout) public {
         vm.assume((amount >= MIN_COLLATERAL_INCREASE) && (amount < address(this).balance - 1 ether));
-        vm.assume(decisionTimeout > DECISION_TIMEOUT);
+        // can finalize only after DECISION_TIMEOUT and have to keep tiemstamp in range (0, u64.max)
+        vm.assume(decisionTimeout > DECISION_TIMEOUT && decisionTimeout < type(uint64).max - block.timestamp);
 
         collateral.deposit{value: amount}();
         collateral.reclaimCollateral(amount, URL, URL_CONTENT_MD5_CHECKSUM);
