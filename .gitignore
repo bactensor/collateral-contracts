@@ -12,5 +12,8 @@ docs/
 
 # Dotenv file
 .env
-
+.venv*
 __pycache__
+
+# Screencast making files
+raw_screencasts/
