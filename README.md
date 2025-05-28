@@ -58,7 +58,7 @@ This contract creates a **trust-minimized interaction** between miners and valid
 
 ## Demo
 
-[![asciicast](https://asciinema.org/a/TwXIpf0SffBjg8mZstaFUuA2L.svg)](https://asciinema.org/a/TwXIpf0SffBjg8mZstaFUuA2L)
+[![asciicast](https://asciinema.org/a/720833.svg)](https://asciinema.org/a/720833)
 
 ## Collateral Smart Contract Lifecycle
 
