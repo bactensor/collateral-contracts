@@ -102,7 +102,11 @@ Other subnets may follow the same process — no changes are needed beyond the `
 
 #### **1. Setup with `setup_evm.sh`**
 
-Run the script on a machine that has access to your **coldkey**, to:
+Run the helper script on a machine that has access to your **coldkey**, to:
+
+```bash
+python scripts/setup_evm.py --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME> --amount-tao 1.2 
+```
 
 - **Create or reuse** an H160 wallet under `~/.bittensor/wallet/coldkey/h160/hotkey`.
 - **Transfer TAO** to the wallet:
