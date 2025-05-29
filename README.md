@@ -190,7 +190,7 @@ python scripts/deposit_collateral.py --contract-address <CONTRACT ADDRESS> --amo
 python scripts/get_miners_collateral.py --contract-address <CONTRACT ADDRESS> --miner-address <YOUR H160 ADDRESS>
 ```
 
-You should see your deposits on [Validator Dashboards on Grafana](https://internal.grafana.bactensor.io/d/validator/metagraph-validator?var-subnet=12&var-validator=5HBVrFGy6oYhhh71m9fFGYD7zbKyAeHnWN8i8s9fJTBMCtEE)
+You should see your deposits on [Validator Dashboards on Grafana](https://grafana.bactensor.io/d/validator/metagraph-validator?var-subnet=12&var-validator=5HBVrFGy6oYhhh71m9fFGYD7zbKyAeHnWN8i8s9fJTBMCtEE&viewPanel=panel-1)
 
 #### **6. Receive Tasks and Monitor the Network**
 
@@ -350,7 +350,7 @@ In rare cases where cheating is **suspected but not yet confirmed** by automatio
 - **Track Miner Collateral Usage**
   - Query each validator's contract (using, for example, a script based on [`scripts/get_collaterals.py`](/scripts/get_collaterals.py)) to see how much collateral is staked by each miner.
   - Aggregate this data into a subnet-wide dashboard for real-time oversight of miner participation.
-  - Check out the [ComputeHorde Grafana chart](https://internal.grafana.bactensor.io/d/validator/metagraph-validator?var-subnet=12&var-validator=5HBVrFGy6oYhhh71m9fFGYD7zbKyAeHnWN8i8s9fJTBMCtEE) for a real-world example.
+  - Check out the [ComputeHorde Grafana chart](https://grafana.bactensor.io/d/validator/metagraph-validator?var-subnet=12&var-validator=5HBVrFGy6oYhhh71m9fFGYD7zbKyAeHnWN8i8s9fJTBMCtEE&viewPanel=panel-1) for a real-world example.
 
 - **Facilitate Result-Based Slashing**
   
