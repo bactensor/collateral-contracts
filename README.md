@@ -186,7 +186,7 @@ Run the helper script on a machine that has access to your validator coldkey:
 
 ```bash
 # defaults: deny timeout 5: days, min collateral increase: 0.01 $Tao, network: finney
-python scripts/setup_evm.py --deploy --netuid 12 --wallet-name <COLDKEY_NAME> --wallet-hotkey <HOTKEY_NAME> --amount-tao 1
+python scripts/setup_evm.py --deploy --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME> --amount-tao 1
 ```
 
 - **Creates or reuses** a validator H160 wallet (`~/.bittensor/wallet/coldkey/h160/hotkey`):
@@ -200,14 +200,13 @@ python scripts/setup_evm.py --deploy --netuid 12 --wallet-name <COLDKEY_NAME> --
 
 #### **2. Transfer H160 Key to Validator Node**
 
-Copy the generated H160 key file (`hotkey`) to your validator machine (e.g., `sn12`).
+Copy the generated H160 key files to your validator machine.
 
 ```bash
-scp ~/.bittensor/wallet/coldkey/h160/my-hotkey <vali-host>:~/.bittensor/wallet/hotkeys/h160-my-hotkey
+scp -r ~/.bittensor/wallets/<YOUR WALLET>/h160 <YOUR VALI USERNAME>@<YOUR VALI HOST>:~/.bittensor/wallets/<YOUR WALLET>/h160
 ```
 
-
-You do **not** need to transfer the coldkey — the private key file is sufficient for all contract interactions.
+You do **not** need to transfer the coldkey — the h160 private key file is sufficient for all contract interactions.
 
 #### **3. Validator Code Uses the Contract**
 
@@ -230,17 +229,17 @@ Validators must keep their H160 wallet funded to support this:
 You can check the balance at any time:
 
 ```bash
-scripts/get_balance.py --wallet h160
+python scripts/get_balance.py <YOUR H160 ADDRESS>
 ```
 
 To top up the wallet, convert the H160 to an SS58 address:
 ```bash
-scripts/h160_to_ss58.py --h160 <YOUR_H160_ADDRESS>
+python scripts/h160_to_ss58.py <YOUR H160 ADDRESS>
 ```
 
 Then use btcli on a machine with your coldkey to transfer funds:
 ```bash
-btcli w transfer --amount 1 --recipient <SS58_FROM_ABOVE>
+btcli w transfer --amount 1 --recipient <SS58 FROM ABOVE>
 ```
 
 #### **5. Manual Slashing & Reclaim Denials (Optional)**
