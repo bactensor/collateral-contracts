@@ -91,6 +91,7 @@ Below is a typical sequence for integrating and using this collateral contract w
 
 Below are step-by-step instructions tailored to **miners**, **validators**, and **subnet owners**.
 Refer to the repository's [`scripts/`](/scripts/) folder for sample implementations and helper scripts.
+Checkout the [screencast](https://asciinema.org/a/720833) to see command-by-command example usecase.
 
 ### Recommended Miner Integration Guide (as used by ComputeHorde)
 
