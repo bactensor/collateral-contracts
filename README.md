@@ -105,6 +105,7 @@ Other subnets may follow the same process — no changes are needed beyond the `
 Run the helper script on a machine that has access to your **coldkey**, to:
 
 ```bash
+# default: network: finney
 python scripts/setup_evm.py --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME> --amount-tao 1.2 
 ```
 
@@ -124,6 +125,30 @@ To find available validators:
 - Run [`scripts/list_contracts.py`](scripts/list_contracts.py) to query your subnet’s **knowledge commitments**.
 - It will list all known validator contracts along with the collateral amount you’ve deposited (if any).
 
+```bash
+python scripts/list_contracts.py --netuid 12 --check-collateral --keyfile <YOUR KEYFILE eg. ~/.bittensor/wallet/coldkey/h160/hotkey>
+```
+
+Example output:
+```
+HotKey 5Fv6ZjjBmrQDgccS96qH18GcWLxiT2esFRfy2Hbw7AcSUyAQ
+- EVM Address: 0x77407f1709d339f5583feac922c0592e248f785f
+- Contract Address: 0x345a2942292197B7D9EbC1438213Be3e0191091D
+- My Collateral: 0 TAO
+HotKey 5EX1Httg28zxxkxYoFkgnzRbeYUGjZ8QhHUMgNd4TB2nrV6P
+- EVM Address: 0xec6f380cbdcf501d161183de0e0667bf51b3a57b
+- Contract Address: 0xb00dae256F37BCB8881b21755A46eA5260562de1
+- My Collateral: 0 TAO
+HotKey 5D1sc4pKGyL6aosSoLvV5594LrTTKdyEh5kCsgvKDr2TeyWV
+- EVM Address: 0xa4b08492d2b5d4e9181153e50e587ce73a889d02
+- Contract Address: 0x06dEDb295eac37d724A21808aca4A89c825E9850
+- My Collateral: 0 TAO
+HotKey 5EqqaqnwNLVofmrphyG5ZhQB6G5EPkVsYtZdw4UXyD4xMmjA
+- EVM Address: 0x663f9694260e0d21295a7f31826e68a8b0ab2571
+- Contract Address: 0xeb1eB8980Aa41A65657c4425BCF519eA496B1001
+- My Collateral: 0 TAO
+```
+
 #### **3. Choose Trusted Validators**
 
 - Review the listed validators and decide which ones you trust to act fairly and slash responsibly.
@@ -139,10 +164,31 @@ Before depositing:
 
 This ensures you are not locking funds into a malicious or fake contract.
 
+```bash
+python scripts/verify_contract.py --contract-address <CONTRACT ADDRESS> --expected-netuid 12 --expected-trustee <VALIDATOR H160/EVM ADDRESS>
+```
+
+Expected output:
+```
+✅ Trustee verification successful!
+✅ NetUID verification successful!
+✅ Contract verification successful!
+The deployed contract matches the source code.
+```
+
 #### **5. Deposit Collateral**
 
 - Run [`scripts/deposit_collateral.py`](scripts/deposit_collateral.py) for each validator you trust.
 - Confirm on-chain that the deposit succeeded using [`scripts/get_miners_collateral.py`](scripts/get_miners_collateral.py).
+
+```bash
+python scripts/deposit_collateral.py --contract-address <CONTRACT ADDRESS> --amount-tao 1 --trustee-address <VALIDATOR ADDRESS> --keyfile <YOUR KEYFILE>
+```
+
+```bash
+python scripts/get_miners_collateral.py --contract-address <CONTRACT ADDRESS> --miner-address <YOUR H160 ADDRESS>
+```
+
 
 #### **6. Receive Tasks and Monitor the Network**
 
