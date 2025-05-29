@@ -12,7 +12,7 @@ from address_conversion import h160_to_ss58
 from generate_keypair import generate_and_save_keypair
 from subtensor import associate_evm_key
 
-DENY_TIMEOUT = 3 * 24 * 60 * 60  # 3 days
+DENY_TIMEOUT = 5 * 24 * 60 * 60  # 5 days
 MIN_COLLATERAL_INCREASE = 10000000000000  # 0.01 TAO
 
 
