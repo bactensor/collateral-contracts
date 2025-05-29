@@ -95,7 +95,7 @@ Refer to the repository's [`scripts/`](/scripts/) folder for sample implementati
 ### Recommended Miner Integration Guide (as used by ComputeHorde)
 
 <details>
-<summary>Click to expand recommended miner setup flow</summary>
+<summary>Click to expand recommended miner setup flow and cmdline snippets</summary>
 
 This is the collateral workflow currently used by **ComputeHorde** miners.
 Other subnets may follow the same process — no changes are needed beyond the `--netuid` value in setup.
@@ -106,7 +106,7 @@ Run the script on a machine that has access to your **coldkey**, to:
 
 - **Create or reuse** an H160 wallet under `~/.bittensor/wallet/coldkey/h160/hotkey`.
 - **Transfer TAO** to the wallet:
-  - At least **1 TAO per validator** you plan to stake with (this is the current minimum for ComputeHorde).
+  - At least **0.01 TAO per validator** you plan to stake with (this is the current minimum for ComputeHorde, it will be increased to 10 TAO when we are sure we slash justly).
   - Plus additional TAO to cover **gas fees** for deposit, reclaim, and finalize transactions — we recommend **~0.2 TAO extra**.
 - **Associate** the H160 wallet with your miner hotkey on the appropriate `--netuid`.
 
@@ -175,7 +175,7 @@ When you want to exit:
 ### Recommended Validator Integration Guide (as used by ComputeHorde)
 
 <details>
-<summary>Click to expand recommended validator setup flow</summary>
+<summary>Click to expand recommended validator setup flow and cmdline snippets</summary>
 
 This is the validator integration flow currently used by the **ComputeHorde** subnet (`sn12`).
 Other subnets are encouraged to adopt the same model — only the `--netuid` parameter needs to be adjusted.
@@ -185,7 +185,8 @@ Other subnets are encouraged to adopt the same model — only the `--netuid` par
 Run the helper script on a machine that has access to your validator coldkey:
 
 ```bash
-scripts/setup_evm.sh --deploy --netuid <NETUID> --coldkey <COLDKEY> --hotkey <HOTKEY> --amount 1.0
+# defaults: deny timeout 5: days, min collateral increase: 0.01 $Tao, network: finney
+python scripts/setup_evm.py --deploy --netuid 12 --wallet-name <COLDKEY_NAME> --wallet-hotkey <HOTKEY_NAME> --amount-tao 1
 ```
 
 - **Creates or reuses** a validator H160 wallet (`~/.bittensor/wallet/coldkey/h160/hotkey`):
