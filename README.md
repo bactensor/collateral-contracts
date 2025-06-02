@@ -110,14 +110,14 @@ Run the helper script on a machine that has access to your **coldkey**, to:
 python scripts/setup_evm.py --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME> --amount-tao 1.2 
 ```
 
-- **Create or reuse** an H160 wallet under `~/.bittensor/wallet/coldkey/h160/hotkey`.
+- **Create or reuse** an H160 wallet under `~/.bittensor/wallets/coldkey/h160/hotkey`.
 - **Transfer TAO** to the wallet:
   - At least **0.01 TAO per validator** you plan to stake with (this is the current minimum for ComputeHorde, it will be increased to 10 TAO when we are sure we slash justly).
   - Plus additional TAO to cover **gas fees** for deposit, reclaim, and finalize transactions — we recommend **~0.2 TAO extra**.
 - **Associate** the H160 wallet with your miner hotkey on the appropriate `--netuid`.
 
 > Note: This is the same script validators use, but without the `--deploy` flag.
-> You do **not** need to deploy a contract or copy the private key to your miner machine.
+> You do **NOT** need to deploy a contract or copy the private key to your miner machine.
 
 #### **2. Discover Validator Contracts**
 
@@ -127,7 +127,7 @@ To find available validators:
 - It will list all known validator contracts along with the collateral amount you’ve deposited (if any).
 
 ```bash
-python scripts/list_contracts.py --netuid 12 --check-collateral --keyfile <YOUR KEYFILE eg. ~/.bittensor/wallet/coldkey/h160/hotkey>
+python scripts/list_contracts.py --netuid 12 --check-collateral --keyfile <YOUR KEYFILE eg. ~/.bittensor/wallets/coldkey/h160/hotkey>
 ```
 
 Example output:
@@ -183,7 +183,7 @@ The deployed contract matches the source code.
 - Confirm on-chain that the deposit succeeded using [`scripts/get_miners_collateral.py`](scripts/get_miners_collateral.py).
 
 ```bash
-python scripts/deposit_collateral.py --contract-address <CONTRACT ADDRESS> --amount-tao 1 --trustee-address <VALIDATOR ADDRESS> --keyfile <YOUR KEYFILE>
+python scripts/deposit_collateral.py --contract-address <CONTRACT ADDRESS> --amount-tao 1 --trustee-address <VALIDATOR H160/EVM ADDRESS> --keyfile <YOUR KEYFILE>
 ```
 
 ```bash
@@ -241,12 +241,12 @@ Run the helper script on a machine that has access to your validator coldkey:
 python scripts/setup_evm.py --deploy --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME> --amount-tao 1
 ```
 
-- **Creates or reuses** a validator H160 wallet (`~/.bittensor/wallet/coldkey/h160/hotkey`):
+- **Creates or reuses** a validator H160 wallet (`~/.bittensor/wallets/coldkey/h160/hotkey`):
   - Use `--reuse` to keep an existing identity.
   - Use `--overwrite` **with caution** – this deletes and replaces the private key (and thus access to any TAO previously sent to it).
 - **Transfers funds** to the wallet (recommended: at least **1 TAO** to start).
 - **Associates** the H160 with the validator’s SS58 hotkey on the target `--netuid`.
-- **Deploys the collateral contract** to Ethereum.
+- **Deploys the collateral contract** to subtensor.
 - If on **mainnet**, it also **verifies the contract on [evm.taostats.io](https://evm.taostats.io)** for public transparency.
 - **Publishes the contract address** as a **knowledge commitment** on-chain, enabling miners and other tools to discover and verify it.
 
