@@ -93,13 +93,28 @@ Below are step-by-step instructions tailored to **miners**, **validators**, and 
 Refer to the repository's [`scripts/`](/scripts/) folder for sample implementations and helper scripts.
 Checkout the [screencast](https://asciinema.org/a/720833) to see command-by-command example usecase.
 
-### Recommended Miner Integration Guide (as used by ComputeHorde)
+### As a Miner, you can:
 
-<details>
-<summary>Click to expand recommended miner setup flow and cmdline snippets</summary>
+- **Deposit Collateral**
+  If you plan to stake for multiple validators, simply repeat these steps for each one:
+  - Obtain the validator's contract address (usually via tools provided by the subnet owner).
+  - Verify that code deployed at the address is indeed the collateral smart contract, the trustee and netuid kept inside are as expected - see [`scripts/verify_contract.py`](/scripts/verify_contract.py).
+  - Run [`scripts/deposit_collateral.py`](/scripts/deposit_collateral.py) to initiate the deposit transaction with your specified amount of $TAO.
+  - Confirm on-chain that your collateral has been successfully locked for that validator - [`scripts/get_miners_collateral.py`](/scripts/get_miners_collateral.py)
+
+- **Reclaim Collateral**
+  - Initiate the reclaim process by running [`scripts/reclaim_collateral.py`](/scripts/reclaim_collateral.py) with your desired withdrawal amount.
+  - Wait for the validator's response or for the configured inactivity timeout to pass.
+  - If the validator does not deny your request by the deadline, run [`scripts/finalize_reclaim.py`](/scripts/finalize_reclaim.py) to unlock and retrieve your collateral.
+  - Verify on-chain that your balance has been updated accordingly.
+
+### Recommended Miner Integration Guide (as used by ComputeHorde)
 
 This is the collateral workflow currently used by **ComputeHorde** miners.
 Other subnets may follow the same process — no changes are needed beyond the `--netuid` value in setup.
+
+<details>
+<summary>Click to expand recommended miner setup flow and cmdline snippets</summary>
 
 #### **1. Setup with `setup_evm.sh`**
 
@@ -211,28 +226,41 @@ When you want to exit:
 
 </details>
 
-### As a Miner, you can:
+### As a Validator, you can:
 
-- **Deposit Collateral**
-  If you plan to stake for multiple validators, simply repeat these steps for each one:
-  - Obtain the validator's contract address (usually via tools provided by the subnet owner).
-  - Verify that code deployed at the address is indeed the collateral smart contract, the trustee and netuid kept inside are as expected - see [`scripts/verify_contract.py`](/scripts/verify_contract.py).
-  - Run [`scripts/deposit_collateral.py`](/scripts/deposit_collateral.py) to initiate the deposit transaction with your specified amount of $TAO.
-  - Confirm on-chain that your collateral has been successfully locked for that validator - [`scripts/get_miners_collateral.py`](/scripts/get_miners_collateral.py)
+- **Deploy the Contract**
+  - Install [Foundry](https://book.getfoundry.sh/).
+  - Clone this repository.
+  - Compile and deploy the contract, use [`deploy.sh`](deploy.sh) with your details as arguments.
+  - Record the deployed contract address and publish it via a subnet-owner-provided tool so that miners can discover and verify it.
 
-- **Reclaim Collateral**
-  - Initiate the reclaim process by running [`scripts/reclaim_collateral.py`](/scripts/reclaim_collateral.py) with your desired withdrawal amount.
-  - Wait for the validator's response or for the configured inactivity timeout to pass.
-  - If the validator does not deny your request by the deadline, run [`scripts/finalize_reclaim.py`](/scripts/finalize_reclaim.py) to unlock and retrieve your collateral.
-  - Verify on-chain that your balance has been updated accordingly.
+- **Enable Regular Operation**
+  - Enable the deployed contract address in your validator's code (provided by the subnet owner), so that
+    - task assignment prioritizes miners with higher collateral balances.
+    - misbehaviour checks causing slashing are automated.
+
+- **Monitor Activity**
+  - Use EVM JSON-RPC API or a blockchain explorer to view events (`Deposit`, `ReclaimProcessStarted`, `Slashed`, `Reclaimed`).
+  - Query contract mappings (`collaterals`, `reclaims`) to check staked amounts and pending reclaim requests.
+  - Maintain a local script or UI to stay updated on changes in miner collateral.
+
+- **Manually Deny a Reclaim**
+  - Identify the relevant `reclaimRequestId` (from `ReclaimProcessStarted` event, for example).
+  - Use [`scripts/deny_reclaim.py`](scripts/deny_reclaim.py) (calling the contract's `denyReclaim(reclaimRequestId)`) before the deadline.
+  - Verify on-chain that the reclaim request is removed and the miner's `hasPendingReclaim` is reset to `false`.
+
+- **Manually Slash Collateral**
+  - Confirm miner misconduct based on subnetwork rules (e.g., invalid blocks, spam, protocol violations).
+  - Use [`scripts/slash_collateral.py`](scripts/slash_collateral.py) (calling the contract's `slashCollateral(miner, slashAmount)`) to penalize the miner by reducing their staked amount.
+  - Verify the transaction on-chain and confirm the miner's `collaterals[miner]` value has changed.
 
 ### Recommended Validator Integration Guide (as used by ComputeHorde)
 
-<details>
-<summary>Click to expand recommended validator setup flow and cmdline snippets</summary>
-
 This is the validator integration flow currently used by the **ComputeHorde** subnet (`sn12`).
 Other subnets are encouraged to adopt the same model — only the `--netuid` parameter needs to be adjusted.
+
+<details>
+<summary>Click to expand recommended validator setup flow and cmdline snippets</summary>
 
 #### **1. Setup with `setup_evm.sh --deploy`**
 
@@ -306,34 +334,6 @@ In rare cases where cheating is **suspected but not yet confirmed** by automatio
 
 </details>
 
-### As a Validator, you can:
-
-- **Deploy the Contract**
-  - Install [Foundry](https://book.getfoundry.sh/).
-  - Clone this repository.
-  - Compile and deploy the contract, use [`deploy.sh`](deploy.sh) with your details as arguments.
-  - Record the deployed contract address and publish it via a subnet-owner-provided tool so that miners can discover and verify it.
-
-- **Enable Regular Operation**
-  - Enable the deployed contract address in your validator's code (provided by the subnet owner), so that
-    - task assignment prioritizes miners with higher collateral balances.
-    - misbehaviour checks causing slashing are automated.
-
-- **Monitor Activity**
-  - Use EVM JSON-RPC API or a blockchain explorer to view events (`Deposit`, `ReclaimProcessStarted`, `Slashed`, `Reclaimed`).
-  - Query contract mappings (`collaterals`, `reclaims`) to check staked amounts and pending reclaim requests.
-  - Maintain a local script or UI to stay updated on changes in miner collateral.
-
-- **Manually Deny a Reclaim**
-  - Identify the relevant `reclaimRequestId` (from `ReclaimProcessStarted` event, for example).
-  - Use [`scripts/deny_reclaim.py`](scripts/deny_reclaim.py) (calling the contract's `denyReclaim(reclaimRequestId)`) before the deadline.
-  - Verify on-chain that the reclaim request is removed and the miner's `hasPendingReclaim` is reset to `false`.
-
-- **Manually Slash Collateral**
-  - Confirm miner misconduct based on subnetwork rules (e.g., invalid blocks, spam, protocol violations).
-  - Use [`scripts/slash_collateral.py`](scripts/slash_collateral.py) (calling the contract's `slashCollateral(miner, slashAmount)`) to penalize the miner by reducing their staked amount.
-  - Verify the transaction on-chain and confirm the miner's `collaterals[miner]` value has changed.
-
 ### As a Subnet Owner, you can
 
 - **Provide Deployment Tools for Validators**
@@ -367,7 +367,6 @@ In rare cases where cheating is **suspected but not yet confirmed** by automatio
   - Reject miners who do not meet a minimum collateral requirement.
 
   By coupling task assignment with the collateral balance, the subnetwork ensures more consistent performance and discourages low-quality or malicious contributions.
-
 
 ## Full Script Reference
 
