@@ -254,40 +254,6 @@ When you want to exit:
   - Use [`scripts/slash_collateral.py`](scripts/slash_collateral.py) (calling the contract's `slashCollateral(miner, slashAmount)`) to penalize the miner by reducing their staked amount.
   - Verify the transaction on-chain and confirm the miner's `collaterals[miner]` value has changed.
 
-### As a Subnet Owner, you can
-
-- **Provide Deployment Tools for Validators**
-  
-  Offer a script <!--(e.g. built on top of [`scripts/deploy.sh`](todo-link))--> to help validators:
-  - Create H160 wallet & assosiate it with their SS58.
-  - Transfer Tao.
-  - Deploy the contract.
-  - Publish the resulting contract address (e.g., as a knowledge commitment) so miners can easily verify and deposit collateral.
-
-- **Provide Tools for Miners**
-  
-  Offer a script that retrieves a list of active validator contract addresses from your on-chain registry or other trusted source.
-  This helps miners discover the correct contract for depositing collateral.
-
-- **Track Miner Collateral Usage**
-  - Query each validator's contract (using, for example, a script based on [`scripts/get_collaterals.py`](/scripts/get_collaterals.py)) to see how much collateral is staked by each miner.
-  - Aggregate this data into a subnet-wide dashboard for real-time oversight of miner participation.
-  - Check out the [ComputeHorde Grafana chart](https://grafana.bactensor.io/d/validator/metagraph-validator?var-subnet=12&var-validator=5HBVrFGy6oYhhh71m9fFGYD7zbKyAeHnWN8i8s9fJTBMCtEE&viewPanel=panel-1) for a real-world example.
-
-- **Facilitate Result-Based Slashing**
-  
-  Provide validators with automated checks that periodically verify a small subset (e.g., 1–2%) of the miner's submissions.
-  If a miner's responses fall below the desired quality threshold, the code should call `slashCollateral()` to penalize substandard performance.
-  For example, in the [ComputeHorde SDK](https://sdk.computehorde.io/), slashing is triggered via the [`report_cheated_job()`](https://sdk.computehorde.io/master/api/client.html#compute_horde_sdk.v1.ComputeHordeClient.report_cheated_job) method.
-
-- **Facilitate Collateral Verification**
-  
-  Provide validator code that checks each miner's staked amount before assigning tasks. This code can:
-  - Prioritize miners who have staked more collateral.
-  - Reject miners who do not meet a minimum collateral requirement.
-
-  By coupling task assignment with the collateral balance, the subnetwork ensures more consistent performance and discourages low-quality or malicious contributions.
-
 ### Recommended Validator Integration Guide (as used by ComputeHorde)
 
 This is the validator integration flow currently used by the **ComputeHorde** subnet (`sn12`).
@@ -368,6 +334,39 @@ In rare cases where cheating is **suspected but not yet confirmed** by automatio
 
 </details>
 
+### As a Subnet Owner, you can
+
+- **Provide Deployment Tools for Validators**
+  
+  Offer a script <!--(e.g. built on top of [`scripts/deploy.sh`](todo-link))--> to help validators:
+  - Create H160 wallet & assosiate it with their SS58.
+  - Transfer Tao.
+  - Deploy the contract.
+  - Publish the resulting contract address (e.g., as a knowledge commitment) so miners can easily verify and deposit collateral.
+
+- **Provide Tools for Miners**
+  
+  Offer a script that retrieves a list of active validator contract addresses from your on-chain registry or other trusted source.
+  This helps miners discover the correct contract for depositing collateral.
+
+- **Track Miner Collateral Usage**
+  - Query each validator's contract (using, for example, a script based on [`scripts/get_collaterals.py`](/scripts/get_collaterals.py)) to see how much collateral is staked by each miner.
+  - Aggregate this data into a subnet-wide dashboard for real-time oversight of miner participation.
+  - Check out the [ComputeHorde Grafana chart](https://grafana.bactensor.io/d/validator/metagraph-validator?var-subnet=12&var-validator=5HBVrFGy6oYhhh71m9fFGYD7zbKyAeHnWN8i8s9fJTBMCtEE&viewPanel=panel-1) for a real-world example.
+
+- **Facilitate Result-Based Slashing**
+  
+  Provide validators with automated checks that periodically verify a small subset (e.g., 1–2%) of the miner's submissions.
+  If a miner's responses fall below the desired quality threshold, the code should call `slashCollateral()` to penalize substandard performance.
+  For example, in the [ComputeHorde SDK](https://sdk.computehorde.io/), slashing is triggered via the [`report_cheated_job()`](https://sdk.computehorde.io/master/api/client.html#compute_horde_sdk.v1.ComputeHordeClient.report_cheated_job) method.
+
+- **Facilitate Collateral Verification**
+  
+  Provide validator code that checks each miner's staked amount before assigning tasks. This code can:
+  - Prioritize miners who have staked more collateral.
+  - Reject miners who do not meet a minimum collateral requirement.
+
+  By coupling task assignment with the collateral balance, the subnetwork ensures more consistent performance and discourages low-quality or malicious contributions.
 
 ## Full Script Reference
 
