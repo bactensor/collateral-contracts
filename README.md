@@ -112,7 +112,9 @@ python scripts/setup_evm.py --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wall
 
 - **Create or reuse** an H160 wallet under `~/.bittensor/wallets/coldkey/h160/hotkey`.
 - **Transfer TAO** to the wallet:
-  - At least **0.01 TAO per validator** you plan to stake with (this is the current minimum for ComputeHorde, it will be increased to 10 TAO when we are sure we slash justly).
+  - This amount will be transferred to your H160 wallet. All further transactions (like depositing, gas fees etc.) will use the balance from this wallet. 
+    More TAO can be transferred to the H160 wallet later too.
+  - At least **0.01 TAO per validator** you plan to stake with (this is the current minimum for ComputeHorde, it will be increased to **10 TAO** when we are sure we slash justly).
   - Plus additional TAO to cover **gas fees** for deposit, reclaim, and finalize transactions — we recommend **~0.2 TAO extra**.
 - **Associate** the H160 wallet with your miner hotkey on the appropriate `--netuid`.
 
@@ -272,7 +274,7 @@ The validator code provided by the subnet owner:
 
 #### **4. Maintain Sufficient TAO for Gas**
 
-Slashing operations consume gas on Ethereum.
+Slashing operations consume gas.
 Validators must keep their H160 wallet funded to support this:
 
 - A **Grafana chart** will monitor the H160 wallet balance.
@@ -298,8 +300,8 @@ btcli w transfer --amount 1 --recipient <SS58 FROM ABOVE>
 
 In rare cases where cheating is **suspected but not yet confirmed** by automation:
 
-- You may **manually deny reclaim requests** from the suspected miner.
-- If confirmed, issue a **manual slash**.
+- You may **manually deny reclaim requests** from the suspected minerusing [scripts/deny_request.py](#contract-interaction--validators).
+- If confirmed, issue a **manual slash** using [scripts/slash_collateral.py](#contract-interaction--validators).
 - If false alarm, stop denying and allow the reclaim to proceed normally.
 
 </details>
@@ -318,7 +320,7 @@ In rare cases where cheating is **suspected but not yet confirmed** by automatio
     - misbehaviour checks causing slashing are automated.
 
 - **Monitor Activity**
-  - Use Ethereum JSON-RPC API or a blockchain explorer to view events (`Deposit`, `ReclaimProcessStarted`, `Slashed`, `Reclaimed`).
+  - Use EVM JSON-RPC API or a blockchain explorer to view events (`Deposit`, `ReclaimProcessStarted`, `Slashed`, `Reclaimed`).
   - Query contract mappings (`collaterals`, `reclaims`) to check staked amounts and pending reclaim requests.
   - Maintain a local script or UI to stay updated on changes in miner collateral.
 
