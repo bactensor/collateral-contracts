@@ -7,6 +7,28 @@
 This smart contract is **generic** and works with **any Bittensor subnet**.  
 The [usage guides](#usage-guides) below follow the integration pattern from [ComputeHorde](https://github.com/backend-developers-ltd/ComputeHorde#readme) (`sn12`) — to use it on another subnet, just run the setup scripts with a different `--netuid`.
 
+## ⚖️ A Note on Slashing Philosophy
+
+The power to slash collateral carries weight — it protects subnet quality, but also risks abuse if unchecked.  
+This contract encourages **automated enforcement** wherever possible, ensuring consistency and fairness across validators.
+
+Manual slashing is supported for edge cases where misbehavior is clear but not yet detectable by automated logic.
+However, validators should approach this capability **with restraint and responsibility**.  
+Every manual slash must be:
+
+- **Justified** — supported by strong evidence (logs, signatures, links).
+- **Transparent** — the justification URL and content hash are stored on-chain.
+- **Proportional** — reflecting the severity and intent of the violation.
+
+Whenever possible, validators are encouraged to **automate detection and slashing logic** so that actions are data-driven and reproducible.
+Automation helps ensure miners are treated consistently across validators — and enables **retroactive enforcement** without requiring on-the-spot judgment.
+
+Slashing is a **last-resort accountability tool**, not a convenience.  
+Validators who use it impulsively risk undermining miner trust — and their own reputation.
+
+This model is designed for **trust-minimized collaboration**, not permissionless aggression.  
+Use slashing to **protect the network**, not to punish disagreement.
+
 ## Overview
 
 This contract creates a **trust-minimized interaction** between miners and validators in the Bittensor ecosystem. 
@@ -24,6 +46,13 @@ This contract creates a **trust-minimized interaction** between miners and valid
 - **Arbitrary Slashing**
   
   Validators can penalize a misbehaving miner by slashing any portion of the miner's collateral.
+
+- **Justified Slashing, Not Arbitrary**
+  Validators can penalize misbehaving miners by slashing a portion of their collateral.
+  However, slashing should never be impulsive — even in manual cases, validators are expected to document and justify their actions.
+  The contract requires off-chain references for every slash event, and the community can audit these slashes to ensure they were applied fairly.
+  While automated slashing is preferred (to minimize bias and enforce consistency), validators retain the ability to act manually when necessary and provable —
+  e.g., for clear evidence of fraud, spam, or protocol violations not yet caught by automation.
 
 - **Automatic Release**
 
@@ -247,12 +276,16 @@ When you want to exit:
 - **Manually Deny a Reclaim**
   - Identify the relevant `reclaimRequestId` (from `ReclaimProcessStarted` event, for example).
   - Use [`scripts/deny_reclaim.py`](scripts/deny_reclaim.py) (calling the contract's `denyReclaim(reclaimRequestId)`) before the deadline.
-  - Verify on-chain that the reclaim request is removed and the miner's `hasPendingReclaim` is reset to `false`.
 
-- **Manually Slash Collateral**
-  - Confirm miner misconduct based on subnetwork rules (e.g., invalid blocks, spam, protocol violations).
-  - Use [`scripts/slash_collateral.py`](scripts/slash_collateral.py) (calling the contract's `slashCollateral(miner, slashAmount)`) to penalize the miner by reducing their staked amount.
-  - Verify the transaction on-chain and confirm the miner's `collaterals[miner]` value has changed.
+- **Manually Slash Collateral (With Care)**
+  - If a miner is found clearly violating subnet rules (e.g., collusion, interference with other miners or validators), 
+    you may initiate a manual slash — but only when you can **provide clear, documented evidence**.
+  - **Ideally, build automated detection mechanisms** that flag and slash such behavior retroactively. Manual intervention should be rare, reserved for edge cases or before automation is fully deployed.
+  - Every manual slash must include a justification URL and checksum pointing to off-chain evidence (e.g., signed logs, validator dashboards, forensic analysis).
+  - Use [`scripts/slash_collateral.py`](scripts/slash_collateral.py) to perform the slash and attach metadata.
+  - Manual slashes must not be used casually — all such actions are on-chain and subject to public scrutiny.
+
+
 
 ### Recommended Validator Integration Guide (as used by ComputeHorde)
 
