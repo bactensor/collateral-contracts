@@ -12,8 +12,9 @@ The [usage guides](#usage-guides) below follow the integration pattern from [Com
 The power to slash collateral carries weight — it protects subnet quality, but also risks abuse if unchecked.  
 This contract encourages **automated enforcement** wherever possible, ensuring consistency and fairness across validators.
 
-Manual slashing is supported for edge cases where misbehavior is clear but not yet detectable by automated logic.  
-However, validators should approach this capability with restraint and responsibility. Every manual slash must be:
+Manual slashing is supported for edge cases where misbehavior is clear but not yet detectable by automated logic.
+However, validators should approach this capability **with restraint and responsibility**.  
+Every manual slash must be:
 
 - **Justified** — supported by strong evidence (logs, signatures, links).
 - **Transparent** — the justification URL and content hash are stored on-chain.
@@ -277,7 +278,7 @@ When you want to exit:
   - Use [`scripts/deny_reclaim.py`](scripts/deny_reclaim.py) (calling the contract's `denyReclaim(reclaimRequestId)`) before the deadline.
 
 - **Manually Slash Collateral (With Care)**
-  - If a miner is found clearly violating subnet rules (e.g., collusion, ddos attack, ignoring small-stake validators, protocol violations), 
+  - If a miner is found clearly violating subnet rules (e.g., collusion, interference with other miners or validators), 
     you may initiate a manual slash — but only when you can **provide clear, documented evidence**.
   - **Ideally, build automated detection mechanisms** that flag and slash such behavior retroactively. Manual intervention should be rare, reserved for edge cases or before automation is fully deployed.
   - Every manual slash must include a justification URL and checksum pointing to off-chain evidence (e.g., signed logs, validator dashboards, forensic analysis).
