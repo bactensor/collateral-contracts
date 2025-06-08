@@ -30,6 +30,11 @@ def main():
         help="Deploy the Contract to the Network",
     )
     parser.add_argument(
+        "--verify",
+        action="store_true",
+        help="Verify the deployed contract with TaoStats (mainnet only)",
+    )
+    parser.add_argument(
         "--netuid",
         help="Netuid of the Subnet in the Network.",
         required=True,
@@ -176,21 +181,14 @@ def main():
             print("Collateral smart contract deployed.")
             print(f"Contract address: {contract_address}")
 
-        if args.network == "finney":
+        if args.verify:
             try:
                 print("Verifying deployed contract with evm.taostats.io.")
                 subprocess.run(
                     [
-                        "forge",
-                        "verify-contract",
-                        "--rpc-url",
-                        "https://evm.taostats.io/api/eth-rpc",
-                        "--verifier",
-                        "blockscout",
-                        "--verifier-url",
-                        "https://evm.taostats.io/api/",
+                        "bash",
+                        "./verify-with-taostats.sh",
                         contract_address,
-                        "src/Collateral.sol:Collateral"
                     ],
                     check=True,
                     cwd=pathlib.Path(__file__).parents[1],
