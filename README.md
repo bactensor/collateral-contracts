@@ -6,7 +6,7 @@
 
 This smart contract is **generic** and works with **any Bittensor subnet**.  
 The [Usage Guides](#usage-guides) below contain [ComputeHorde](https://github.com/backend-developers-ltd/ComputeHorde#readme)-specific (`sn12`) instructions, 
-but the same integration pattern can be easily adopted by other subnets — simply run the setup script a different `--netuid`.
+but the same integration pattern can be easily adopted by other subnets — simply run the setup script with a different `--netuid`.
 
 ## ⚖️ A Note on Slashing Philosophy
 
