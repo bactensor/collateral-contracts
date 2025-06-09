@@ -106,7 +106,7 @@ Below is a typical sequence for integrating and using this collateral contract w
    - Upon confirmation, miners **deposit** collateral by calling the contract's `deposit()` function.
 
 - **Slashing Misbehaving Miners**
-   - If a miner is found violating subnet rules (e.g., returning invalid responses), the validator **calls** `slashCollateral()` to penalize the miner by reducing their staked amount.
+   - If a miner is found violating subnet rules (e.g., returning invalid responses), the validator **automatically calls** `slashCollateral()` to penalize the miner by reducing their staked amount.
 
 - **Reclaiming Collateral**
    - When miners wish to withdraw their stake, they **initiate a reclaim** by calling `reclaimCollateral()`.
