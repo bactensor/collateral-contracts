@@ -367,7 +367,7 @@ Then use btcli on a machine with your coldkey to transfer funds:
 btcli w transfer --amount 1 --recipient <SS58 FROM ABOVE>
 ```
 
-#### **5. Manual Slashing & Reclaim Denials (Optional)**
+#### **5. Manual Reclaim Denials (Optional)**
 
 In rare cases where cheating is **suspected but not yet confirmed** by automation:
 
