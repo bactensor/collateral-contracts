@@ -124,6 +124,12 @@ Checkout the [screencast](https://asciinema.org/a/720833) to see command-by-comm
 
 ### As a Miner, you can:
 
+- **Prepare your EVM Identity**
+  - You do not need to deploy a contract — validators deploy their own collateral contracts.
+  - You need to create an **Ethereum (H160) identity** (wallet) and associate it with your miner's SS58 hotkey. 
+    This allows validators to reliably link deposited collateral to your miner identity.
+  - You can use `scripts/setup_evm.py` (recommended) as described [here](#recommended-miner-integration-guide-as-used-by-computehorde), or run the individual scripts manually (`generate_keypair.py`, `associate_evm_key.py`, and fund the wallet).
+
 - **Deposit Collateral**
   If you plan to stake for multiple validators, simply repeat these steps for each one:
   - Obtain the validator's contract address (usually via tools provided by the subnet owner).
@@ -323,7 +329,7 @@ python scripts/setup_evm.py --deploy --verify --netuid 12 --wallet-name <YOUR CO
 - **Transfers funds** to the wallet (recommended: at least **1 TAO** to start).
 - **Associates** the H160 with the validator’s SS58 hotkey on the target `--netuid`.
 - **Deploys the collateral contract** to subtensor.
-- If on **mainnet**, it also **verifies the contract on [evm.taostats.io](https://evm.taostats.io)** for public transparency.
+- With `--verify` (on **mainnet**), it also **verifies the contract on [evm.taostats.io](https://evm.taostats.io)** for public transparency.
 - **Publishes the contract address** as a **knowledge commitment** on-chain, enabling miners and other tools to discover and verify it.
 
 #### **2. Transfer H160 Key to Validator Node**
