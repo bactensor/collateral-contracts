@@ -308,13 +308,13 @@ Other subnets are encouraged to adopt the same model — only the `--netuid` par
 - Install [Foundry](https://book.getfoundry.sh/) (needed because `setup_evm.py`, deployment and verification scripts call Foundry tools internally).
 - Make sure `pip install -r requirements.txt` is done.
 
-#### **1. Setup with `setup_evm.sh --deploy`**
+#### **1. Setup with `setup_evm.sh --deploy --verify`**
 
 Run the helper script on a machine that has access to your validator coldkey:
 
 ```bash
 # defaults: deny timeout 5: days, min collateral increase: 0.01 $Tao, network: finney
-python scripts/setup_evm.py --deploy --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME> --amount-tao 1
+python scripts/setup_evm.py --deploy --verify --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME> --amount-tao 1
 ```
 
 - **Creates or reuses** a validator H160 wallet (`~/.bittensor/wallets/coldkey/h160/hotkey`):
