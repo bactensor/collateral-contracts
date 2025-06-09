@@ -145,6 +145,12 @@ Other subnets may follow the same process — no changes are needed beyond the `
 <details>
 <summary>Click to expand recommended miner setup flow and cmdline snippets</summary>
 
+#### **0. Prepare the environment**
+
+- Clone this repository.
+- Install [Foundry](https://book.getfoundry.sh/) (needed because verification scripts call Foundry tools internally).
+- Make sure `pip install -r requirements.txt` is done.
+
 #### **1. Setup with `setup_evm.sh`**
 
 Run the helper script on a machine that has access to your **coldkey**, to:
@@ -260,8 +266,9 @@ When you want to exit:
 - **Deploy the Contract**
   - Install [Foundry](https://book.getfoundry.sh/).
   - Clone this repository.
-  - Compile and deploy the contract, use [`deploy.sh`](deploy.sh) with your details as arguments.
+  - Compile and deploy the contract.
   - Record the deployed contract address and publish it via a subnet-owner-provided tool so that miners can discover and verify it.
+  - You can use `scripts/setup_evm.py` (recommended) as described [here](#recommended-validator-integration-guide-as-used-by-computehorde), or run `./deploy.sh` and other scripts directly if you prefer to do the steps manually.
 
 - **Enable Regular Operation**
   - Enable the deployed contract address in your validator's code (provided by the subnet owner), so that
@@ -294,6 +301,12 @@ Other subnets are encouraged to adopt the same model — only the `--netuid` par
 
 <details>
 <summary>Click to expand recommended validator setup flow and cmdline snippets</summary>
+
+#### **0. Prepare the environment**
+
+- Clone this repository.
+- Install [Foundry](https://book.getfoundry.sh/) (needed because `setup_evm.py`, deployment and verification scripts call Foundry tools internally).
+- Make sure `pip install -r requirements.txt` is done.
 
 #### **1. Setup with `setup_evm.sh --deploy`**
 
