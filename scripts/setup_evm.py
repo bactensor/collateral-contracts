@@ -181,22 +181,22 @@ def main():
             print("Collateral smart contract deployed.")
             print(f"Contract address: {contract_address}")
 
-        if args.verify:
-            try:
-                print("Verifying deployed contract with evm.taostats.io.")
-                subprocess.run(
-                    [
-                        "bash",
-                        "./verify-with-taostats.sh",
-                        contract_address,
-                    ],
-                    check=True,
-                    cwd=pathlib.Path(__file__).parents[1],
-                )
-            except subprocess.CalledProcessError as e:
-                print("Failed to verify deployed contract", file=sys.stderr)
-                print(f"Error: {e.stderr}", file=sys.stderr)
-                print("", file=sys.stderr)
+            if args.verify:
+                try:
+                    print("Verifying deployed contract with evm.taostats.io.")
+                    subprocess.run(
+                        [
+                            "bash",
+                            "./verify-with-taostats.sh",
+                            contract_address,
+                        ],
+                        check=True,
+                        cwd=pathlib.Path(__file__).parents[1],
+                    )
+                except subprocess.CalledProcessError as e:
+                    print("Failed to verify deployed contract", file=sys.stderr)
+                    print(f"Error: {e.stderr}", file=sys.stderr)
+                    print("", file=sys.stderr)
 
         try:
             print("Publishing contract address as knowledge commitment.", flush=True)
