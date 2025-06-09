@@ -5,7 +5,9 @@
 > **Design**: One collateral contract per validator and subnet.
 
 This smart contract is **generic** and works with **any Bittensor subnet**.  
-The [usage guides](#usage-guides) below follow the integration pattern from [ComputeHorde](https://github.com/backend-developers-ltd/ComputeHorde#readme) (`sn12`) — to use it on another subnet, just run the setup scripts with a different `--netuid`.
+The [Usage Guides](#usage-guids) below contain [ComputeHorde](https://github.com/backend-developers-ltd/ComputeHorde#readme)-specific (`sn12`) instructions, 
+but the same integration pattern can be easily adopted by other subnets — simply run the setup script a different `--netuid`.
+
 
 ## ⚖️ A Note on Slashing Philosophy
 
