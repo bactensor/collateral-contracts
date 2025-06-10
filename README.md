@@ -5,29 +5,29 @@
 > **Design**: One collateral contract per validator and subnet.
 
 This smart contract is **generic** and works with **any Bittensor subnet**.  
-The [usage guides](#usage-guides) below follow the integration pattern from [ComputeHorde](https://github.com/backend-developers-ltd/ComputeHorde#readme) (`sn12`) — to use it on another subnet, just run the setup scripts with a different `--netuid`.
+The [Usage Guides](#usage-guides) below contain [ComputeHorde](https://github.com/backend-developers-ltd/ComputeHorde#readme)-specific (`sn12`) instructions, 
+but the same integration pattern can be easily adopted by other subnets — simply run the setup script with a different `--netuid`.
 
 ## ⚖️ A Note on Slashing Philosophy
 
-The power to slash collateral carries weight — it protects subnet quality, but also risks abuse if unchecked.  
-This contract encourages **automated enforcement** wherever possible, ensuring consistency and fairness across validators.
+The power to slash collateral carries weight — it protects subnet quality, but also risks abuse if unchecked.
+This contract is designed for **fully automated enforcement**.
+All slashing must be triggered by **automated validator logic**, following deterministic, verifiable rules.
 
-Manual slashing is supported for edge cases where misbehavior is clear but not yet detectable by automated logic.
-However, validators should approach this capability **with restraint and responsibility**.  
-Every manual slash must be:
+To ensure trust and accountability:
 
-- **Justified** — supported by strong evidence (logs, signatures, links).
+- **Justified** — slashing must be based on strong evidence (logs, signatures, links).
 - **Transparent** — the justification URL and content hash are stored on-chain.
-- **Proportional** — reflecting the severity and intent of the violation.
+- **Proportional** — slashing amounts should reflect the severity and intent of the violation.
 
-Whenever possible, validators are encouraged to **automate detection and slashing logic** so that actions are data-driven and reproducible.
-Automation helps ensure miners are treated consistently across validators — and enables **retroactive enforcement** without requiring on-the-spot judgment.
+In the future, validators may run slashing logic on a **Trusted Execution Environment (TEE)** and submit signed proofs 
+that the logic was executed correctly on a secure VM — providing even stronger trust guarantees.
 
-Slashing is a **last-resort accountability tool**, not a convenience.  
-Validators who use it impulsively risk undermining miner trust — and their own reputation.
+When new types of miner exploits are discovered, subnet owners will release updated validator logic.
+Validators should deploy these updates and restart their validators — updated logic will then automatically catch and slash offending miners.
 
-This model is designed for **trust-minimized collaboration**, not permissionless aggression.  
-Use slashing to **protect the network**, not to punish disagreement.
+Slashing is a **safety mechanism** for **trust-minimized collaboration**, not a discretionary tool.
+Subnet owners and validators should ensure that all slashing is implemented and triggered **in code only** — not through human judgment.
 
 ## Overview
 
@@ -43,16 +43,12 @@ This contract creates a **trust-minimized interaction** between miners and valid
   Validators may choose to favor miners with higher collateral when assigning tasks, providing mild incentives for greater stakes and reliable performance.
   **Note**: Turning this into an arms race should be avoided — collateral is best used as a minimum quality filter and to break scheduling ties, not as a barrier that escalates endlessly.
 
-- **Arbitrary Slashing**
-  
-  Validators can penalize a misbehaving miner by slashing any portion of the miner's collateral.
+- **Automated Slashing**
 
-- **Justified Slashing, Not Arbitrary**
-  Validators can penalize misbehaving miners by slashing a portion of their collateral.
-  However, slashing should never be impulsive — even in manual cases, validators are expected to document and justify their actions.
-  The contract requires off-chain references for every slash event, and the community can audit these slashes to ensure they were applied fairly.
-  While automated slashing is preferred (to minimize bias and enforce consistency), validators retain the ability to act manually when necessary and provable —
-  e.g., for clear evidence of fraud, spam, or protocol violations not yet caught by automation.
+  Validators can penalize a misbehaving miner by slashing part of their collateral — but this must always be performed by **automated validator logic**.
+  This ensures enforcement is **consistent**, **auditable**, and free from validator discretion.  
+  When new miner exploits are discovered, updated validator logic can be deployed to catch and slash offending miners automatically.
+
 
 - **Automatic Release**
 
@@ -110,7 +106,7 @@ Below is a typical sequence for integrating and using this collateral contract w
    - Upon confirmation, miners **deposit** collateral by calling the contract's `deposit()` function.
 
 - **Slashing Misbehaving Miners**
-   - If a miner is found violating subnet rules (e.g., returning invalid responses), the validator **calls** `slashCollateral()` to penalize the miner by reducing their staked amount.
+   - If a miner is found violating subnet rules (e.g., returning invalid responses), the validator **automatically calls** `slashCollateral()` to penalize the miner by reducing their staked amount.
 
 - **Reclaiming Collateral**
    - When miners wish to withdraw their stake, they **initiate a reclaim** by calling `reclaimCollateral()`.
@@ -123,6 +119,12 @@ Refer to the repository's [`scripts/`](/scripts/) folder for sample implementati
 Checkout the [screencast](https://asciinema.org/a/720833) to see command-by-command example usecase.
 
 ### As a Miner, you can:
+
+- **Prepare your EVM Identity**
+  - You do not need to deploy a contract — validators deploy their own collateral contracts.
+  - You need to create an **Ethereum (H160) identity** (wallet) and associate it with your miner's SS58 hotkey. 
+    This allows validators to reliably link deposited collateral to your miner identity.
+  - You can use `scripts/setup_evm.py` (recommended) as described [here](#recommended-miner-integration-guide-as-used-by-computehorde), or run the individual scripts manually (`generate_keypair.py`, `associate_evm_key.py`, and fund the wallet).
 
 - **Deposit Collateral**
   If you plan to stake for multiple validators, simply repeat these steps for each one:
@@ -144,6 +146,12 @@ Other subnets may follow the same process — no changes are needed beyond the `
 
 <details>
 <summary>Click to expand recommended miner setup flow and cmdline snippets</summary>
+
+#### **0. Prepare the environment**
+
+- Clone this repository.
+- Install [Foundry](https://book.getfoundry.sh/) (needed because verification scripts call Foundry tools internally).
+- Make sure `pip install -r requirements.txt` is done.
 
 #### **1. Setup with `setup_evm.sh`**
 
@@ -260,8 +268,9 @@ When you want to exit:
 - **Deploy the Contract**
   - Install [Foundry](https://book.getfoundry.sh/).
   - Clone this repository.
-  - Compile and deploy the contract, use [`deploy.sh`](deploy.sh) with your details as arguments.
+  - Compile and deploy the contract.
   - Record the deployed contract address and publish it via a subnet-owner-provided tool so that miners can discover and verify it.
+  - You can use `scripts/setup_evm.py` (recommended) as described [here](#recommended-validator-integration-guide-as-used-by-computehorde), or run `./deploy.sh` and other scripts directly if you prefer to do the steps manually.
 
 - **Enable Regular Operation**
   - Enable the deployed contract address in your validator's code (provided by the subnet owner), so that
@@ -277,15 +286,10 @@ When you want to exit:
   - Identify the relevant `reclaimRequestId` (from `ReclaimProcessStarted` event, for example).
   - Use [`scripts/deny_reclaim.py`](scripts/deny_reclaim.py) (calling the contract's `denyReclaim(reclaimRequestId)`) before the deadline.
 
-- **Manually Slash Collateral (With Care)**
-  - If a miner is found clearly violating subnet rules (e.g., collusion, interference with other miners or validators), 
-    you may initiate a manual slash — but only when you can **provide clear, documented evidence**.
-  - **Ideally, build automated detection mechanisms** that flag and slash such behavior retroactively. Manual intervention should be rare, reserved for edge cases or before automation is fully deployed.
-  - Every manual slash must include a justification URL and checksum pointing to off-chain evidence (e.g., signed logs, validator dashboards, forensic analysis).
-  - Use [`scripts/slash_collateral.py`](scripts/slash_collateral.py) to perform the slash and attach metadata.
-  - Manual slashes must not be used casually — all such actions are on-chain and subject to public scrutiny.
 
-
+- **Keep Validator Software Updated**
+  - When new miner exploits are discovered, updated validator logic will be released by the subnet owner.
+  - Keeping your validator software up-to-date ensures that new automated slashing logic is deployed and running — helping to maintain network integrity.
 
 ### Recommended Validator Integration Guide (as used by ComputeHorde)
 
@@ -295,13 +299,19 @@ Other subnets are encouraged to adopt the same model — only the `--netuid` par
 <details>
 <summary>Click to expand recommended validator setup flow and cmdline snippets</summary>
 
-#### **1. Setup with `setup_evm.sh --deploy`**
+#### **0. Prepare the environment**
+
+- Clone this repository.
+- Install [Foundry](https://book.getfoundry.sh/) (needed because `setup_evm.py`, deployment and verification scripts call Foundry tools internally).
+- Make sure `pip install -r requirements.txt` is done.
+
+#### **1. Setup with `setup_evm.sh --deploy --verify`**
 
 Run the helper script on a machine that has access to your validator coldkey:
 
 ```bash
 # defaults: deny timeout 5: days, min collateral increase: 0.01 $Tao, network: finney
-python scripts/setup_evm.py --deploy --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME> --amount-tao 1
+python scripts/setup_evm.py --deploy --verify --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME> --amount-tao 1
 ```
 
 - **Creates or reuses** a validator H160 wallet (`~/.bittensor/wallets/coldkey/h160/hotkey`):
@@ -310,7 +320,7 @@ python scripts/setup_evm.py --deploy --netuid 12 --wallet-name <YOUR COLDKEY NAM
 - **Transfers funds** to the wallet (recommended: at least **1 TAO** to start).
 - **Associates** the H160 with the validator’s SS58 hotkey on the target `--netuid`.
 - **Deploys the collateral contract** to subtensor.
-- If on **mainnet**, it also **verifies the contract on [evm.taostats.io](https://evm.taostats.io)** for public transparency.
+- With `--verify` (on **mainnet**), it also **verifies the contract on [evm.taostats.io](https://evm.taostats.io)** for public transparency.
 - **Publishes the contract address** as a **knowledge commitment** on-chain, enabling miners and other tools to discover and verify it.
 
 #### **2. Transfer H160 Key to Validator Node**
@@ -357,13 +367,15 @@ Then use btcli on a machine with your coldkey to transfer funds:
 btcli w transfer --amount 1 --recipient <SS58 FROM ABOVE>
 ```
 
-#### **5. Manual Slashing & Reclaim Denials (Optional)**
+#### **5. Manual Reclaim Denials (Optional)**
 
 In rare cases where cheating is **suspected but not yet confirmed** by automation:
 
-- You may **manually deny reclaim requests** from the suspected minerusing [scripts/deny_request.py](#contract-interaction--validators).
-- If confirmed, issue a **manual slash** using [scripts/slash_collateral.py](#contract-interaction--validators).
-- If false alarm, stop denying and allow the reclaim to proceed normally.
+- You may **manually deny reclaim requests** from the suspected miner, using [scripts/deny_request.py](#contract-interaction--validators).
+- Once the investigation is complete, if cheating is confirmed:
+  - Update your validator software with the appropriate automated slashing logic (provided by the subnet owner).
+  - Allow the updated validator code to automatically perform the slashing.
+- If cheating is not confirmed, stop denying reclaim requests and allow the reclaim to proceed normally.
 
 </details>
 
