@@ -319,7 +319,7 @@ python scripts/setup_evm.py --netuid 12 --amount-tao 0 --wallet-name <YOUR COLDK
 - **Creates or reuses** a validator H160 wallet (`~/.bittensor/wallets/coldkey/h160/hotkey`):
   - Use `--reuse` to keep an existing identity.
   - Use `--overwrite` **with caution** – this deletes and replaces the private key (and thus access to any TAO previously sent to it).
-- **Associates** the H160 with the validator’s SS58 hotkey on the target `--netuid` (this requires a signature from your hotkey).
+- **Associates** the H160 with the validator’s SS58 hotkey on the target `--netuid` (this must be signed with your hotkey).
 - Prints the **SS58 address** to send TAO to.
 
 #### **2. Send TAO to that EVM address (from coldkey-controlled machine)**  
