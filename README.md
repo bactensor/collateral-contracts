@@ -159,7 +159,7 @@ Run the helper script on a machine that has access to your **coldkey**, to:
 
 ```bash
 # default: network: finney
-python scripts/setup_evm.py --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME> --amount-tao 1.2 
+python scripts/setup_evm.py --netuid 12 --amount-tao 1.2 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME> 
 ```
 
 - **Create or reuse** an H160 wallet under `~/.bittensor/wallets/coldkey/h160/hotkey`.
@@ -313,7 +313,7 @@ Run this on any machine where you have access to your hotkey:
 
 ```bash
 # defaults: network: finney
-python scripts/setup_evm.py --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME> --amount-tao 0
+python scripts/setup_evm.py --netuid 12 --amount-tao 0 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME>
 ```
 
 - **Creates or reuses** a validator H160 wallet (`~/.bittensor/wallets/coldkey/h160/hotkey`):
@@ -425,7 +425,7 @@ Run the helper script on a machine that has access to your coldkey:
 
 ```bash
 # defaults: deny timeout 5: days, min collateral increase: 0.01 TAO, network: finney
-python scripts/setup_evm.py --deploy --verify --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME> --amount-tao 0.2
+python scripts/setup_evm.py --deploy --verify --netuid 12 --amount-tao 0.2 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME>
 ```
 - **Creates or reuses** a validator H160 wallet (`~/.bittensor/wallets/coldkey/h160/hotkey`):
   - Use `--reuse` to keep an existing identity.
