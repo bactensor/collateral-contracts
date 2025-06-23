@@ -438,12 +438,12 @@ python scripts/setup_evm.py --deploy --verify --netuid 12 --amount-tao 0.2 --wal
 - **Publishes the contract address** as a **knowledge commitment** on-chain, enabling miners and other tools to discover and verify it.
 
 #### **Then continue with steps 4–8 from the recommended setup above** 
-Namely
-  4. Transfer H160 Key to Validator Node
-  5. Backup H160 Key
-  6. Validator Code Uses the Contract
-  7. Maintain Sufficient TAO for Gas
-  8. Manual Reclaim Denials (Optional)
+Namely:  
+4. Transfer H160 Key to Validator Node  
+5. Backup H160 Key  
+6. Validator Code Uses the Contract  
+7. Maintain Sufficient TAO for Gas  
+8. Manual Reclaim Denials (Optional)
 
 </details>
 
