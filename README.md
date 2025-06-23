@@ -326,10 +326,10 @@ python scripts/setup_evm.py --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wall
 On your coldkey machine:
 
 ```bash
-btcli w transfer --wallet-name <YOUR COLDKEY NAME> --recipient <SS58> --amount 1
+btcli w transfer --wallet-name <YOUR COLDKEY NAME> --recipient <SS58> --amount 0.2
 ```
 
-- Recommended: at least **1 TAO** to start (the contract deployment costs less than 0.02 TAO, and each slashing action uses around 0.0005 TAO in gas).
+- Recommended: at least **0.2 TAO** to start (the contract deployment costs less than 0.02 TAO, and each slashing action uses around 0.0005 TAO in gas).
 
 #### **3. Deploy and publish the contract with `setup_evm.sh --deploy --verify`**  
 Back on your validator (or same hotkey-accessible machine as Step 1):
@@ -390,7 +390,7 @@ python scripts/h160_to_ss58.py <YOUR H160 ADDRESS>
 
 Then use btcli on a machine with your coldkey to transfer funds:
 ```bash
-btcli w transfer --amount 1 --recipient <SS58 FROM ABOVE>
+btcli w transfer --amount 0.2 --recipient <SS58 FROM ABOVE>
 ```
 
 #### **8. Manual Reclaim Denials (Optional)**
@@ -425,13 +425,13 @@ Run the helper script on a machine that has access to your validator coldkey:
 
 ```bash
 # defaults: deny timeout 5: days, min collateral increase: 0.01 $Tao, network: finney
-python scripts/setup_evm.py --deploy --verify --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME> --amount-tao 1
+python scripts/setup_evm.py --deploy --verify --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME> --amount-tao 0.2
 ```
 - **Creates or reuses** a validator H160 wallet (`~/.bittensor/wallets/coldkey/h160/hotkey`):
   - Use `--reuse` to keep an existing identity.
   - Use `--overwrite` **with caution** – this deletes and replaces the private key (and thus access to any TAO previously sent to it).
 - **Associates** the H160 with the validator’s SS58 hotkey on the target `--netuid` (this requires to be signed with your hotkey).
-- **Transfers funds** to the wallet (recommended: at least **1 TAO** to start - the contract deployment costs less than 0.02 TAO, and each slashing action uses around 0.0005 TAO in gas)
+- **Transfers funds** to the wallet (recommended: at least **0.2 TAO** to start - the contract deployment costs less than 0.02 TAO, and each slashing action uses around 0.0005 TAO in gas)
 - **Deploys the collateral contract** to subtensor.
 - With `--verify`, it also **verifies the mainnet contract on [evm.taostats.io](https://evm.taostats.io)** for public transparency.
 - **Publishes the contract address** as a **knowledge commitment** on-chain, enabling miners and other tools to discover and verify it.
