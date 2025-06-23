@@ -153,7 +153,7 @@ Other subnets may follow the same process — no changes are needed beyond the `
 - Install [Foundry](https://book.getfoundry.sh/) (needed because verification scripts call Foundry tools internally).
 - Make sure `pip install -r requirements.txt` is done.
 
-#### **1. Setup with `setup_evm.sh`**
+#### **1. Setup with `setup_evm.py`**
 
 Run the helper script on a machine that has access to your **coldkey**, to:
 
@@ -291,7 +291,7 @@ When you want to exit:
   - When new miner exploits are discovered, updated validator logic will be released by the subnet owner.
   - Keeping your validator software up-to-date ensures that new automated slashing logic is deployed and running — helping to maintain network integrity.
 
-### Recommended Validator Integration Guide (as used by ComputeHorde)
+### Recommended Validator Integration Guide (Security-First, as used by ComputeHorde)
 
 This is the recommended security-first validator integration flow currently used by the **ComputeHorde** subnet (`sn12`).
 It doesn't require running scripts on coldkey machines.
@@ -319,7 +319,7 @@ python scripts/setup_evm.py --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wall
 - **Creates or reuses** a validator H160 wallet (`~/.bittensor/wallets/coldkey/h160/hotkey`):
   - Use `--reuse` to keep an existing identity.
   - Use `--overwrite` **with caution** – this deletes and replaces the private key (and thus access to any TAO previously sent to it).
-- **Associates** the H160 with the validator’s SS58 hotkey on the target `--netuid` (this requires to be signed with your hotkey).
+- **Associates** the H160 with the validator’s SS58 hotkey on the target `--netuid` (this requires a signature from your hotkey).
 - Prints the **SS58 address** to send TAO to.
 
 #### **2. Send TAO to that EVM address (from coldkey-controlled machine)**  
@@ -331,8 +331,8 @@ btcli w transfer --wallet-name <YOUR COLDKEY NAME> --recipient <SS58> --amount 0
 
 - Recommended: at least **0.2 TAO** to start (the contract deployment costs less than 0.02 TAO, and each slashing action uses around 0.0005 TAO in gas).
 
-#### **3. Deploy and publish the contract with `setup_evm.sh --deploy --verify`**  
-Back on your validator (or same hotkey-accessible machine as Step 1):
+#### **3. Deploy and publish the contract with `setup_evm.py --deploy --verify`**  
+Then, on your validator node (or any machine you used to execute step 1):
 
 ```bash
 # defaults: deny timeout 5: days, min collateral increase: 0.01 $Tao, network: finney
@@ -356,8 +356,8 @@ You do **not** need to transfer the coldkey — the h160 private key file is suf
 
 #### **5. Backup H160 Key**
 
-Make sure you don't loose the H160 key files. You would loose the funds and would have to deploy the contract again. 
-Miners' funds will be safe, they are able to reclaim them without your private key. 
+Make sure you don't lose the H160 key files. You would lose the funds and would have to deploy the contract again. 
+Miners’ funds remain safe — they can reclaim their collateral even if you lose your private key.
 
 #### **6. Validator Code Uses the Contract**
 
@@ -419,9 +419,9 @@ If you're comfortable running a script on your coldkey-enabled machine, you can 
 - Make sure `pip install -r requirements.txt` is done.
 
 
-#### **1. One-Step Deployment with Coldkey Machine with `setup_evm.sh --deploy --verify`**
+#### **1. One-Step Deployment with Coldkey Machine with `setup_evm.py --deploy --verify`**
 
-Run the helper script on a machine that has access to your validator coldkey:
+Run the helper script on a machine that has access to your coldkey:
 
 ```bash
 # defaults: deny timeout 5: days, min collateral increase: 0.01 $Tao, network: finney
@@ -436,7 +436,7 @@ python scripts/setup_evm.py --deploy --verify --netuid 12 --wallet-name <YOUR CO
 - With `--verify`, it also **verifies the mainnet contract on [evm.taostats.io](https://evm.taostats.io)** for public transparency.
 - **Publishes the contract address** as a **knowledge commitment** on-chain, enabling miners and other tools to discover and verify it.
 
-#### **Proceed with steps 4 through 8 of the recommended setup** 
+#### **Then continue with steps 4–8 from the recommended setup above** 
 Namely
 - 4. Transfer H160 Key to Validator Node
 - 5. Backup H160 Key
