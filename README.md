@@ -293,7 +293,9 @@ When you want to exit:
 
 ### Recommended Validator Integration Guide (as used by ComputeHorde)
 
-This is the validator integration flow currently used by the **ComputeHorde** subnet (`sn12`).
+This is the recommended security-first validator integration flow currently used by the **ComputeHorde** subnet (`sn12`).
+It doesn't require running scripts on coldkey machines.
+
 Other subnets are encouraged to adopt the same model — only the `--netuid` parameter needs to be adjusted.
 
 <details>
@@ -305,27 +307,46 @@ Other subnets are encouraged to adopt the same model — only the `--netuid` par
 - Install [Foundry](https://book.getfoundry.sh/) (needed because `setup_evm.py`, deployment and verification scripts call Foundry tools internally).
 - Make sure `pip install -r requirements.txt` is done.
 
-#### **1. Setup with `setup_evm.sh --deploy --verify`**
 
-Run the helper script on a machine that has access to your validator coldkey:
+#### **1. Generate EVM key and associate with hotkey**  
+Run this on any machine where you have access to your hotkey:
 
 ```bash
-# defaults: deny timeout 5: days, min collateral increase: 0.01 $Tao, network: finney
-python scripts/setup_evm.py --deploy --verify --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME> --amount-tao 1
+# defaults: network: finney
+python scripts/setup_evm.py --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME> --amount-tao 0
 ```
 
 - **Creates or reuses** a validator H160 wallet (`~/.bittensor/wallets/coldkey/h160/hotkey`):
   - Use `--reuse` to keep an existing identity.
   - Use `--overwrite` **with caution** – this deletes and replaces the private key (and thus access to any TAO previously sent to it).
-- **Transfers funds** to the wallet (recommended: at least **1 TAO** to start).
-- **Associates** the H160 with the validator’s SS58 hotkey on the target `--netuid`.
+- **Associates** the H160 with the validator’s SS58 hotkey on the target `--netuid` (this requires to be signed with your hotkey).
+- Prints the **SS58 address** to send TAO to.
+
+#### **2. Send TAO to that EVM address (from coldkey-controlled machine)**  
+On your coldkey machine:
+
+```bash
+btcli w transfer --wallet-name <YOUR COLDKEY NAME> --recipient <SS58> --amount 1
+```
+
+- Recommended: at least **1 TAO** to start (the contract deployment costs less than 0.02 TAO, and each slashing action uses around 0.0005 TAO in gas).
+
+#### **3. Deploy and publish the contract with `setup_evm.sh --deploy --verify`**  
+Back on your validator (or same hotkey-accessible machine as Step 1):
+
+```bash
+# defaults: deny timeout 5: days, min collateral increase: 0.01 $Tao, network: finney
+python scripts/setup_evm.py --reuse --amount-tao 0 --deploy --verify --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME>
+```
 - **Deploys the collateral contract** to subtensor.
-- With `--verify` (on **mainnet**), it also **verifies the contract on [evm.taostats.io](https://evm.taostats.io)** for public transparency.
+- With `--verify`, it also **verifies the mainnet contract on [evm.taostats.io](https://evm.taostats.io)** for public transparency.
 - **Publishes the contract address** as a **knowledge commitment** on-chain, enabling miners and other tools to discover and verify it.
 
-#### **2. Transfer H160 Key to Validator Node**
 
-Copy the generated H160 key files to your validator machine.
+#### **4. Transfer H160 Key to Validator Node**
+
+Copy the generated H160 key files to your validator machine. 
+If you used the validator machine for previous steps the key is already in the right place.
 
 ```bash
 scp -r ~/.bittensor/wallets/<YOUR WALLET>/h160 <YOUR VALI USERNAME>@<YOUR VALI HOST>:~/.bittensor/wallets/<YOUR WALLET>/h160
@@ -333,7 +354,12 @@ scp -r ~/.bittensor/wallets/<YOUR WALLET>/h160 <YOUR VALI USERNAME>@<YOUR VALI H
 
 You do **not** need to transfer the coldkey — the h160 private key file is sufficient for all contract interactions.
 
-#### **3. Validator Code Uses the Contract**
+#### **5. Backup H160 Key**
+
+Make sure you don't loose the H160 key files. You would loose the funds and would have to deploy the contract again. 
+Miners' funds will be safe, they are able to reclaim them without your private key. 
+
+#### **6. Validator Code Uses the Contract**
 
 The validator code provided by the subnet owner:
 
@@ -343,7 +369,7 @@ The validator code provided by the subnet owner:
   - Initially slashes **tiny amounts** to calibrate the logic.
   - Later increases slashing severity to discourage misbehavior.
 
-#### **4. Maintain Sufficient TAO for Gas**
+#### **7. Maintain Sufficient TAO for Gas**
 
 Slashing operations consume gas.
 Validators must keep their H160 wallet funded to support this:
@@ -367,7 +393,7 @@ Then use btcli on a machine with your coldkey to transfer funds:
 btcli w transfer --amount 1 --recipient <SS58 FROM ABOVE>
 ```
 
-#### **5. Manual Reclaim Denials (Optional)**
+#### **8. Manual Reclaim Denials (Optional)**
 
 In rare cases where cheating is **suspected but not yet confirmed** by automation:
 
@@ -376,6 +402,47 @@ In rare cases where cheating is **suspected but not yet confirmed** by automatio
   - Update your validator software with the appropriate automated slashing logic (provided by the subnet owner).
   - Allow the updated validator code to automatically perform the slashing.
 - If cheating is not confirmed, stop denying reclaim requests and allow the reclaim to proceed normally.
+
+</details>
+
+### Alternative Flow (More Convenient but Requires Coldkey Access)
+
+If you're comfortable running a script on your coldkey-enabled machine, you can use this simpler setup:
+
+<details>
+<summary>Click to expand convenient but less secure validator setup</summary>
+
+#### **0. Prepare the environment**
+
+- Clone this repository.
+- Install [Foundry](https://book.getfoundry.sh/) (needed because `setup_evm.py`, deployment and verification scripts call Foundry tools internally).
+- Make sure `pip install -r requirements.txt` is done.
+
+
+#### **1. One-Step Deployment with Coldkey Machine with `setup_evm.sh --deploy --verify`**
+
+Run the helper script on a machine that has access to your validator coldkey:
+
+```bash
+# defaults: deny timeout 5: days, min collateral increase: 0.01 $Tao, network: finney
+python scripts/setup_evm.py --deploy --verify --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME> --amount-tao 1
+```
+- **Creates or reuses** a validator H160 wallet (`~/.bittensor/wallets/coldkey/h160/hotkey`):
+  - Use `--reuse` to keep an existing identity.
+  - Use `--overwrite` **with caution** – this deletes and replaces the private key (and thus access to any TAO previously sent to it).
+- **Associates** the H160 with the validator’s SS58 hotkey on the target `--netuid` (this requires to be signed with your hotkey).
+- **Transfers funds** to the wallet (recommended: at least **1 TAO** to start - the contract deployment costs less than 0.02 TAO, and each slashing action uses around 0.0005 TAO in gas)
+- **Deploys the collateral contract** to subtensor.
+- With `--verify`, it also **verifies the mainnet contract on [evm.taostats.io](https://evm.taostats.io)** for public transparency.
+- **Publishes the contract address** as a **knowledge commitment** on-chain, enabling miners and other tools to discover and verify it.
+
+#### **Proceed with steps 4 through 8 of the recommended setup** 
+Namely
+- 4. Transfer H160 Key to Validator Node
+- 5. Backup H160 Key
+- 6. Validator Code Uses the Contract
+- 7. Maintain Sufficient TAO for Gas
+- 8. Manual Reclaim Denials (Optional)
 
 </details>
 
