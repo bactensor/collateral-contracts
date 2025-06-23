@@ -493,10 +493,9 @@ Most of them are already linked inline in the **Usage Guides** above, but this s
   - Associates it with a hotkey.
   - Optionally funds it with TAO (set `--amount-tao 0` to skip).
   - For validators, optionally deploys and verifies a new contract (`--deploy --verify`) and publishes the contract address as a knowledge commitment.
-
-> 🛡️ **Security-First Validator Setup Tip**:  
-> To avoid running scripts on your coldkey machine, run `setup_evm.py` with `--amount-tao 0`, manually transfer TAO to the printed SS58 address, then run again with `--reuse --amount-tao 0 --deploy --verify`.  
-> See [Recommended Validator Integration Guide](#recommended-validator-integration-guide-security-first-as-used-by-computehorde) for full steps.
+  - 🛡️ **Security-First Validator Setup Tip**:  
+    To avoid running scripts on your coldkey machine, run `setup_evm.py` with `--amount-tao 0`, manually transfer TAO to the printed SS58 address, then run again with `--reuse --amount-tao 0 --deploy --verify`.  
+    See [Recommended Validator Integration Guide](#recommended-validator-integration-guide-security-first-as-used-by-computehorde) for full steps.
 
 - [`send_to_ss58_precompile.py`](scripts/send_to_ss58_precompile.py) – Transfers TAO from an H160 wallet back to an SS58 address once contract interactions are complete.
 
