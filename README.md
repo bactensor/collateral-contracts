@@ -130,7 +130,7 @@ Checkout the [screencast](https://asciinema.org/a/720833) to see command-by-comm
   If you plan to stake for multiple validators, simply repeat these steps for each one:
   - Obtain the validator's contract address (usually via tools provided by the subnet owner).
   - Verify that code deployed at the address is indeed the collateral smart contract, the trustee and netuid kept inside are as expected - see [`scripts/verify_contract.py`](/scripts/verify_contract.py).
-  - Run [`scripts/deposit_collateral.py`](/scripts/deposit_collateral.py) to initiate the deposit transaction with your specified amount of $TAO.
+  - Run [`scripts/deposit_collateral.py`](/scripts/deposit_collateral.py) to initiate the deposit transaction with your specified amount of TAO.
   - Confirm on-chain that your collateral has been successfully locked for that validator - [`scripts/get_miners_collateral.py`](/scripts/get_miners_collateral.py)
 
 - **Reclaim Collateral**
@@ -335,7 +335,7 @@ btcli w transfer --wallet-name <YOUR COLDKEY NAME> --recipient <SS58> --amount 0
 Then, on your validator node (or any machine you used to execute step 1):
 
 ```bash
-# defaults: deny timeout 5: days, min collateral increase: 0.01 $Tao, network: finney
+# defaults: deny timeout 5: days, min collateral increase: 0.01 TAO, network: finney
 python scripts/setup_evm.py --reuse --amount-tao 0 --deploy --verify --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME>
 ```
 - **Deploys the collateral contract** to subtensor.
@@ -405,7 +405,7 @@ In rare cases where cheating is **suspected but not yet confirmed** by automatio
 
 </details>
 
-### Alternative Flow (More Convenient but Requires Coldkey Access)
+### Alternative Validator Integration Guide (More Convenient but Requires Coldkey Access)
 
 If you're comfortable running a script on your coldkey-enabled machine, you can use this simpler setup:
 
@@ -424,7 +424,7 @@ If you're comfortable running a script on your coldkey-enabled machine, you can 
 Run the helper script on a machine that has access to your coldkey:
 
 ```bash
-# defaults: deny timeout 5: days, min collateral increase: 0.01 $Tao, network: finney
+# defaults: deny timeout 5: days, min collateral increase: 0.01 TAO, network: finney
 python scripts/setup_evm.py --deploy --verify --netuid 12 --wallet-name <YOUR COLDKEY NAME> --wallet-hotkey <YOUR HOTKEY NAME> --amount-tao 0.2
 ```
 - **Creates or reuses** a validator H160 wallet (`~/.bittensor/wallets/coldkey/h160/hotkey`):
@@ -452,7 +452,7 @@ Namely
   
   Offer a script <!--(e.g. built on top of [`scripts/deploy.sh`](todo-link))--> to help validators:
   - Create H160 wallet & assosiate it with their SS58.
-  - Transfer Tao.
+  - Transfer TAO.
   - Deploy the contract.
   - Publish the resulting contract address (e.g., as a knowledge commitment) so miners can easily verify and deposit collateral.
 
