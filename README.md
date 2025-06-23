@@ -356,7 +356,10 @@ You do **not** need to transfer the coldkey — the h160 private key file is suf
 
 #### **5. Backup H160 Key**
 
-Make sure you don't lose the H160 key files. You would lose the funds and would have to deploy the contract again. 
+Make sure you don't lose the H160 key files.  
+
+You would lose the funds and would have to deploy the contract again. 
+
 Miners’ funds remain safe — they can reclaim their collateral even if you lose your private key.
 
 #### **6. Validator Code Uses the Contract**
