@@ -270,7 +270,7 @@ When you want to exit:
   - Clone this repository.
   - Compile and deploy the contract.
   - Record the deployed contract address and publish it via a subnet-owner-provided tool so that miners can discover and verify it.
-  - You can use `scripts/setup_evm.py` (recommended) as described [here](#recommended-validator-integration-guide-as-used-by-computehorde), or run `./deploy.sh` and other scripts directly if you prefer to do the steps manually.
+  - You can use `scripts/setup_evm.py` (recommended) as described [here](##recommended-validator-integration-guide-security-first-as-used-by-computehorde), or run `./deploy.sh` and other scripts directly if you prefer to do the steps manually.
 
 - **Enable Regular Operation**
   - Enable the deployed contract address in your validator's code (provided by the subnet owner), so that
