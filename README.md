@@ -487,7 +487,16 @@ Most of them are already linked inline in the **Usage Guides** above, but this s
 
 ### **Getting Started & Finalizing**
 
-- [`setup_evm.py`](scripts/setup_evm.py) – End-to-end setup script for both miners and validators: generates or reuses an H160 wallet, associates it with a hotkey, and funds it with TAO. Validators continue by deploying the contract and publishing its address.
+- [`setup_evm.py`](scripts/setup_evm.py) – End-to-end setup script for both miners and validators.  
+  - Generates or reuses an H160 wallet.
+  - Associates it with a hotkey.
+  - Optionally funds it with TAO (set `--amount-tao 0` to skip).
+  - For validators, optionally deploys and verifies a new contract (`--deploy --verify`) and publishes the contract address as a knowledge commitment.
+
+> 🛡️ **Security-First Validator Setup Tip**:  
+> To avoid running scripts on your coldkey machine, run `setup_evm.py` with `--amount-tao 0`, manually transfer TAO to the printed SS58 address, then run again with `--reuse --amount-tao 0 --deploy --verify`.  
+> See [Recommended Validator Integration Guide](#recommended-validator-integration-guide-security-first-as-used-by-computehorde) for full steps.
+
 - [`send_to_ss58_precompile.py`](scripts/send_to_ss58_precompile.py) – Transfers TAO from an H160 wallet back to an SS58 address once contract interactions are complete.
 
 ### **Contract Interaction – Miners**
