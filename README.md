@@ -186,7 +186,17 @@ btcli w transfer --wallet-name <YOUR COLDKEY NAME> --recipient <SS58> --amount 0
 - Recommended: At least **0.01 TAO per validator** you plan to stake with (this is the current minimum for ComputeHorde, it will be increased to **10 TAO** when we are sure we slash justly).
 
 
-#### **3. Discover Validator Contracts**
+#### **3. Check Balance of EVM wallet**
+After successfully transferring TAO to your EVM wallet, you can check balance with:
+
+```bash
+python scripts/get_balance.py <EVM ADDRESS>
+```
+
+You can find you EVM address in `~/.bittensor/wallets/<YOUR WALLET>/h160/`.
+
+
+#### **4. Discover Validator Contracts**
 
 To find available validators:
 
@@ -217,12 +227,12 @@ HotKey 5EqqaqnwNLVofmrphyG5ZhQB6G5EPkVsYtZdw4UXyD4xMmjA
 - My Collateral: 0 TAO
 ```
 
-#### **4. Choose Trusted Validators**
+#### **5. Choose Trusted Validators**
 
 - Review the listed validators and decide which ones you trust to act fairly and slash responsibly.
 - You can choose one or multiple validators — just be sure to have enough TAO for each one.
 
-#### **5. Verify Contracts**
+#### **6. Verify Contracts**
 
 Before depositing:
 
@@ -244,7 +254,7 @@ Expected output:
 The deployed contract matches the source code.
 ```
 
-#### **6. Deposit Collateral**
+#### **7. Deposit Collateral**
 
 - Run [`scripts/deposit_collateral.py`](scripts/deposit_collateral.py) for each validator you trust.
 - Confirm on-chain that the deposit succeeded using [`scripts/get_miners_collateral.py`](scripts/get_miners_collateral.py).
@@ -259,12 +269,12 @@ python scripts/get_miners_collateral.py --contract-address <CONTRACT ADDRESS> --
 
 You should see your deposits on [Validator Dashboards on Grafana](https://grafana.bactensor.io/d/validator/metagraph-validator?var-subnet=12&var-validator=5HBVrFGy6oYhhh71m9fFGYD7zbKyAeHnWN8i8s9fJTBMCtEE&viewPanel=panel-1)
 
-#### **7. Receive Tasks and Monitor the Network**
+#### **8. Receive Tasks and Monitor the Network**
 
 - You will begin receiving **organic task assignments** from validators using your staked collateral as a signal.
 - Periodically re-run `list_contracts.py` to discover new validators or updated contracts you may want to deposit into.
 
-#### **8. Reclaim and Withdraw**
+#### **9. Reclaim and Withdraw**
 
 When you want to exit:
 
@@ -344,7 +354,16 @@ btcli w transfer --wallet-name <YOUR COLDKEY NAME> --recipient <SS58> --amount 0
 
 - Recommended: at least **0.2 TAO** to start (the contract deployment costs less than 0.02 TAO, and each slashing action uses around 0.0005 TAO in gas).
 
-#### **3. Deploy and publish the contract with `setup_evm.py --deploy --verify`**  
+#### **3. Check Balance of EVM wallet**
+After successfully transferring TAO to your EVM wallet, you can check balance with:
+
+```bash
+python scripts/get_balance.py <EVM ADDRESS>
+```
+
+You can find you EVM address in `~/.bittensor/wallets/<YOUR WALLET>/h160/`.
+
+#### **4. Deploy and publish the contract with `setup_evm.py --deploy --verify`**  
 Then, on your validator node (or any machine you used to execute step 1):
 
 ```bash
@@ -356,7 +375,7 @@ python scripts/setup_evm.py --reuse --amount-tao 0 --deploy --verify --netuid 12
 - **Publishes the contract address** as a **knowledge commitment** on-chain, enabling miners and other tools to discover and verify it.
 
 
-#### **4. Transfer H160 Key to Validator Node**
+#### **5. Transfer H160 Key to Validator Node**
 
 Copy the generated H160 key files to your validator machine. 
 If you used the validator machine for previous steps the key is already in the right place.
@@ -367,13 +386,13 @@ scp -r ~/.bittensor/wallets/<YOUR WALLET>/h160 <YOUR VALI USERNAME>@<YOUR VALI H
 
 You do **not** need to transfer the coldkey — the h160 private key file is sufficient for all contract interactions.
 
-#### **5. Backup H160 Key**
+#### **6. Backup H160 Key**
 
 Make sure you don't lose the H160 key files.   
 You would lose the funds and would have to deploy the contract again.  
 Miners’ funds remain safe — they can reclaim their collateral even if you lose your private key.
 
-#### **6. Validator Code Uses the Contract**
+#### **7. Validator Code Uses the Contract**
 
 The validator code provided by the subnet owner:
 
@@ -383,7 +402,7 @@ The validator code provided by the subnet owner:
   - Initially slashes **tiny amounts** to calibrate the logic.
   - Later increases slashing severity to discourage misbehavior.
 
-#### **7. Maintain Sufficient TAO for Gas**
+#### **8. Maintain Sufficient TAO for Gas**
 
 Slashing operations consume gas.
 Validators must keep their H160 wallet funded to support this:
@@ -407,7 +426,7 @@ Then use btcli on a machine with your coldkey to transfer funds:
 btcli w transfer --amount 0.2 --recipient <SS58 FROM ABOVE>
 ```
 
-#### **8. Manual Reclaim Denials (Optional)**
+#### **9. Manual Reclaim Denials (Optional)**
 
 In rare cases where cheating is **suspected but not yet confirmed** by automation:
 
