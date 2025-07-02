@@ -168,12 +168,25 @@ python scripts/setup_evm.py --netuid 12 --amount-tao 1.2 --wallet-name <YOUR COL
     More TAO can be transferred to the H160 wallet later too.
   - At least **0.01 TAO per validator** you plan to stake with (this is the current minimum for ComputeHorde, it will be increased to **10 TAO** when we are sure we slash justly).
   - Plus additional TAO to cover **gas fees** for deposit, reclaim, and finalize transactions — we recommend **~0.2 TAO extra**.
+  - If you don't have access to your wallet coldkey on this machine, you can run this script with `--amount-tao 0`.
+    It will print the SS58 address of the EVM wallet you can manually transfer TAO to.
 - **Associate** the H160 wallet with your miner hotkey on the appropriate `--netuid`.
 
 > Note: This is the same script validators use, but without the `--deploy` flag.
 > You do **NOT** need to deploy a contract or copy the private key to your miner machine.
 
-#### **2. Discover Validator Contracts**
+#### **2. (OPTIONAL) Send TAO to that EVM address (from coldkey-controlled machine)**  
+If you used `--amount-tao 0` in the previous step, it printed the SS58 address of your EVM wallet.
+Send TAO to that wallet from your coldkey machine:
+
+```bash
+btcli w transfer --wallet-name <YOUR COLDKEY NAME> --recipient <SS58> --amount 0.2
+```
+
+- Recommended: At least **0.01 TAO per validator** you plan to stake with (this is the current minimum for ComputeHorde, it will be increased to **10 TAO** when we are sure we slash justly).
+
+
+#### **3. Discover Validator Contracts**
 
 To find available validators:
 
@@ -204,12 +217,12 @@ HotKey 5EqqaqnwNLVofmrphyG5ZhQB6G5EPkVsYtZdw4UXyD4xMmjA
 - My Collateral: 0 TAO
 ```
 
-#### **3. Choose Trusted Validators**
+#### **4. Choose Trusted Validators**
 
 - Review the listed validators and decide which ones you trust to act fairly and slash responsibly.
 - You can choose one or multiple validators — just be sure to have enough TAO for each one.
 
-#### **4. Verify Contracts**
+#### **5. Verify Contracts**
 
 Before depositing:
 
@@ -231,7 +244,7 @@ Expected output:
 The deployed contract matches the source code.
 ```
 
-#### **5. Deposit Collateral**
+#### **6. Deposit Collateral**
 
 - Run [`scripts/deposit_collateral.py`](scripts/deposit_collateral.py) for each validator you trust.
 - Confirm on-chain that the deposit succeeded using [`scripts/get_miners_collateral.py`](scripts/get_miners_collateral.py).
@@ -246,12 +259,12 @@ python scripts/get_miners_collateral.py --contract-address <CONTRACT ADDRESS> --
 
 You should see your deposits on [Validator Dashboards on Grafana](https://grafana.bactensor.io/d/validator/metagraph-validator?var-subnet=12&var-validator=5HBVrFGy6oYhhh71m9fFGYD7zbKyAeHnWN8i8s9fJTBMCtEE&viewPanel=panel-1)
 
-#### **6. Receive Tasks and Monitor the Network**
+#### **7. Receive Tasks and Monitor the Network**
 
 - You will begin receiving **organic task assignments** from validators using your staked collateral as a signal.
 - Periodically re-run `list_contracts.py` to discover new validators or updated contracts you may want to deposit into.
 
-#### **7. Reclaim and Withdraw**
+#### **8. Reclaim and Withdraw**
 
 When you want to exit:
 
