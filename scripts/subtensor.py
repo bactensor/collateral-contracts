@@ -55,4 +55,5 @@ def associate_evm_key(
         wallet,
         wait_for_inclusion=True,
         wait_for_finalization=True,
+        sign_with="hotkey",
     )
