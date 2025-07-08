@@ -143,6 +143,9 @@ def main():
                 print(f"Unable to Transfer TAO to generated EVM wallet.", file=sys.stderr)
                 sys.exit(1)
 
+        else:
+            print(f"Transfer Tao to `{h160_to_ss58(keypair['address'])}` in order to top up {keypair['address']}.", flush=True)
+
         if not args.deploy:
             return
 
