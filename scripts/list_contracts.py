@@ -86,6 +86,7 @@ async def main():
 
             try:
                 evm_address = associations[validators[hotkey]]
+                evm_address = w3.to_checksum_address(evm_address)
             except KeyError:
                 evm_address = "?"
 
@@ -99,7 +100,7 @@ async def main():
                 continue
 
             print(f"HotKey {hotkey}")
-            print(f"- EVM Address: 0x{evm_address}")
+            print(f"- EVM Address: {evm_address}")
             print(f"- Contract Address: {contract_address}")
 
             # collateral checking is a blocking function so we make it optional

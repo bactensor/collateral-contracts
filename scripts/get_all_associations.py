@@ -4,6 +4,7 @@ import sys
 import bittensor
 
 from common import get_evm_key_associations
+from web3 import Web3
 
 
 def main() -> None:
@@ -28,7 +29,7 @@ def main() -> None:
         print("-----|--------------------------------------------------|-------------------------------------------")
         for uid in sorted(associations.keys()):
             hotkey = uid_to_hotkey_map.get(uid, "Unknown")
-            evm_address = associations[uid]
+            evm_address = Web3.to_checksum_address(associations[uid])
             print(f"{uid:4} | {hotkey:48} | {evm_address}")
 
 
