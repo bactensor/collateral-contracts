@@ -1,5 +1,4 @@
 import argparse
-import json
 import sys
 
 import bittensor
@@ -7,24 +6,7 @@ import bittensor.utils
 import bittensor_wallet
 
 from common import validate_address_format
-
-def publish_contract_address(subtensor, wallet, netuid, contract_address):
-    try:
-        print("Publishing contract address as knowledge commitment.", flush=True)
-        subtensor.commit(
-            wallet,
-            netuid=netuid,
-            data=json.dumps(
-                {
-                    "contract": {
-                        "address": contract_address,
-                    },
-                }
-            ),
-        )
-    except bittensor.MetadataError as e:
-        print(f"Unable to Publish Contract Address. {e}", file=sys.stderr)
-        sys.exit(1)
+from subtensor import publish_contract_address as publish_contract_address_onchain
 
 
 def main():
@@ -76,8 +58,16 @@ def main():
     with bittensor.Subtensor(
         network=network_url,
     ) as subtensor:
-
-        publish_contract_address(subtensor, wallet, args.netuid, args.contract_address)
+        try:
+            publish_contract_address_onchain(
+                subtensor,
+                wallet,
+                args.netuid,
+                args.contract_address,
+            )
+        except bittensor.MetadataError as e:
+            print(f"Unable to Publish Contract Address. {e}", file=sys.stderr)
+            sys.exit(1)
 
 
 if __name__ == "__main__":

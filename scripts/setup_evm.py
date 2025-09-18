@@ -10,7 +10,7 @@ import bittensor.utils
 import bittensor_wallet
 from address_conversion import h160_to_ss58
 from generate_keypair import generate_and_save_keypair
-from subtensor import associate_evm_key
+from subtensor import associate_evm_key, publish_contract_address as publish_contract_address_onchain
 
 DENY_TIMEOUT = 5 * 24 * 60 * 60  # 5 days
 MIN_COLLATERAL_INCREASE = 10000000000000  # 0.01 TAO
@@ -203,16 +203,11 @@ def main():
 
         try:
             print("Publishing contract address as knowledge commitment.", flush=True)
-            subtensor.commit(
+            publish_contract_address_onchain(
+                subtensor,
                 wallet,
-                netuid=args.netuid,
-                data=json.dumps(
-                    {
-                        "contract": {
-                            "address": contract_address,
-                        },
-                    }
-                ),
+                args.netuid,
+                contract_address,
             )
         except bittensor.MetadataError as e:
             print(f"Unable to Publish Contract Address. {e}", file=sys.stderr)
