@@ -71,6 +71,11 @@ def main():
         default=MIN_COLLATERAL_INCREASE,
         help="Minimum collateral increase for miners for deposits in Wei. Default is 10000000000000, which is 0.01 TAO.",
     )
+    parser.add_argument(
+        "--skip-association",
+        action="store_true",
+        help="Don't try associating the EVM key with your hotkey"
+    )
     override_or_reuse = parser.add_mutually_exclusive_group()
     override_or_reuse.add_argument(
         "--overwrite",
@@ -117,17 +122,19 @@ def main():
     with bittensor.Subtensor(
         network=network_url,
     ) as subtensor:
-        print(f"Associating {keypair['address']} with your hotkey.", flush=True)
-        success, error = associate_evm_key(
-            subtensor,
-            wallet,
-            keypair["private_key"],
-            args.netuid,
-        )
+        
+        if not args.skip_association:
+            print(f"Associating {keypair['address']} with your hotkey.", flush=True)
+            success, error = associate_evm_key(
+                subtensor,
+                wallet,
+                keypair["private_key"],
+                args.netuid,
+            )
 
-        if not success:
-            print(f"Unable to Associate EVM Key. {error}", file=sys.stderr)
-            sys.exit(1)
+            if not success:
+                print(f"Unable to Associate EVM Key. {error}", file=sys.stderr)
+                sys.exit(1)
 
         if args.amount_tao > 0:
             print(f"Transfering {args.amount_tao} to {keypair['address']}.", flush=True)
