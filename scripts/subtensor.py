@@ -1,3 +1,5 @@
+import json
+
 import bittensor
 import bittensor_wallet
 import eth_account
@@ -56,4 +58,25 @@ def associate_evm_key(
         wait_for_inclusion=True,
         wait_for_finalization=True,
         sign_with="hotkey",
+    )
+
+
+def publish_contract_address(
+    subtensor: bittensor.Subtensor,
+    wallet: bittensor_wallet.Wallet,
+    netuid: int,
+    contract_address: str,
+) -> None:
+    """Publish the collateral contract address as a knowledge commitment."""
+
+    subtensor.commit(
+        wallet,
+        netuid=netuid,
+        data=json.dumps(
+            {
+                "contract": {
+                    "address": contract_address,
+                },
+            }
+        ),
     )
