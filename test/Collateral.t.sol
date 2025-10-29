@@ -290,8 +290,9 @@ contract CollateralTest is CollateralTestBase {
         verifyReclaim(2, DEPOSITOR1, 1 ether, block.timestamp + DECISION_TIMEOUT);
     }
 
-    function test_finalizeReclaim_DeletesReclaimRequestAndDoesNotReturnCollateralIfMinerGotCollateralSlashedBelowReclaimAmount(
-    ) public {
+    function test_finalizeReclaim_DeletesReclaimRequestAndDoesNotReturnCollateralIfMinerGotCollateralSlashedBelowReclaimAmount()
+        public
+    {
         vm.startPrank(DEPOSITOR1);
         collateral.deposit{value: 2 ether}();
 
