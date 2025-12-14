@@ -62,10 +62,14 @@ contract Collateral {
     }
 
     modifier onlyTrustee() {
+        _onlyTrustee();
+        _;
+    }
+
+    function _onlyTrustee() internal view {
         if (msg.sender != TRUSTEE) {
             revert NotTrustee();
         }
-        _;
     }
 
     // Allow deposits only via deposit() function
@@ -118,7 +122,11 @@ contract Collateral {
         }
 
         uint64 expirationTime = uint64(block.timestamp) + DECISION_TIMEOUT;
-        reclaims[++nextReclaimId] = Reclaim(msg.sender, amount, expirationTime);
+        reclaims[++nextReclaimId] = Reclaim({
+            miner: msg.sender,
+            amount: amount,
+            denyTimeout: expirationTime
+        });
         collateralUnderPendingReclaims[msg.sender] += amount;
 
         emit ReclaimProcessStarted(nextReclaimId, msg.sender, amount, expirationTime, url, urlContentMd5Checksum);
