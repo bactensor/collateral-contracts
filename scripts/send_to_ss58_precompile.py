@@ -82,8 +82,18 @@ def main():
     args = parser.parse_args()
 
     w3 = get_web3_connection(args.network)
+    print(f"Using network: {args.network}")
     account = get_account(args.keyfile)
+    balance = w3.eth.get_balance(account.address)
+    gas_price = w3.eth.gas_price
     print(f"Using account: {account.address}")
+    print(f"Current balance: {balance} wei ({w3.from_wei(balance, 'ether')} TAO)")
+    est_gas = 120000
+    needed = gas_price * est_gas + args.amount_wei
+    if balance < needed:
+        raise SystemExit(
+            f"Insufficient funds: need at least {needed} wei (~gasPrice {gas_price}, gas {est_gas}, value {args.amount_wei})"
+        )
 
     receipt = send_tao_to_ss58(
         w3=w3,
